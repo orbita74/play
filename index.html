@@ -183,15 +183,20 @@
     gap: 7px;
   }
 
-  .btn-swiss:hover {
+  .btn-swiss:hover:not(:disabled) {
     background: var(--paper-deep);
     transform: translate(-1px, -1px);
     box-shadow: 4px 4px 0px var(--ink);
   }
 
-  .btn-swiss:active {
+  .btn-swiss:active:not(:disabled) {
     transform: translate(3px, 3px);
     box-shadow: 0px 0px 0px var(--ink);
+  }
+
+  .btn-swiss:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
   }
 
   .btn-primary {
@@ -204,9 +209,23 @@
     box-shadow: var(--shadow-hard);
   }
 
-  .btn-primary:hover {
+  .btn-primary:hover:not(:disabled) {
     background: #C9321B;
     box-shadow: 6px 6px 0px var(--ink);
+  }
+
+  .btn-gold {
+    background: var(--ochre);
+    color: var(--ink);
+    font-family: var(--font-display);
+    font-size: 13px;
+    letter-spacing: 0.04em;
+    padding: 11px 16px;
+    box-shadow: var(--shadow-sm);
+  }
+
+  .btn-gold:hover:not(:disabled) {
+    background: #D49117;
   }
 
   /* Overlay Screens */
@@ -227,8 +246,8 @@
 
   .hub-shell {
     width: 100%;
-    max-width: 780px;
-    max-height: 90vh;
+    max-width: 840px;
+    max-height: 92vh;
     background: var(--paper-elevated);
     border: 3px solid var(--ink);
     box-shadow: 10px 10px 0px var(--ink);
@@ -443,33 +462,97 @@
     margin-top: 2px;
   }
 
-  /* ATELIER */
+  /* =========================================================
+     ATELIER INSPECTOR + CATALOG LAYOUT
+     ========================================================= */
   .atelier-layout {
     display: grid;
-    grid-template-columns: 215px 1fr;
-    gap: 16px;
+    grid-template-columns: 275px 1fr;
+    gap: 18px;
+    align-items: start;
   }
 
-  @media (max-width: 660px) {
+  @media (max-width: 720px) {
     .atelier-layout { grid-template-columns: 1fr; }
   }
 
-  .preview-stage-box {
-    border: 2px solid var(--ink);
+  .inspector-panel {
+    border: 2.5px solid var(--ink);
     background: var(--paper);
-    padding: 12px;
+    padding: 14px;
+    box-shadow: var(--shadow-sm);
     display: flex;
     flex-direction: column;
-    align-items: center;
-    justify-content: space-between;
     gap: 10px;
+    position: sticky;
+    top: 0;
   }
+
+  .inspector-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    border-bottom: 1.5px solid var(--ink);
+    padding-bottom: 6px;
+  }
+
+  .tier-badge {
+    padding: 2px 6px;
+    border: 1.5px solid var(--ink);
+    font-size: 9.5px;
+    background: var(--paper-elevated);
+    color: var(--ink);
+  }
+  .tier-badge.legendary { background: var(--ochre); color: var(--ink); }
+  .tier-badge.masterwork { background: var(--vermilion); color: #fff; }
+  .tier-badge.atelier { background: var(--cobalt); color: #fff; }
 
   canvas#atelier-preview {
     width: 100%;
     height: 175px;
-    border: 1.5px solid var(--ink);
+    border: 2px solid var(--ink);
     background: var(--paper-elevated);
+    display: block;
+  }
+
+  .inspector-title {
+    font-family: var(--font-display);
+    font-size: 18px;
+    line-height: 1.1;
+    color: var(--ink);
+  }
+
+  .inspector-desc {
+    font-size: 11.5px;
+    line-height: 1.4;
+    color: var(--ink-soft);
+  }
+
+  .inspector-specs {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px;
+    border-top: 1px dashed rgba(23,22,20,0.3);
+    border-bottom: 1px dashed rgba(23,22,20,0.3);
+    padding: 8px 0;
+    font-size: 10.5px;
+  }
+
+  .spec-cell span {
+    display: block;
+    font-size: 9px;
+    color: var(--ink-muted);
+    text-transform: uppercase;
+  }
+
+  .spec-cell strong {
+    color: var(--ink);
+    font-weight: 700;
   }
 
   .shop-section-title {
@@ -485,20 +568,21 @@
 
   .shop-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-    gap: 10px;
+    grid-template-columns: repeat(auto-fill, minmax(145px, 1fr));
+    gap: 9px;
     margin-bottom: 16px;
   }
 
   .shop-item {
     border: 2px solid var(--ink);
     background: var(--paper);
-    padding: 10px;
+    padding: 9px 10px;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    gap: 8px;
+    gap: 7px;
     cursor: pointer;
+    transition: transform 0.08s ease, box-shadow 0.08s ease, background-color 0.1s ease;
   }
 
   .shop-item:hover {
@@ -506,16 +590,18 @@
     box-shadow: 3px 3px 0 var(--ink);
   }
 
-  .shop-item.equipped {
+  .shop-item.inspected {
     background: var(--paper-elevated);
-    box-shadow: inset 0 0 0 2px var(--vermilion);
+    box-shadow: 0 0 0 2px var(--cobalt), 4px 4px 0 var(--ink);
+    border-color: var(--cobalt);
   }
 
   .shop-item-top {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    font-size: 10px;
+    font-size: 9.5px;
+    font-weight: 700;
     color: var(--ink-muted);
   }
 
@@ -525,31 +611,104 @@
     line-height: 1.2;
   }
 
-  .shop-item-desc {
-    font-size: 10.5px;
-    color: var(--ink-soft);
-    line-height: 1.3;
-  }
-
-  .shop-item-btn {
-    width: 100%;
-    padding: 5px 8px;
-    font-family: var(--font-mono);
+  .status-pill {
+    font-size: 9.5px;
     font-weight: 700;
-    font-size: 10.5px;
     text-transform: uppercase;
+    padding: 3px 6px;
     border: 1.5px solid var(--ink);
-    background: var(--paper-elevated);
-    cursor: pointer;
+    text-align: center;
+    background: var(--paper-deep);
+    color: var(--ink);
   }
 
-  .shop-item.equipped .shop-item-btn {
+  .status-pill.equipped {
     background: var(--vermilion);
     color: #fff;
   }
 
-  .shop-item.locked .shop-item-btn {
+  .status-pill.owned {
+    background: var(--paper-elevated);
+    color: var(--sage);
+    border-color: var(--sage);
+  }
+
+  .status-pill.locked {
     background: var(--ochre-soft);
+    color: var(--ink);
+  }
+
+  /* =========================================================
+     PURCHASE CONFIRMATION MODAL
+     ========================================================= */
+  .confirm-backdrop {
+    position: absolute;
+    inset: 0;
+    z-index: 35;
+    background: rgba(23, 22, 20, 0.55);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 18px;
+  }
+
+  .confirm-backdrop.hidden {
+    display: none;
+  }
+
+  .confirm-card {
+    width: 100%;
+    max-width: 420px;
+    background: var(--paper-elevated);
+    border: 3px solid var(--ink);
+    box-shadow: 10px 10px 0px var(--ink);
+    padding: 22px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .confirm-kicker {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    color: var(--vermilion);
+    text-transform: uppercase;
+  }
+
+  .confirm-title {
+    font-family: var(--font-display);
+    font-size: 22px;
+    line-height: 1.1;
+  }
+
+  .confirm-ledger {
+    border: 2px solid var(--ink);
+    background: var(--paper);
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    font-size: 12px;
+  }
+
+  .ledger-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .ledger-row.total {
+    border-top: 1.5px solid var(--ink);
+    padding-top: 8px;
+    font-weight: 700;
+    font-size: 13px;
+  }
+
+  .confirm-actions {
+    display: grid;
+    grid-template-columns: 1fr 1.35fr;
+    gap: 10px;
   }
 
   /* MISSIONS */
@@ -682,7 +841,7 @@
     font-size: 12px;
     font-weight: 700;
     letter-spacing: 0.05em;
-    z-index: 40;
+    z-index: 45;
     pointer-events: none;
     transition: transform 0.25s ease;
     box-shadow: 4px 4px 0 var(--vermilion);
@@ -796,7 +955,7 @@
 
               <div class="mini-stat">
                 <div class="mini-stat-label">Equipped Configuration</div>
-                <div style="font-size:12px; font-weight:700; margin-top:4px;" id="equipped-summary">01 MONOLITH + VERMILION INK</div>
+                <div style="font-size:12px; font-weight:700; margin-top:4px;" id="equipped-summary">01 MONOLITH + VERMILION RIBBON</div>
               </div>
 
               <button class="btn-swiss btn-primary" id="btn-launch" type="button" style="width:100%;">LAUNCH VESSEL →</button>
@@ -804,30 +963,44 @@
           </div>
         </div>
 
-        <!-- TAB 2: ATELIER -->
+        <!-- TAB 2: ATELIER (2-STEP INSPECT -> BUY -> CONFIRM) -->
         <div class="tab-panel" id="tab-atelier">
           <div class="atelier-layout">
-            <div class="preview-stage-box">
-              <div class="shop-section-title" style="width:100%; margin-bottom:0;">
-                <span>Live Wind Tunnel</span>
-                <span>FIG. 2</span>
+            <!-- LEFT: LIVE WIND-TUNNEL INSPECTOR -->
+            <div class="inspector-panel">
+              <div class="inspector-header">
+                <span id="insp-code">BLUEPRINT · 01</span>
+                <span class="tier-badge" id="insp-tier">STANDARD</span>
               </div>
-              <canvas id="atelier-preview" width="240" height="190"></canvas>
-              <div style="font-size:11px; color:var(--ink-soft); text-align:center;" id="preview-caption">
-                Calibrated flight path preview
+              <canvas id="atelier-preview" width="260" height="175"></canvas>
+              <div>
+                <div class="inspector-title" id="insp-name">01 Monolith</div>
+                <div class="inspector-desc" id="insp-desc">Balanced Bauhaus delta wing with twin ion thrusters.</div>
               </div>
+              <div class="inspector-specs">
+                <div class="spec-cell">
+                  <span>Category</span>
+                  <strong id="insp-cat">Vessel Chassis</strong>
+                </div>
+                <div class="spec-cell">
+                  <span>Signature Feature</span>
+                  <strong id="insp-feat">Twin Ion Flare</strong>
+                </div>
+              </div>
+              <button class="btn-swiss btn-gold" id="insp-action-btn" type="button" style="width:100%;">EQUIPPED</button>
             </div>
 
+            <!-- RIGHT: COSMETICS CATALOG -->
             <div>
               <div class="shop-section-title">
-                <span>Vessel Chassis (6)</span>
-                <span>Select or Unlock</span>
+                <span>Vessel Chassis (Click to Inspect)</span>
+                <span>6 Blueprints</span>
               </div>
               <div class="shop-grid" id="shop-ships"></div>
 
               <div class="shop-section-title">
-                <span>Ink Trail Formulation (6)</span>
-                <span>Select or Unlock</span>
+                <span>Ink Trail Formulations (Click to Inspect)</span>
+                <span>6 Formulations</span>
               </div>
               <div class="shop-grid" id="shop-trails"></div>
             </div>
@@ -884,6 +1057,37 @@
     </div>
   </div>
 
+  <!-- PURCHASE CONFIRMATION MODAL -->
+  <div class="confirm-backdrop hidden" id="confirm-modal">
+    <div class="confirm-card">
+      <div>
+        <div class="confirm-kicker">Atelier Requisition</div>
+        <div class="confirm-title">CONFIRM PURCHASE</div>
+      </div>
+      <div style="font-size:12.5px; color:var(--ink-soft);" id="confirm-item-summary">
+        Acquire <strong>02 Valkyrie</strong> for your observatory fleet?
+      </div>
+      <div class="confirm-ledger">
+        <div class="ledger-row">
+          <span>Current Ink Balance</span>
+          <strong id="confirm-bal-before">100 INK</strong>
+        </div>
+        <div class="ledger-row" style="color:var(--vermilion);">
+          <span>Requisition Cost</span>
+          <strong id="confirm-cost">-80 INK</strong>
+        </div>
+        <div class="ledger-row total">
+          <span>Remaining Balance</span>
+          <strong id="confirm-bal-after">20 INK</strong>
+        </div>
+      </div>
+      <div class="confirm-actions">
+        <button class="btn-swiss" id="btn-confirm-cancel" type="button">CANCEL</button>
+        <button class="btn-swiss btn-primary" id="btn-confirm-yes" type="button" style="padding:11px 14px; font-size:13px;">CONFIRM BUY ✓</button>
+      </div>
+    </div>
+  </div>
+
   <!-- GAME OVER OVERLAY -->
   <div class="overlay-backdrop hidden" id="gameover-overlay">
     <div class="gameover-card">
@@ -915,22 +1119,121 @@
 
 <script>
 function bootOrbita() {
+  /* =========================================================
+     1. UPGRADED ATELIER CATALOG (6 MULTI-PART VESSELS + 6 TRAILS)
+     ========================================================= */
   const SHIPS = [
-    { id: 'monolith',  code: '01', name: 'Monolith',  cost: 0,   desc: 'Balanced Bauhaus delta wedge.' },
-    { id: 'concorde',  code: '02', name: 'Concorde',  cost: 60,  desc: 'Needle-nose supersonic dart.' },
-    { id: 'sputnik',   code: '03', name: 'Sputnik',   cost: 120, desc: 'Brass sphere with swept antennae.' },
-    { id: 'vector',    code: '04', name: 'Vector',    cost: 200, desc: 'Forward-swept twin-fin interceptor.' },
-    { id: 'astrolabe', code: '05', name: 'Astrolabe', cost: 300, desc: 'Counter-rotating brass gimbal ring.' },
-    { id: 'valkyrie',  code: '06', name: 'Valkyrie',  cost: 450, desc: 'Articulated folding-wing glider.' }
+    {
+      id: 'monolith',
+      code: '01',
+      name: 'Monolith',
+      tier: 'STANDARD',
+      feat: 'Twin Ion Thrusters',
+      cost: 0,
+      desc: 'Crisp Bauhaus delta wing with vermilion core and pulsing twin ion thrusters.'
+    },
+    {
+      id: 'valkyrie',
+      code: '02',
+      name: 'Valkyrie',
+      tier: 'ATELIER',
+      feat: 'Variable Folding Wings',
+      cost: 75,
+      desc: 'Forward-canard interceptor with articulated swing-wings that sweep back at speed.'
+    },
+    {
+      id: 'chronograph',
+      code: '03',
+      name: 'Chronograph',
+      tier: 'ATELIER',
+      feat: 'Ticking Tourbillon Gears',
+      cost: 140,
+      desc: 'Horological brass & enamel craft with a visible ticking escapement wheel and balance ring.'
+    },
+    {
+      id: 'seraph',
+      code: '04',
+      name: 'Seraph',
+      tier: 'MASTERWORK',
+      feat: 'Articulated Origami Vanes',
+      cost: 220,
+      desc: 'Multi-layered celestial prism craft with animated golden wing-vanes and solar halo.'
+    },
+    {
+      id: 'hyperion',
+      code: '05',
+      name: 'Hyperion',
+      tier: 'MASTERWORK',
+      feat: 'Suspended Plasma Core',
+      cost: 320,
+      desc: 'Twin-hull catamaran railgun vessel with an energized magnetic arc suspended between pontoons.'
+    },
+    {
+      id: 'sovereign',
+      code: '06',
+      name: 'Sovereign',
+      tier: 'LEGENDARY',
+      feat: 'Orbiting Escort Drone',
+      cost: 460,
+      desc: 'Prestige gold-trimmed flagship escorted by a miniature orbiting brass satellite drone.'
+    }
   ];
 
   const TRAILS = [
-    { id: 'vermilion', code: 'T1', name: 'Vermilion Ink',   cost: 0,   desc: 'Classic silkscreen vermilion ribbon.' },
-    { id: 'ticks',     code: 'T2', name: 'Telemetry Ticks', cost: 50,  desc: 'Drafting ruler hash marks.' },
-    { id: 'halftone',  code: 'T3', name: 'Halftone Dots',   cost: 110, desc: 'Stepped lithograph ink spheres.' },
-    { id: 'prism',     code: 'T4', name: 'Bauhaus Triad',   cost: 180, desc: 'Vermilion, ochre & cobalt stripes.' },
-    { id: 'stardust',  code: 'T5', name: 'Gold Leaf',       cost: 260, desc: 'Glittering ochre diamond flecks.' },
-    { id: 'sonic',     code: 'T6', name: 'Sonic Rings',     cost: 380, desc: 'Expanding acoustic pressure rings.' }
+    {
+      id: 'vermilion',
+      code: 'T1',
+      name: 'Vermilion Ribbon',
+      tier: 'STANDARD',
+      feat: 'Calligraphic Ink Drops',
+      cost: 0,
+      desc: 'Tapered silkscreen vermilion brush stroke with trailing ink splatter droplets.'
+    },
+    {
+      id: 'golden_ratio',
+      code: 'T2',
+      name: 'Golden Ratio',
+      tier: 'ATELIER',
+      feat: 'Fibonacci Compass Ticks',
+      cost: 65,
+      desc: 'Architectural drafting line punctuated by rotating golden-ratio compass arcs.'
+    },
+    {
+      id: 'constellation',
+      code: 'T3',
+      name: 'Constellation',
+      tier: 'ATELIER',
+      feat: 'Star-Chart Triangulation',
+      cost: 130,
+      desc: 'Celestial astrolabe nodes linked by hairline coordinates and gleaming ochre stars.'
+    },
+    {
+      id: 'prism',
+      code: 'T4',
+      name: 'Bauhaus Prism',
+      tier: 'MASTERWORK',
+      feat: 'Tri-Color Chevrons',
+      cost: 210,
+      desc: 'Overlapping vermilion, ochre & cobalt silkscreen ribbons with crisp vector chevrons.'
+    },
+    {
+      id: 'eclipse',
+      code: 'T5',
+      name: 'Eclipse Corona',
+      tier: 'MASTERWORK',
+      feat: 'Gold-Leaf Solar Embers',
+      cost: 300,
+      desc: 'Obsidian ink core rimmed with shimmering gold-leaf embers and solar flare rings.'
+    },
+    {
+      id: 'supernova',
+      code: 'T6',
+      name: 'Supernova Wake',
+      tier: 'LEGENDARY',
+      feat: 'Chromatic Shock Rings',
+      cost: 420,
+      desc: 'Radiant multi-spectral shock rings, diamond glints, and high-energy afterimages.'
+    }
   ];
 
   const MISSION_POOL = [
@@ -943,7 +1246,7 @@ function bootOrbita() {
   ];
 
   const DEFAULT_SAVE = {
-    ink: 40,
+    ink: 100, // Starter Ink so player can immediately test Inspect -> Buy -> Confirm!
     bestScore: 0,
     totalGrazes: 0,
     unlockedShips: ['monolith'],
@@ -966,7 +1269,7 @@ function bootOrbita() {
 
   function loadSave() {
     try {
-      const raw = window.localStorage.getItem('orbita74_save_v5');
+      const raw = window.localStorage.getItem('orbita74_save_v6');
       if (!raw) return JSON.parse(JSON.stringify(DEFAULT_SAVE));
       const parsed = JSON.parse(raw);
       return {
@@ -983,12 +1286,19 @@ function bootOrbita() {
 
   function persist() {
     try {
-      window.localStorage.setItem('orbita74_save_v5', JSON.stringify(save));
+      window.localStorage.setItem('orbita74_save_v6', JSON.stringify(save));
     } catch (e) {}
   }
 
+  // Currently inspected item in the Atelier (can be locked or unlocked)
+  let inspected = {
+    category: 'ship', // 'ship' or 'trail'
+    id: save.equippedShip
+  };
+  let pendingPurchase = null;
+
   /* =========================================================
-     PROCEDURAL WEB AUDIO SYNTHESIZER
+     2. PROCEDURAL WEB AUDIO SYNTHESIZER
      ========================================================= */
   class SoundEngine {
     constructor() {
@@ -1006,6 +1316,25 @@ function bootOrbita() {
         if (this.ctx && this.ctx.state === 'suspended') {
           this.ctx.resume();
         }
+      } catch (e) {}
+    }
+
+    playClick(freq = 520) {
+      if (!save.settings.sound) return;
+      this.init();
+      if (!this.ctx) return;
+      try {
+        const now = this.ctx.currentTime;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(freq, now);
+        osc.frequency.exponentialRampToValueAtTime(freq * 0.65, now + 0.055);
+        gain.gain.setValueAtTime(0.14, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.06);
+        osc.connect(gain).connect(this.ctx.destination);
+        osc.start(now);
+        osc.stop(now + 0.065);
       } catch (e) {}
     }
 
@@ -1160,7 +1489,7 @@ function bootOrbita() {
   const sfx = new SoundEngine();
 
   /* =========================================================
-     CANVAS & CALM GALLERIA BACKGROUND
+     3. CANVAS & CALM GALLERIA BACKGROUND
      ========================================================= */
   const canvas = document.getElementById('world');
   const ctx = canvas.getContext('2d');
@@ -1244,7 +1573,7 @@ function bootOrbita() {
   }
 
   /* =========================================================
-     VESSEL & TRAIL RENDERERS
+     4. MULTI-PART ANIMATED VESSEL & SILKSCREEN TRAIL RENDERERS
      ========================================================= */
   function drawVessel(c, x, y, angle, shipId, scale, fever, time, squash) {
     c.save();
@@ -1252,24 +1581,26 @@ function bootOrbita() {
     c.rotate(angle);
     c.scale(scale * squash, scale / Math.sqrt(Math.max(0.2, squash)));
 
+    // Fever aura
     if (fever) {
       c.save();
       c.strokeStyle = '#DF3E26';
       c.lineWidth = 2.5;
       c.beginPath();
-      c.arc(0, 0, 22 + Math.sin(time * 18) * 3, 0, Math.PI * 2);
+      c.arc(0, 0, 24 + Math.sin(time * 18) * 3, 0, Math.PI * 2);
       c.stroke();
       c.restore();
     }
 
+    // Print Drop Shadow
     c.save();
     c.translate(3, 4);
-    c.fillStyle = 'rgba(23, 22, 20, 0.25)';
+    c.fillStyle = 'rgba(23, 22, 20, 0.22)';
     c.beginPath();
-    c.moveTo(16, 0);
-    c.lineTo(-12, -10);
+    c.moveTo(17, 0);
+    c.lineTo(-12, -11);
     c.lineTo(-8, 0);
-    c.lineTo(-12, 10);
+    c.lineTo(-12, 11);
     c.closePath();
     c.fill();
     c.restore();
@@ -1277,13 +1608,160 @@ function bootOrbita() {
     c.lineWidth = 2.2;
     c.strokeStyle = '#171614';
 
-    if (shipId === 'concorde') {
+    if (shipId === 'valkyrie') {
+      // 02 VALKYRIE: Forward canards + variable-geometry folding swing wings + cobalt afterburners
+      const sweep = Math.sin(time * 5) * 0.18;
+      const flame = 8 + Math.sin(time * 38) * 3;
+
+      // Twin cobalt afterburner plumes
+      c.fillStyle = '#1E5AA8';
+      c.beginPath();
+      c.moveTo(-11, -5); c.lineTo(-11 - flame, -3.5); c.lineTo(-11, -2);
+      c.moveTo(-11, 5);  c.lineTo(-11 - flame, 3.5);  c.lineTo(-11, 2);
+      c.fill();
+
+      // Articulated Swing Wings
+      [-1, 1].forEach(side => {
+        c.save();
+        c.translate(-2, side * 4);
+        c.rotate(side * (0.38 + sweep));
+        c.fillStyle = '#E3A024';
+        c.beginPath();
+        c.moveTo(4, 0);
+        c.lineTo(-12, side * 14);
+        c.lineTo(-15, side * 11);
+        c.lineTo(-6, 0);
+        c.closePath();
+        c.fill();
+        c.stroke();
+        c.restore();
+      });
+
+      // Forward Canards
+      c.fillStyle = '#DF3E26';
+      c.beginPath();
+      c.moveTo(11, 0);
+      c.lineTo(4, -9);
+      c.lineTo(2, 0);
+      c.lineTo(4, 9);
+      c.closePath();
+      c.fill();
+      c.stroke();
+
+      // Main Ivory Fuselage
+      c.fillStyle = '#FAF6EE';
+      c.beginPath();
+      c.moveTo(21, 0);
+      c.lineTo(-12, -7);
+      c.lineTo(-9, 0);
+      c.lineTo(-12, 7);
+      c.closePath();
+      c.fill();
+      c.stroke();
+
+      // Cockpit visor
+      c.fillStyle = '#1E5AA8';
+      c.beginPath();
+      c.ellipse(6, 0, 4.5, 2.2, 0, 0, Math.PI * 2);
+      c.fill();
+
+    } else if (shipId === 'chronograph') {
+      // 03 CHRONOGRAPH: Horological brass tourbillon + ticking escapement wheel + balance ring
+      c.save();
+      c.rotate(-time * 3.5);
+      c.strokeStyle = '#E3A024';
+      c.lineWidth = 2.6;
+      c.beginPath();
+      c.arc(0, 0, 15.5, 0, Math.PI * 2);
+      c.stroke();
+      // Compass cardinal lugs
+      for (let i = 0; i < 4; i++) {
+        const a = (i * Math.PI) / 2;
+        c.beginPath();
+        c.moveTo(Math.cos(a) * 13, Math.sin(a) * 13);
+        c.lineTo(Math.cos(a) * 18, Math.sin(a) * 18);
+        c.stroke();
+      }
+      c.restore();
+
+      // Enamel outer housing
+      c.fillStyle = '#FAF6EE';
+      c.beginPath();
+      c.moveTo(19, 0);
+      c.lineTo(4, -11);
+      c.lineTo(-12, -9);
+      c.lineTo(-9, 0);
+      c.lineTo(-12, 9);
+      c.lineTo(4, 11);
+      c.closePath();
+      c.fill();
+      c.stroke();
+
+      // Ticking Tourbillon Escapement Gear inside hull
+      const tickAngle = Math.floor(time * 8) * (Math.PI / 6);
+      c.save();
+      c.translate(-1, 0);
+      c.rotate(tickAngle);
+      c.strokeStyle = '#DF3E26';
+      c.lineWidth = 1.8;
+      c.beginPath();
+      c.arc(0, 0, 5.5, 0, Math.PI * 2);
+      for (let i = 0; i < 6; i++) {
+        const a = (i * Math.PI) / 3;
+        c.moveTo(0, 0);
+        c.lineTo(Math.cos(a) * 7.5, Math.sin(a) * 7.5);
+      }
+      c.stroke();
+      c.restore();
+
+      // Vermilion nose tip
+      c.fillStyle = '#DF3E26';
+      c.beginPath();
+      c.moveTo(19, 0);
+      c.lineTo(10, -4);
+      c.lineTo(10, 4);
+      c.closePath();
+      c.fill();
+
+    } else if (shipId === 'seraph') {
+      // 04 SERAPH: Multi-layered origami prism craft + articulated golden wing-vanes + solar halo
+      const flap = Math.sin(time * 7) * 2.5;
+
+      // Golden Solar Halo behind craft
+      c.save();
+      c.translate(-6, 0);
+      c.strokeStyle = '#E3A024';
+      c.lineWidth = 2.2;
+      c.beginPath();
+      c.arc(0, 0, 12, -Math.PI * 0.72, Math.PI * 0.72);
+      c.stroke();
+      c.restore();
+
+      // Upper & Lower Origami Wing Vanes
+      c.fillStyle = '#E3A024';
+      c.beginPath();
+      c.moveTo(4, -3);
+      c.lineTo(-10, -16 - flap);
+      c.lineTo(-14, -6);
+      c.closePath();
+      c.fill();
+      c.stroke();
+
+      c.beginPath();
+      c.moveTo(4, 3);
+      c.lineTo(-10, 16 + flap);
+      c.lineTo(-14, 6);
+      c.closePath();
+      c.fill();
+      c.stroke();
+
+      // Layered Ivory & Vermilion Origami Core
       c.fillStyle = '#FAF6EE';
       c.beginPath();
       c.moveTo(20, 0);
-      c.lineTo(-13, -9);
-      c.lineTo(-9, 0);
-      c.lineTo(-13, 9);
+      c.lineTo(-6, -9);
+      c.lineTo(-13, 0);
+      c.lineTo(-6, 9);
       c.closePath();
       c.fill();
       c.stroke();
@@ -1291,95 +1769,140 @@ function bootOrbita() {
       c.fillStyle = '#DF3E26';
       c.beginPath();
       c.moveTo(20, 0);
-      c.lineTo(4, -3.5);
-      c.lineTo(4, 3.5);
+      c.lineTo(-2, -4);
+      c.lineTo(-6, 0);
+      c.lineTo(-2, 4);
       c.closePath();
       c.fill();
-    } else if (shipId === 'sputnik') {
+
+    } else if (shipId === 'hyperion') {
+      // 05 HYPERION: Twin-hull catamaran railgun with energized plasma arc suspended between pontoons
+      const arcFlicker = Math.sin(time * 45) * 2;
+
+      // Energized Plasma Bridge between pontoons
+      c.save();
+      c.strokeStyle = '#DF3E26';
+      c.lineWidth = 3;
       c.beginPath();
-      c.moveTo(-4, -6); c.lineTo(-18, -14);
-      c.moveTo(-4, 6);  c.lineTo(-18, 14);
-      c.moveTo(-8, 0);  c.lineTo(-20, 0);
+      c.moveTo(6, -7);
+      c.quadraticCurveTo(9 + arcFlicker, 0, 6, 7);
       c.stroke();
 
       c.fillStyle = '#E3A024';
       c.beginPath();
-      c.arc(2, 0, 10, 0, Math.PI * 2);
+      c.arc(6, 0, 3.8 + Math.sin(time * 24) * 0.8, 0, Math.PI * 2);
       c.fill();
-      c.stroke();
+      c.restore();
 
+      // Rear Cross-Strut Bridge
       c.fillStyle = '#171614';
-      c.beginPath();
-      c.arc(5, 0, 3, 0, Math.PI * 2);
-      c.fill();
-    } else if (shipId === 'vector') {
-      c.fillStyle = '#1E5AA8';
-      c.beginPath();
-      c.moveTo(16, 0);
-      c.lineTo(2, -14);
-      c.lineTo(-4, -6);
-      c.lineTo(-14, -10);
-      c.lineTo(-10, 0);
-      c.lineTo(-14, 10);
-      c.lineTo(-4, 6);
-      c.lineTo(2, 14);
-      c.closePath();
-      c.fill();
-      c.stroke();
+      c.fillRect(-9, -8, 6, 16);
 
-      c.fillStyle = '#FAF6EE';
-      c.beginPath();
-      c.arc(3, 0, 3.5, 0, Math.PI * 2);
-      c.fill();
-    } else if (shipId === 'astrolabe') {
+      // Twin Armored Pontoons (Cobalt + Ivory)
+      [-1, 1].forEach(side => {
+        c.fillStyle = '#1E5AA8';
+        c.beginPath();
+        c.moveTo(18, side * 7.5);
+        c.lineTo(8, side * 11.5);
+        c.lineTo(-14, side * 11.5);
+        c.lineTo(-11, side * 5.5);
+        c.lineTo(10, side * 5.5);
+        c.closePath();
+        c.fill();
+        c.stroke();
+
+        // Gold trim stripe
+        c.fillStyle = '#E3A024';
+        c.fillRect(-6, side * 7.8 - 1.2, 14, 2.4);
+      });
+
+    } else if (shipId === 'sovereign') {
+      // 06 SOVEREIGN: Prestige gold-trimmed flagship + orbiting miniature brass satellite drone
+      const satAng = time * 5.2;
+      const sx = Math.cos(satAng) * 21;
+      const sy = Math.sin(satAng) * 17;
+
+      // Subtle satellite tether ring
       c.save();
-      c.rotate(time * 4);
-      c.strokeStyle = '#E3A024';
-      c.lineWidth = 2.5;
+      c.strokeStyle = 'rgba(227, 160, 36, 0.35)';
+      c.lineWidth = 1.2;
+      c.setLineDash([3, 3]);
       c.beginPath();
-      c.ellipse(0, 0, 15, 9, 0, 0, Math.PI * 2);
+      c.ellipse(0, 0, 21, 17, 0, 0, Math.PI * 2);
       c.stroke();
       c.restore();
 
+      // Flagship Wing & Hull
       c.fillStyle = '#171614';
       c.beginPath();
-      c.moveTo(14, 0);
-      c.lineTo(-10, -8);
-      c.lineTo(-6, 0);
-      c.lineTo(-10, 8);
-      c.closePath();
-      c.fill();
-      c.stroke();
-    } else if (shipId === 'valkyrie') {
-      const wingSpread = 13 + Math.sin(time * 8) * 2.5;
-      c.fillStyle = '#FAF6EE';
-      c.beginPath();
-      c.moveTo(18, 0);
-      c.lineTo(-6, -wingSpread);
-      c.lineTo(-12, -5);
-      c.lineTo(-8, 0);
-      c.lineTo(-12, 5);
-      c.lineTo(-6, wingSpread);
+      c.moveTo(20, 0);
+      c.lineTo(-8, -14);
+      c.lineTo(-13, -7);
+      c.lineTo(-9, 0);
+      c.lineTo(-13, 7);
+      c.lineTo(-8, 14);
       c.closePath();
       c.fill();
       c.stroke();
 
+      // Gold Leaf Inlay Plates
+      c.fillStyle = '#E3A024';
+      c.beginPath();
+      c.moveTo(15, 0);
+      c.lineTo(-4, -9);
+      c.lineTo(-6, 0);
+      c.lineTo(-4, 9);
+      c.closePath();
+      c.fill();
+
+      // Vermilion Royal Core
       c.fillStyle = '#DF3E26';
-      c.fillRect(-5, -2.5, 11, 5);
+      c.beginPath();
+      c.moveTo(8, 0);
+      c.lineTo(-1, -4);
+      c.lineTo(-1, 4);
+      c.closePath();
+      c.fill();
+
+      // Orbiting Escort Drone
+      c.save();
+      c.translate(sx, sy);
+      c.rotate(time * 8);
+      c.fillStyle = '#FAF6EE';
+      c.strokeStyle = '#171614';
+      c.lineWidth = 1.8;
+      c.beginPath();
+      c.moveTo(0, -4.5); c.lineTo(4.5, 0); c.lineTo(0, 4.5); c.lineTo(-4.5, 0);
+      c.closePath();
+      c.fill();
+      c.stroke();
+      c.restore();
+
     } else {
+      // 01 MONOLITH: Crisp Bauhaus delta wing + pulsing twin ion thrusters
+      const thruster = 6 + Math.sin(time * 34) * 2.5;
+      c.fillStyle = '#E3A024';
+      c.beginPath();
+      c.moveTo(-10, -5); c.lineTo(-10 - thruster, -3.5); c.lineTo(-10, -2);
+      c.moveTo(-10, 5);  c.lineTo(-10 - thruster, 3.5);  c.lineTo(-10, 2);
+      c.fill();
+
       c.fillStyle = fever ? '#DF3E26' : '#FAF6EE';
       c.beginPath();
-      c.moveTo(16, 0);
-      c.lineTo(-12, -10);
-      c.lineTo(-7, 0);
-      c.lineTo(-12, 10);
+      c.moveTo(17, 0);
+      c.lineTo(-12, -11);
+      c.lineTo(-8, 0);
+      c.lineTo(-12, 11);
       c.closePath();
       c.fill();
       c.stroke();
 
       c.fillStyle = fever ? '#E3A024' : '#DF3E26';
       c.beginPath();
-      c.arc(1, 0, 3.5, 0, Math.PI * 2);
+      c.moveTo(9, 0);
+      c.lineTo(-2, -4.5);
+      c.lineTo(-2, 4.5);
+      c.closePath();
       c.fill();
     }
 
@@ -1390,34 +1913,64 @@ function bootOrbita() {
     if (points.length < 2) return;
     c.save();
 
-    if (trailId === 'ticks') {
-      for (let i = 1; i < points.length; i += 2) {
+    if (trailId === 'golden_ratio') {
+      // T2 GOLDEN RATIO: Drafting baseline + Fibonacci spiral compass arcs
+      c.strokeStyle = fever ? '#DF3E26' : '#B8790C';
+      c.lineWidth = 2;
+      c.beginPath();
+      for (let i = 0; i < points.length; i++) {
+        if (i === 0) c.moveTo(points[i].x, points[i].y);
+        else c.lineTo(points[i].x, points[i].y);
+      }
+      c.stroke();
+
+      for (let i = 3; i < points.length; i += 4) {
         const p = points[i];
-        const prev = points[i - 1];
-        const ang = Math.atan2(p.y - prev.y, p.x - prev.x) + Math.PI / 2;
         const t = i / points.length;
-        c.strokeStyle = fever ? '#DF3E26' : `rgba(23, 22, 20, ${t * 0.75})`;
-        c.lineWidth = 2;
+        c.strokeStyle = fever ? '#DF3E26' : '#E3A024';
+        c.lineWidth = 1.8;
         c.beginPath();
-        c.moveTo(p.x + Math.cos(ang) * 6 * t, p.y + Math.sin(ang) * 6 * t);
-        c.lineTo(p.x - Math.cos(ang) * 6 * t, p.y - Math.sin(ang) * 6 * t);
+        c.arc(p.x, p.y, 4 + t * 8, i * 0.6, i * 0.6 + Math.PI * 1.15);
         c.stroke();
       }
-    } else if (trailId === 'halftone') {
+    } else if (trailId === 'constellation') {
+      // T3 CONSTELLATION: Star-chart triangulation lines + glowing 4-point star nodes
+      c.strokeStyle = 'rgba(30, 90, 168, 0.55)';
+      c.lineWidth = 1.4;
+      c.beginPath();
       for (let i = 0; i < points.length; i += 2) {
         const p = points[i];
+        if (i === 0) c.moveTo(p.x, p.y);
+        else c.lineTo(p.x, p.y);
+      }
+      c.stroke();
+
+      for (let i = 2; i < points.length; i += 3) {
+        const p = points[i];
         const t = i / points.length;
-        c.fillStyle = fever ? '#DF3E26' : '#171614';
+        const r = 3.5 + t * 4.5;
+        c.save();
+        c.translate(p.x, p.y);
+        c.fillStyle = fever ? '#DF3E26' : '#E3A024';
+        c.strokeStyle = '#171614';
+        c.lineWidth = 1.2;
         c.beginPath();
-        c.arc(p.x, p.y, 1.5 + t * 4.5, 0, Math.PI * 2);
+        c.moveTo(0, -r); c.lineTo(r * 0.35, -r * 0.35);
+        c.lineTo(r, 0);  c.lineTo(r * 0.35, r * 0.35);
+        c.lineTo(0, r);  c.lineTo(-r * 0.35, r * 0.35);
+        c.lineTo(-r, 0); c.lineTo(-r * 0.35, -r * 0.35);
+        c.closePath();
         c.fill();
+        c.stroke();
+        c.restore();
       }
     } else if (trailId === 'prism') {
+      // T4 BAUHAUS PRISM: Overlapping vermilion, ochre & cobalt silkscreen ribbons + chevrons
       const cols = ['#DF3E26', '#E3A024', '#1E5AA8'];
       cols.forEach((col, idx) => {
-        const off = (idx - 1) * 3.5;
+        const off = (idx - 1) * 4;
         c.strokeStyle = col;
-        c.lineWidth = 2.4;
+        c.lineWidth = 2.8;
         c.beginPath();
         for (let i = 0; i < points.length; i++) {
           const p = points[i];
@@ -1426,44 +1979,88 @@ function bootOrbita() {
         }
         c.stroke();
       });
-    } else if (trailId === 'stardust') {
-      for (let i = 0; i < points.length; i += 2) {
+
+      for (let i = 4; i < points.length; i += 5) {
         const p = points[i];
-        const t = i / points.length;
+        const prev = points[i - 1];
+        const ang = Math.atan2(p.y - prev.y, p.x - prev.x);
         c.save();
         c.translate(p.x, p.y);
-        c.rotate(i * 0.4);
-        c.fillStyle = fever ? '#DF3E26' : '#E3A024';
+        c.rotate(ang);
         c.strokeStyle = '#171614';
-        c.lineWidth = 1;
-        const r = 4.5 * t;
+        c.lineWidth = 2;
         c.beginPath();
-        c.moveTo(0, -r); c.lineTo(r, 0); c.lineTo(0, r); c.lineTo(-r, 0);
-        c.closePath();
-        c.fill();
+        c.moveTo(-4, -7); c.lineTo(3, 0); c.lineTo(-4, 7);
         c.stroke();
         c.restore();
       }
-    } else if (trailId === 'sonic') {
-      for (let i = 2; i < points.length; i += 4) {
-        const p = points[i];
-        const t = i / points.length;
-        c.strokeStyle = fever ? `rgba(223, 62, 38, ${t})` : `rgba(30, 90, 168, ${t * 0.8})`;
-        c.lineWidth = 1.8;
-        c.beginPath();
-        c.arc(p.x, p.y, (1 - t) * 14 + 3, 0, Math.PI * 2);
-        c.stroke();
-      }
-    } else {
+    } else if (trailId === 'eclipse') {
+      // T5 ECLIPSE CORONA: Obsidian ink core rimmed with gold-leaf embers
       for (let i = 1; i < points.length; i++) {
         const t = i / points.length;
-        c.strokeStyle = fever ? '#E3A024' : '#DF3E26';
-        c.lineWidth = Math.max(1.5, t * 7);
+        c.strokeStyle = '#E3A024';
+        c.lineWidth = Math.max(2, t * 10);
         c.lineCap = 'round';
         c.beginPath();
         c.moveTo(points[i - 1].x, points[i - 1].y);
         c.lineTo(points[i].x, points[i].y);
         c.stroke();
+
+        c.strokeStyle = fever ? '#DF3E26' : '#171614';
+        c.lineWidth = Math.max(1, t * 4.5);
+        c.beginPath();
+        c.moveTo(points[i - 1].x, points[i - 1].y);
+        c.lineTo(points[i].x, points[i].y);
+        c.stroke();
+      }
+      for (let i = 2; i < points.length; i += 3) {
+        const p = points[i];
+        const jitterX = Math.sin(i * 12.9) * 8;
+        const jitterY = Math.cos(i * 7.3) * 8;
+        c.fillStyle = '#E3A024';
+        c.fillRect(p.x + jitterX - 1.5, p.y + jitterY - 1.5, 3, 3);
+      }
+    } else if (trailId === 'supernova') {
+      // T6 SUPERNOVA WAKE: Multi-layered chromatic shock rings + diamond glints
+      for (let i = 1; i < points.length; i++) {
+        const t = i / points.length;
+        c.strokeStyle = fever ? '#DF3E26' : '#1E5AA8';
+        c.lineWidth = Math.max(1.5, t * 6);
+        c.lineCap = 'round';
+        c.beginPath();
+        c.moveTo(points[i - 1].x, points[i - 1].y);
+        c.lineTo(points[i].x, points[i].y);
+        c.stroke();
+      }
+      for (let i = 2; i < points.length; i += 4) {
+        const p = points[i];
+        const t = i / points.length;
+        const rad = (1 - t) * 16 + 4;
+        c.strokeStyle = i % 8 === 0 ? '#DF3E26' : '#E3A024';
+        c.lineWidth = 2;
+        c.beginPath();
+        c.arc(p.x, p.y, rad, 0, Math.PI * 2);
+        c.stroke();
+      }
+    } else {
+      // T1 VERMILION RIBBON: Tapered silkscreen brush stroke + ink droplets
+      for (let i = 1; i < points.length; i++) {
+        const t = i / points.length;
+        c.strokeStyle = fever ? '#E3A024' : '#DF3E26';
+        c.lineWidth = Math.max(1.5, t * 7.5);
+        c.lineCap = 'round';
+        c.beginPath();
+        c.moveTo(points[i - 1].x, points[i - 1].y);
+        c.lineTo(points[i].x, points[i].y);
+        c.stroke();
+      }
+      for (let i = 3; i < points.length - 3; i += 4) {
+        const p = points[i];
+        const off = Math.sin(i * 5) * 7;
+        c.fillStyle = fever ? '#E3A024' : '#DF3E26';
+        c.beginPath();
+        c.arc(p.x + off, p.y - off * 0.6, 2.2, 0, Math.PI * 2);
+        c.fill();
       }
     }
 
@@ -1471,7 +2068,7 @@ function bootOrbita() {
   }
 
   /* =========================================================
-     GAMEPLAY SIMULATION & ENTITIES
+     5. GAMEPLAY SIMULATION & ENTITIES
      ========================================================= */
   let state = 'MENU';
   let globalTime = 0;
@@ -2185,7 +2782,7 @@ function bootOrbita() {
   }
 
   /* =========================================================
-     ATELIER LIVE WIND-TUNNEL PREVIEW
+     6. ATELIER LIVE WIND-TUNNEL PREVIEW (SHOWS INSPECTED ITEM)
      ========================================================= */
   const previewCanvas = document.getElementById('atelier-preview');
   const pCtx = previewCanvas.getContext('2d');
@@ -2202,26 +2799,30 @@ function bootOrbita() {
     pCtx.strokeStyle = 'rgba(23, 22, 20, 0.08)';
     pCtx.lineWidth = 1;
     pCtx.beginPath();
-    for (let x = 30; x < pw; x += 30) { pCtx.moveTo(x, 0); pCtx.lineTo(x, ph); }
-    for (let y = 30; y < ph; y += 30) { pCtx.moveTo(0, y); pCtx.lineTo(pw, y); }
+    for (let x = 26; x < pw; x += 26) { pCtx.moveTo(x, 0); pCtx.lineTo(x, ph); }
+    for (let y = 26; y < ph; y += 26) { pCtx.moveTo(0, y); pCtx.lineTo(pw, y); }
     pCtx.stroke();
 
-    const t = globalTime * 2.2;
-    const x = pw * 0.5 + Math.sin(t) * 68;
+    const t = globalTime * 2.1;
+    const x = pw * 0.5 + Math.sin(t) * 76;
     const y = ph * 0.5 + Math.sin(t * 2) * 34;
-    const dx = Math.cos(t) * 68;
+    const dx = Math.cos(t) * 76;
     const dy = Math.cos(t * 2) * 68;
     const ang = Math.atan2(dy, dx);
 
     previewTrail.push({ x, y });
-    if (previewTrail.length > 26) previewTrail.shift();
+    if (previewTrail.length > 28) previewTrail.shift();
 
-    drawTrail(pCtx, previewTrail, save.equippedTrail, false);
-    drawVessel(pCtx, x, y, ang, save.equippedShip, 1.15, false, globalTime, 1);
+    // Preview the currently inspected ship/trail (or equipped for the other slot)
+    const previewShipId = inspected.category === 'ship' ? inspected.id : save.equippedShip;
+    const previewTrailId = inspected.category === 'trail' ? inspected.id : save.equippedTrail;
+
+    drawTrail(pCtx, previewTrail, previewTrailId, false);
+    drawVessel(pCtx, x, y, ang, previewShipId, 1.25, false, globalTime, 1);
   }
 
   /* =========================================================
-     UI BINDINGS, SHOP & HUD UPDATES
+     7. UI BINDINGS, 2-STEP INSPECT -> BUY -> CONFIRM & HUD
      ========================================================= */
   function updateHud() {
     document.getElementById('hud-score').textContent = score.toLocaleString();
@@ -2241,6 +2842,111 @@ function bootOrbita() {
     });
   }
 
+  function updateInspectorPanel() {
+    const isShip = inspected.category === 'ship';
+    const list = isShip ? SHIPS : TRAILS;
+    const item = list.find(x => x.id === inspected.id) || list[0];
+    const unlockedList = isShip ? save.unlockedShips : save.unlockedTrails;
+    const equippedId = isShip ? save.equippedShip : save.equippedTrail;
+
+    const isUnlocked = unlockedList.includes(item.id);
+    const isEquipped = equippedId === item.id;
+
+    document.getElementById('insp-code').textContent = `BLUEPRINT · ${item.code}`;
+    const tierEl = document.getElementById('insp-tier');
+    tierEl.textContent = item.tier;
+    tierEl.className = 'tier-badge ' + item.tier.toLowerCase();
+
+    document.getElementById('insp-name').textContent = `${item.code} ${item.name}`;
+    document.getElementById('insp-desc').textContent = item.desc;
+    document.getElementById('insp-cat').textContent = isShip ? 'Vessel Chassis' : 'Ink Formulation';
+    document.getElementById('insp-feat').textContent = item.feat;
+
+    const actionBtn = document.getElementById('insp-action-btn');
+    if (isEquipped) {
+      actionBtn.textContent = '✓ EQUIPPED';
+      actionBtn.className = 'btn-swiss';
+      actionBtn.disabled = true;
+    } else if (isUnlocked) {
+      actionBtn.textContent = 'EQUIP BLUEPRINT';
+      actionBtn.className = 'btn-swiss btn-primary';
+      actionBtn.style.padding = '11px 14px';
+      actionBtn.style.fontSize = '13px';
+      actionBtn.disabled = false;
+    } else {
+      actionBtn.textContent = `PURCHASE · ${item.cost} INK`;
+      actionBtn.className = 'btn-swiss btn-gold';
+      actionBtn.disabled = false;
+    }
+  }
+
+  function openConfirmModal(category, item) {
+    if (save.ink < item.cost) {
+      sfx.playClick(240);
+      showToast(`INSUFFICIENT INK · NEED ${item.cost - save.ink} MORE`);
+      return;
+    }
+    sfx.playClick(620);
+    pendingPurchase = { category, item };
+    document.getElementById('confirm-item-summary').innerHTML =
+      `Acquire <strong>${item.code} ${item.name}</strong> (${category === 'ship' ? 'Vessel Chassis' : 'Ink Trail'}) for your observatory?`;
+    document.getElementById('confirm-bal-before').textContent = `${save.ink.toLocaleString()} INK`;
+    document.getElementById('confirm-cost').textContent = `-${item.cost.toLocaleString()} INK`;
+    document.getElementById('confirm-bal-after').textContent = `${(save.ink - item.cost).toLocaleString()} INK`;
+    document.getElementById('confirm-modal').classList.remove('hidden');
+  }
+
+  function closeConfirmModal() {
+    pendingPurchase = null;
+    document.getElementById('confirm-modal').classList.add('hidden');
+  }
+
+  document.getElementById('btn-confirm-cancel').addEventListener('click', () => {
+    sfx.playClick(340);
+    closeConfirmModal();
+  });
+
+  document.getElementById('btn-confirm-yes').addEventListener('click', () => {
+    if (!pendingPurchase) return;
+    const { category, item } = pendingPurchase;
+    if (save.ink >= item.cost) {
+      save.ink -= item.cost;
+      if (category === 'ship') {
+        if (!save.unlockedShips.includes(item.id)) save.unlockedShips.push(item.id);
+        save.equippedShip = item.id;
+      } else {
+        if (!save.unlockedTrails.includes(item.id)) save.unlockedTrails.push(item.id);
+        save.equippedTrail = item.id;
+      }
+      sfx.playFever();
+      persist();
+      closeConfirmModal();
+      refreshMenuUI();
+      showToast(`ACQUIRED & EQUIPPED: ${item.name.toUpperCase()}`);
+    }
+  });
+
+  document.getElementById('insp-action-btn').addEventListener('click', () => {
+    const isShip = inspected.category === 'ship';
+    const list = isShip ? SHIPS : TRAILS;
+    const item = list.find(x => x.id === inspected.id) || list[0];
+    const unlockedList = isShip ? save.unlockedShips : save.unlockedTrails;
+    const equippedId = isShip ? save.equippedShip : save.equippedTrail;
+
+    if (equippedId === item.id) return;
+
+    if (unlockedList.includes(item.id)) {
+      if (isShip) save.equippedShip = item.id;
+      else save.equippedTrail = item.id;
+      sfx.playClick(660);
+      persist();
+      refreshMenuUI();
+      showToast(`EQUIPPED: ${item.name.toUpperCase()}`);
+    } else {
+      openConfirmModal(inspected.category, item);
+    }
+  });
+
   function refreshMenuUI() {
     document.getElementById('wallet-ink').textContent = save.ink.toLocaleString();
     document.getElementById('menu-best').textContent = save.bestScore.toLocaleString();
@@ -2250,79 +2956,62 @@ function bootOrbita() {
     const trailObj = TRAILS.find(t => t.id === save.equippedTrail) || TRAILS[0];
     document.getElementById('equipped-summary').textContent =
       `${shipObj.code} ${shipObj.name.toUpperCase()} + ${trailObj.name.toUpperCase()}`;
-    document.getElementById('preview-caption').textContent =
-      `${shipObj.name} · ${trailObj.name}`;
 
+    // Render Ships Catalog
     const shipsGrid = document.getElementById('shop-ships');
     shipsGrid.innerHTML = '';
     for (const item of SHIPS) {
       const unlocked = save.unlockedShips.includes(item.id);
       const equipped = save.equippedShip === item.id;
+      const isInspected = inspected.category === 'ship' && inspected.id === item.id;
       const el = document.createElement('div');
-      el.className = `shop-item ${equipped ? 'equipped' : ''} ${!unlocked ? 'locked' : ''}`;
+      el.className = `shop-item ${isInspected ? 'inspected' : ''}`;
+      const statusClass = equipped ? 'equipped' : (unlocked ? 'owned' : 'locked');
+      const statusText = equipped ? 'EQUIPPED' : (unlocked ? 'OWNED' : `${item.cost} INK`);
       el.innerHTML = `
         <div>
-          <div class="shop-item-top"><span>FIG. ${item.code}</span><span>${unlocked ? 'OWNED' : item.cost + ' INK'}</span></div>
+          <div class="shop-item-top"><span>FIG. ${item.code}</span><span>${item.tier}</span></div>
           <div class="shop-item-name">${item.name}</div>
-          <div class="shop-item-desc">${item.desc}</div>
         </div>
-        <button class="shop-item-btn" type="button">${equipped ? 'EQUIPPED' : (unlocked ? 'EQUIP' : 'UNLOCK · ' + item.cost)}</button>
+        <div class="status-pill ${statusClass}">${statusText}</div>
       `;
       el.addEventListener('click', () => {
-        if (unlocked) {
-          save.equippedShip = item.id;
-          persist();
-          refreshMenuUI();
-        } else if (save.ink >= item.cost) {
-          save.ink -= item.cost;
-          save.unlockedShips.push(item.id);
-          save.equippedShip = item.id;
-          sfx.playFever();
-          persist();
-          refreshMenuUI();
-          showToast(`UNLOCKED CHASSIS: ${item.name.toUpperCase()}`);
-        } else {
-          showToast(`NEED ${item.cost - save.ink} MORE INK ATOMS`);
-        }
+        sfx.playClick(540);
+        inspected = { category: 'ship', id: item.id };
+        refreshMenuUI();
       });
       shipsGrid.appendChild(el);
     }
 
+    // Render Trails Catalog
     const trailsGrid = document.getElementById('shop-trails');
     trailsGrid.innerHTML = '';
     for (const item of TRAILS) {
       const unlocked = save.unlockedTrails.includes(item.id);
       const equipped = save.equippedTrail === item.id;
+      const isInspected = inspected.category === 'trail' && inspected.id === item.id;
       const el = document.createElement('div');
-      el.className = `shop-item ${equipped ? 'equipped' : ''} ${!unlocked ? 'locked' : ''}`;
+      el.className = `shop-item ${isInspected ? 'inspected' : ''}`;
+      const statusClass = equipped ? 'equipped' : (unlocked ? 'owned' : 'locked');
+      const statusText = equipped ? 'EQUIPPED' : (unlocked ? 'OWNED' : `${item.cost} INK`);
       el.innerHTML = `
         <div>
-          <div class="shop-item-top"><span>INK ${item.code}</span><span>${unlocked ? 'OWNED' : item.cost + ' INK'}</span></div>
+          <div class="shop-item-top"><span>INK ${item.code}</span><span>${item.tier}</span></div>
           <div class="shop-item-name">${item.name}</div>
-          <div class="shop-item-desc">${item.desc}</div>
         </div>
-        <button class="shop-item-btn" type="button">${equipped ? 'EQUIPPED' : (unlocked ? 'EQUIP' : 'UNLOCK · ' + item.cost)}</button>
+        <div class="status-pill ${statusClass}">${statusText}</div>
       `;
       el.addEventListener('click', () => {
-        if (unlocked) {
-          save.equippedTrail = item.id;
-          persist();
-          refreshMenuUI();
-        } else if (save.ink >= item.cost) {
-          save.ink -= item.cost;
-          save.unlockedTrails.push(item.id);
-          save.equippedTrail = item.id;
-          sfx.playFever();
-          persist();
-          refreshMenuUI();
-          showToast(`UNLOCKED INK: ${item.name.toUpperCase()}`);
-        } else {
-          showToast(`NEED ${item.cost - save.ink} MORE INK ATOMS`);
-        }
+        sfx.playClick(580);
+        inspected = { category: 'trail', id: item.id };
+        refreshMenuUI();
       });
       trailsGrid.appendChild(el);
     }
 
+    updateInspectorPanel();
+
+    // Render Missions
     const mList = document.getElementById('mission-list');
     mList.innerHTML = '';
     let activeCount = 0;
@@ -2371,6 +3060,7 @@ function bootOrbita() {
 
   document.querySelectorAll('.hub-tab').forEach(btn => {
     btn.addEventListener('click', () => {
+      sfx.playClick(480);
       document.querySelectorAll('.hub-tab').forEach(b => b.classList.remove('active'));
       document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
       btn.classList.add('active');
@@ -2429,7 +3119,7 @@ function bootOrbita() {
   });
 
   function handlePress(e) {
-    if (e.target && e.target.closest && (e.target.closest('button') || e.target.closest('.hub-shell') || e.target.closest('.gameover-card'))) return;
+    if (e.target && e.target.closest && (e.target.closest('button') || e.target.closest('.hub-shell') || e.target.closest('.gameover-card') || e.target.closest('.confirm-card'))) return;
     if (state === 'PLAYING' && !isHolding) {
       isHolding = true;
       engageTether();
@@ -2450,6 +3140,10 @@ function bootOrbita() {
   window.addEventListener('mouseup', handleRelease);
 
   window.addEventListener('keydown', (e) => {
+    if (e.code === 'Escape') {
+      closeConfirmModal();
+      return;
+    }
     if (e.code === 'Space' || e.code === 'ArrowUp' || e.code === 'KeyW') {
       if (state === 'PLAYING' && !isHolding) {
         e.preventDefault();
