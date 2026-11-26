@@ -3,22 +3,20 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>ORBITA '74 — Orbital Slingshot Arcade</title>
-  <!-- Distinctive Swiss / Technical Google Font Pairing -->
+  <title>ORBITA '74 — Kinetic Orbital Arcade</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Space+Mono:ital,wght@0,400;0,700;1,700&display=swap" rel="stylesheet">
   <style>
     :root {
       --paper: #F4EFE6;
-      --paper-dark: #E8E0D2;
-      --ink: #1C1B18;
+      --paper-dark: #E6DEC8;
+      --ink: #181715;
       --vermilion: #E03C28;
-      --ochre: #E8A825;
-      --cobalt: #1D6F8A;
-      --sage: #3B7A57;
+      --ochre: #F0A818;
+      --cobalt: #1D4ED8;
+      --sage: #2A7B5C;
       --border-w: 2.5px;
-      --shadow-offset: 5px;
     }
 
     * {
@@ -40,7 +38,6 @@
       touch-action: none;
     }
 
-    /* Full-bleed Canvas */
     #gameCanvas {
       display: block;
       width: 100vw;
@@ -51,43 +48,55 @@
       cursor: crosshair;
     }
 
-    /* Tactile Archival Paper Grain Overlay */
+    /* Tactile Archival Paper Grain */
     .paper-grain {
       position: fixed;
       inset: 0;
       z-index: 2;
       pointer-events: none;
-      opacity: 0.32;
+      opacity: 0.30;
       mix-blend-mode: multiply;
       background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.55'/%3E%3C/svg%3E");
+    }
+
+    body.dark-theme .paper-grain {
+      mix-blend-mode: screen;
+      opacity: 0.14;
     }
 
     /* Swiss Registration Frame Border */
     .poster-frame {
       position: fixed;
       inset: 10px;
-      border: 1.5px solid rgba(28, 27, 24, 0.28);
+      border: 2px solid var(--ink);
+      opacity: 0.35;
       z-index: 3;
       pointer-events: none;
+      transition: border-color 0.2s ease, border-width 0.2s ease, opacity 0.2s ease;
+    }
+
+    body.overdrive-active .poster-frame {
+      border: 5px solid var(--vermilion);
+      opacity: 0.95;
     }
 
     /* Top Minimal HUD */
     #hud {
       position: fixed;
-      top: 22px;
-      left: 24px;
-      right: 24px;
-      z-index: 10;
+      top: 18px;
+      left: 20px;
+      right: 20px;
+      z-index: 12;
       display: flex;
       justify-content: space-between;
       align-items: flex-start;
       pointer-events: none;
-      transition: opacity 0.25s ease;
+      gap: 10px;
     }
 
-    .hud-group {
+    .hud-left, .hud-right {
       display: flex;
-      gap: 10px;
+      gap: 8px;
       align-items: center;
       flex-wrap: wrap;
     }
@@ -96,51 +105,101 @@
       background: var(--paper);
       border: var(--border-w) solid var(--ink);
       box-shadow: 3px 3px 0px var(--ink);
-      padding: 6px 12px;
+      padding: 5px 10px;
       display: flex;
       flex-direction: column;
-      min-width: 92px;
+      min-width: 78px;
     }
 
     .swiss-tag .label {
-      font-size: 10px;
+      font-size: 9px;
       font-weight: 700;
       letter-spacing: 0.12em;
       text-transform: uppercase;
-      opacity: 0.75;
+      opacity: 0.72;
       line-height: 1.1;
     }
 
     .swiss-tag .val {
       font-family: 'Archivo Black', sans-serif;
-      font-size: 22px;
+      font-size: 19px;
       line-height: 1.15;
       letter-spacing: -0.02em;
       color: var(--ink);
     }
 
+    .swiss-tag.ink-bank {
+      background: var(--paper-dark);
+    }
+
+    .swiss-tag.ink-bank .val {
+      color: var(--cobalt);
+    }
+
     .multiplier-pill {
       background: var(--ochre);
+      color: #181715;
       border: var(--border-w) solid var(--ink);
       box-shadow: 3px 3px 0px var(--ink);
-      padding: 6px 12px;
+      padding: 5px 10px;
       display: flex;
       flex-direction: column;
-      min-width: 78px;
+      min-width: 68px;
       transition: transform 0.12s cubic-bezier(0.2, 1.5, 0.4, 1), background-color 0.15s ease;
     }
 
     .multiplier-pill.hot {
       background: var(--vermilion);
-      color: var(--paper);
-    }
-
-    .multiplier-pill.hot .val {
-      color: var(--paper);
+      color: #F4EFE6;
     }
 
     .multiplier-pill.pop {
-      transform: scale(1.14) rotate(-2deg);
+      transform: scale(1.16) rotate(-2deg);
+    }
+
+    /* Segmented Fever / Overdrive Gauge */
+    .overdrive-box {
+      background: var(--paper);
+      border: var(--border-w) solid var(--ink);
+      box-shadow: 3px 3px 0px var(--ink);
+      padding: 5px 10px;
+      min-width: 132px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .overdrive-box.hidden-in-menu {
+      display: none;
+    }
+
+    .od-header {
+      display: flex;
+      justify-content: space-between;
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+    }
+
+    .od-segments {
+      display: grid;
+      grid-template-columns: repeat(10, 1fr);
+      gap: 2px;
+      height: 12px;
+    }
+
+    .od-seg {
+      border: 1.5px solid var(--ink);
+      background: var(--paper-dark);
+      transition: background-color 0.1s ease;
+    }
+
+    .od-seg.filled {
+      background: var(--ochre);
+    }
+
+    .overdrive-box.active .od-seg.filled {
+      background: var(--vermilion);
     }
 
     /* Tactile Swiss Buttons */
@@ -148,55 +207,65 @@
       pointer-events: auto;
       font-family: 'Space Mono', monospace;
       font-weight: 700;
-      font-size: 13px;
-      letter-spacing: 0.08em;
+      font-size: 12px;
+      letter-spacing: 0.07em;
       text-transform: uppercase;
       background: var(--paper);
       color: var(--ink);
       border: var(--border-w) solid var(--ink);
       box-shadow: 4px 4px 0px var(--ink);
-      padding: 10px 16px;
+      padding: 8px 13px;
       cursor: pointer;
-      transition: transform 0.08s ease, box-shadow 0.08s ease, background-color 0.12s ease;
+      transition: transform 0.07s ease, box-shadow 0.07s ease, background-color 0.12s ease, color 0.12s ease;
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      gap: 8px;
+      gap: 6px;
     }
 
-    .swiss-btn:hover {
+    .swiss-btn:hover:not(:disabled) {
       background: var(--ochre);
+      color: #181715;
       transform: translate(-1px, -1px);
       box-shadow: 5px 5px 0px var(--ink);
     }
 
-    .swiss-btn:active {
+    .swiss-btn:active:not(:disabled) {
       transform: translate(3px, 3px);
       box-shadow: 1px 1px 0px var(--ink);
     }
 
+    .swiss-btn:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+    }
+
     .swiss-btn.primary {
       background: var(--vermilion);
-      color: var(--paper);
+      color: #F4EFE6;
       font-family: 'Archivo Black', sans-serif;
-      font-size: 18px;
+      font-size: 17px;
       letter-spacing: 0.04em;
-      padding: 15px 30px;
-      box-shadow: 6px 6px 0px var(--ink);
+      padding: 14px 26px;
+      box-shadow: 5px 5px 0px var(--ink);
     }
 
     .swiss-btn.primary:hover {
       background: #c9301d;
-      transform: translate(-1px, -1px);
-      box-shadow: 7px 7px 0px var(--ink);
+      color: #F4EFE6;
     }
 
-    .swiss-btn.primary:active {
-      transform: translate(4px, 4px);
-      box-shadow: 2px 2px 0px var(--ink);
+    .swiss-btn.cobalt {
+      background: var(--cobalt);
+      color: #F4EFE6;
     }
 
-    /* Overlays (Title & Game Over) */
+    .swiss-btn.cobalt:hover {
+      background: #173ea8;
+      color: #F4EFE6;
+    }
+
+    /* Overlays */
     .overlay {
       position: fixed;
       inset: 0;
@@ -204,11 +273,12 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: 20px;
-      background: rgba(244, 239, 230, 0.58);
-      backdrop-filter: blur(2px);
-      -webkit-backdrop-filter: blur(2px);
-      transition: opacity 0.25s ease, visibility 0.25s ease;
+      padding: 16px;
+      padding-top: 72px;
+      background: rgba(24, 23, 21, 0.16);
+      backdrop-filter: blur(1.5px);
+      -webkit-backdrop-filter: blur(1.5px);
+      transition: opacity 0.22s ease, visibility 0.22s ease;
     }
 
     .overlay.hidden {
@@ -217,26 +287,85 @@
       pointer-events: none;
     }
 
-    .poster-card {
+    /* Main Menu Hub Card */
+    .hub-card {
       background: var(--paper);
       border: 3px solid var(--ink);
       box-shadow: 10px 10px 0px var(--ink);
-      max-width: 500px;
+      max-width: 680px;
       width: 100%;
-      padding: 28px 30px;
-      position: relative;
-      animation: posterEnter 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+      max-height: calc(100vh - 96px);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      animation: posterEnter 0.3s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
     @keyframes posterEnter {
-      from {
-        opacity: 0;
-        transform: translateY(16px) scale(0.97);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0) scale(1);
-      }
+      from { opacity: 0; transform: translateY(14px) scale(0.98); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    /* Mechanical Tab Strip */
+    .tab-bar {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      border-bottom: 3px solid var(--ink);
+      background: var(--paper-dark);
+    }
+
+    .tab-btn {
+      font-family: 'Space Mono', monospace;
+      font-weight: 700;
+      font-size: 12px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 13px 8px;
+      border: none;
+      border-right: 2px solid var(--ink);
+      background: transparent;
+      color: var(--ink);
+      cursor: pointer;
+      transition: background-color 0.12s ease, color 0.12s ease;
+      position: relative;
+    }
+
+    .tab-btn:last-child {
+      border-right: none;
+    }
+
+    .tab-btn:hover {
+      background: rgba(240, 168, 24, 0.32);
+    }
+
+    .tab-btn.active {
+      background: var(--ink);
+      color: var(--paper);
+    }
+
+    .tab-badge {
+      display: inline-block;
+      background: var(--vermilion);
+      color: #F4EFE6;
+      font-size: 9px;
+      padding: 1px 5px;
+      margin-left: 4px;
+      vertical-align: middle;
+    }
+
+    .hub-body {
+      padding: 22px 26px;
+      overflow-y: auto;
+      scrollbar-width: thin;
+      scrollbar-color: var(--ink) var(--paper-dark);
+    }
+
+    .tab-pane {
+      display: none;
+    }
+
+    .tab-pane.active {
+      display: block;
     }
 
     .poster-header-strip {
@@ -244,8 +373,8 @@
       justify-content: space-between;
       align-items: center;
       border-bottom: 2px solid var(--ink);
-      padding-bottom: 10px;
-      margin-bottom: 18px;
+      padding-bottom: 8px;
+      margin-bottom: 14px;
       font-size: 11px;
       font-weight: 700;
       letter-spacing: 0.12em;
@@ -265,90 +394,290 @@
 
     .poster-title {
       font-family: 'Archivo Black', sans-serif;
-      font-size: clamp(42px, 9vw, 66px);
+      font-size: clamp(40px, 8vw, 64px);
       line-height: 0.92;
       letter-spacing: -0.03em;
       text-transform: uppercase;
       color: var(--ink);
-      margin-bottom: 12px;
+      margin-bottom: 10px;
     }
 
     .poster-title span {
       color: var(--vermilion);
-      display: inline-block;
     }
 
     .poster-subtitle {
       font-size: 13px;
       line-height: 1.5;
-      color: var(--ink);
-      margin-bottom: 20px;
+      margin-bottom: 18px;
       border-left: 4px solid var(--ochre);
       padding-left: 12px;
     }
 
     .mechanic-grid {
       display: grid;
-      grid-template-columns: 1fr 1fr;
+      grid-template-columns: repeat(3, 1fr);
       gap: 10px;
-      margin-bottom: 22px;
+      margin-bottom: 18px;
     }
 
     .mechanic-box {
       background: var(--paper-dark);
       border: 2px solid var(--ink);
-      padding: 10px 12px;
+      padding: 10px;
     }
 
     .mechanic-box strong {
       display: block;
-      font-size: 11px;
+      font-size: 10px;
       letter-spacing: 0.08em;
       text-transform: uppercase;
       color: var(--cobalt);
-      margin-bottom: 3px;
+      margin-bottom: 4px;
     }
 
     .mechanic-box span {
-      font-size: 12px;
+      font-size: 11px;
       line-height: 1.35;
       display: block;
     }
 
-    .control-banner {
-      background: var(--ink);
-      color: var(--paper);
-      padding: 10px 14px;
+    /* Atelier Shop Sections */
+    .shop-section-title {
+      font-family: 'Archivo Black', sans-serif;
+      font-size: 14px;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      margin: 14px 0 8px;
+      padding-bottom: 4px;
+      border-bottom: 2px solid var(--ink);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .shop-section-title:first-child {
+      margin-top: 0;
+    }
+
+    .shop-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+    }
+
+    .shop-item {
+      border: 2px solid var(--ink);
+      background: var(--paper-dark);
+      padding: 10px 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      transition: transform 0.1s ease;
+    }
+
+    .shop-item.equipped {
+      background: var(--paper);
+      border-color: var(--vermilion);
+      box-shadow: 3px 3px 0px var(--vermilion);
+    }
+
+    .item-meta {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .item-swatch {
+      width: 34px;
+      height: 34px;
+      border: 2px solid var(--ink);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      font-family: 'Archivo Black', sans-serif;
       font-size: 12px;
+    }
+
+    .item-info strong {
+      display: block;
+      font-size: 12px;
+      letter-spacing: 0.03em;
+    }
+
+    .item-info small {
+      display: block;
+      font-size: 10px;
+      opacity: 0.78;
+    }
+
+    .shop-action-btn {
+      font-family: 'Space Mono', monospace;
       font-weight: 700;
-      letter-spacing: 0.06em;
-      text-align: center;
-      margin-bottom: 20px;
+      font-size: 11px;
+      padding: 6px 10px;
+      border: 2px solid var(--ink);
+      background: var(--ochre);
+      color: #181715;
+      cursor: pointer;
+      white-space: nowrap;
+      box-shadow: 2px 2px 0px var(--ink);
+    }
+
+    .shop-action-btn:hover:not(:disabled) {
+      transform: translate(-1px, -1px);
+      box-shadow: 3px 3px 0px var(--ink);
+    }
+
+    .shop-action-btn.equip {
+      background: var(--paper);
+      color: var(--ink);
+    }
+
+    .shop-action-btn.active-tag {
+      background: var(--sage);
+      color: #F4EFE6;
+      cursor: default;
+      box-shadow: none;
+    }
+
+    .shop-action-btn:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+    }
+
+    /* Missions Stamp Cards */
+    .mission-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .mission-card {
+      border: 2.5px solid var(--ink);
+      background: var(--paper-dark);
+      padding: 12px 14px;
+      position: relative;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .mission-card.completed {
+      background: var(--paper);
+    }
+
+    .mission-title {
+      font-weight: 700;
+      font-size: 13px;
+      margin-bottom: 4px;
+    }
+
+    .mission-bar-wrap {
+      width: 100%;
+      max-width: 280px;
+      height: 10px;
+      border: 1.5px solid var(--ink);
+      background: var(--paper);
+      margin-top: 6px;
+      overflow: hidden;
+    }
+
+    .mission-bar-fill {
+      height: 100%;
+      background: var(--cobalt);
+      transition: width 0.25s ease;
+    }
+
+    .mission-card.completed .mission-bar-fill {
+      background: var(--sage);
+    }
+
+    .stamp-verified {
+      border: 2.5px solid var(--vermilion);
+      color: var(--vermilion);
+      font-family: 'Archivo Black', sans-serif;
+      font-size: 11px;
+      padding: 4px 8px;
+      letter-spacing: 0.08em;
+      transform: rotate(-4deg);
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+
+    .mission-reward-pill {
+      font-weight: 700;
+      font-size: 12px;
+      background: var(--ochre);
+      color: #181715;
+      border: 2px solid var(--ink);
+      padding: 5px 9px;
+      white-space: nowrap;
+    }
+
+    /* Calibration Settings */
+    .setting-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .setting-row {
+      border: 2px solid var(--ink);
+      background: var(--paper-dark);
+      padding: 11px 14px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .setting-row strong {
+      display: block;
+      font-size: 12px;
       text-transform: uppercase;
     }
 
-    .control-banner em {
-      color: var(--ochre);
-      font-style: normal;
+    .setting-row small {
+      font-size: 11px;
+      opacity: 0.78;
     }
 
-    /* Game Over Stats Grid */
+    /* Standard Modal Poster Card (Pause & Game Over) */
+    .poster-card {
+      background: var(--paper);
+      border: 3px solid var(--ink);
+      box-shadow: 10px 10px 0px var(--ink);
+      max-width: 500px;
+      width: 100%;
+      padding: 26px 28px;
+      animation: posterEnter 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
     .stats-row {
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
+      grid-template-columns: repeat(2, 1fr);
       gap: 10px;
-      margin: 18px 0 22px;
+      margin: 16px 0 20px;
     }
 
     .stat-cell {
       border: 2px solid var(--ink);
       background: var(--paper-dark);
-      padding: 10px;
-      text-align: left;
+      padding: 10px 12px;
     }
 
     .stat-cell.highlight {
       background: var(--ochre);
+      color: #181715;
+    }
+
+    .stat-cell.ink-earned {
+      background: var(--cobalt);
+      color: #F4EFE6;
     }
 
     .stat-cell .k {
@@ -369,7 +698,7 @@
     .new-record-ribbon {
       display: inline-block;
       background: var(--vermilion);
-      color: var(--paper);
+      color: #F4EFE6;
       font-size: 10px;
       font-weight: 700;
       letter-spacing: 0.12em;
@@ -383,78 +712,68 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 12px;
+      gap: 10px;
       flex-wrap: wrap;
     }
 
-    .shortcut-hint {
-      font-size: 11px;
-      opacity: 0.75;
-      font-weight: 700;
-    }
-
-    /* Live Hint Pill at Bottom */
     #bottomHint {
       position: fixed;
-      bottom: 22px;
+      bottom: 18px;
       left: 50%;
       transform: translateX(-50%);
-      z-index: 10;
+      z-index: 12;
       background: var(--ink);
       color: var(--paper);
       font-size: 11px;
       font-weight: 700;
-      letter-spacing: 0.1em;
+      letter-spacing: 0.09em;
       text-transform: uppercase;
-      padding: 7px 14px;
+      padding: 6px 14px;
       border: 2px solid var(--ink);
       box-shadow: 3px 3px 0px var(--vermilion);
       pointer-events: none;
-      transition: opacity 0.3s ease;
+      transition: opacity 0.25s ease;
       white-space: nowrap;
     }
 
-    @media (max-width: 540px) {
+    @media (max-width: 600px) {
       #hud {
-        top: 16px;
-        left: 16px;
-        right: 16px;
+        top: 14px;
+        left: 14px;
+        right: 14px;
       }
       .swiss-tag {
-        padding: 5px 9px;
-        min-width: 74px;
+        padding: 4px 8px;
+        min-width: 66px;
       }
       .swiss-tag .val {
-        font-size: 18px;
+        font-size: 16px;
       }
-      .poster-card {
-        padding: 20px;
-        box-shadow: 7px 7px 0px var(--ink);
+      .overdrive-box {
+        min-width: 108px;
       }
-      .mechanic-grid {
+      .mechanic-grid, .shop-grid {
         grid-template-columns: 1fr;
       }
-      .stats-row {
-        grid-template-columns: 1fr 1fr;
+      .tab-btn {
+        font-size: 10px;
+        padding: 11px 4px;
       }
-      .stats-row .stat-cell:last-child {
-        grid-column: span 2;
+      .hub-body {
+        padding: 16px;
       }
     }
   </style>
 </head>
 <body>
 
-  <!-- Live High-DPI Vector Game Canvas -->
   <canvas id="gameCanvas"></canvas>
-
-  <!-- Archival Paper Grain & Registration Frame -->
   <div class="paper-grain"></div>
   <div class="poster-frame"></div>
 
   <!-- Minimalist Swiss Telemetry HUD -->
   <header id="hud">
-    <div class="hud-group">
+    <div class="hud-left">
       <div class="swiss-tag">
         <span class="label">SCORE</span>
         <span class="val" id="hudScore">0000</span>
@@ -463,58 +782,169 @@
         <span class="label">CHAIN</span>
         <span class="val" id="hudMult">x1</span>
       </div>
-      <div class="swiss-tag">
-        <span class="label">BEST</span>
-        <span class="val" id="hudBest">0000</span>
+      <div class="overdrive-box hidden-in-menu" id="hudOverdriveBox">
+        <div class="od-header">
+          <span id="odLabel">OVERDRIVE</span>
+          <span id="odPct">0%</span>
+        </div>
+        <div class="od-segments" id="odSegments"></div>
+      </div>
+      <div class="swiss-tag ink-bank">
+        <span class="label">INK ATOMS</span>
+        <span class="val" id="hudInk">0</span>
       </div>
     </div>
 
-    <div class="hud-group">
+    <div class="hud-right">
+      <button class="swiss-btn" id="pauseBtn" style="display:none;" aria-label="Pause Game">II PAUSE</button>
       <button class="swiss-btn" id="muteBtn" aria-label="Toggle Sound">
-        <span id="muteIcon">●</span> <span id="muteText">AUDIO ON</span>
+        <span id="muteIcon">●</span> <span id="muteText">AUDIO</span>
       </button>
     </div>
   </header>
 
-  <!-- Dynamic In-Game Micro Hint -->
-  <div id="bottomHint">HOLD CLICK / SPACE TO TETHER ORBIT • RELEASE TO SLINGSHOT</div>
+  <div id="bottomHint" style="opacity:0;">HOLD CLICK / SPACE TO TETHER ORBIT • RELEASE TO SLINGSHOT</div>
 
-  <!-- Title Overlay (Swiss Exhibition Poster Style) -->
-  <section class="overlay" id="titleOverlay">
-    <div class="poster-card">
-      <div class="poster-header-strip">
-        <span><i class="badge-dot"></i>KINETIC SERIES NO. 74</span>
-        <span>BASEL / ZÜRICH</span>
-      </div>
+  <!-- MAIN MENU HUB (PLAY / ATELIER / MISSIONS / CALIBRATION) -->
+  <section class="overlay" id="menuOverlay">
+    <div class="hub-card">
+      <nav class="tab-bar" role="tablist">
+        <button class="tab-btn active" data-tab="playTab">01. PLAY</button>
+        <button class="tab-btn" data-tab="atelierTab">02. ATELIER</button>
+        <button class="tab-btn" data-tab="missionsTab">03. MISSIONS <span class="tab-badge" id="missionBadge">3</span></button>
+        <button class="tab-btn" data-tab="settingsTab">04. CALIBRATE</button>
+      </nav>
 
-      <h1 class="poster-title">ORBITA<span>’74</span></h1>
-      <p class="poster-subtitle">
-        Tether onto solar anchors, build angular momentum, and slingshot across the void. Skim past hazards for high-voltage graze multipliers.
-      </p>
+      <div class="hub-body">
+        <!-- TAB 1: PLAY -->
+        <div class="tab-pane active" id="playTab">
+          <div class="poster-header-strip">
+            <span><i class="badge-dot"></i>KINETIC SERIES NO. 74</span>
+            <span>BEST ARCHIVE: <strong id="menuBestScore">0000</strong></span>
+          </div>
 
-      <div class="mechanic-grid">
-        <div class="mechanic-box">
-          <strong>01 / TETHER & LAUNCH</strong>
-          <span>Hold to lock into nearest gravity ring; release to fire tangentially.</span>
+          <h1 class="poster-title">ORBITA<span>’74</span></h1>
+          <p class="poster-subtitle">
+            Latch onto solar anchors, whip around gravity wells, and skim Bauhaus spikes to ignite <strong>OVERDRIVE</strong>—smashing straight through hazards for massive Ink rewards.
+          </p>
+
+          <div class="mechanic-grid">
+            <div class="mechanic-box">
+              <strong>TETHER & WHIP</strong>
+              <span>Hold input to lock onto nearest ring; release to launch tangentially.</span>
+            </div>
+            <div class="mechanic-box">
+              <strong>SPECIAL ANCHORS</strong>
+              <span>Cobalt rings give <b>SONIC BOOST</b>; dashed rings shatter after 1 use.</span>
+            </div>
+            <div class="mechanic-box">
+              <strong>FEVER OVERDRIVE</strong>
+              <span>Fill the 10-bar gauge via stars &amp; grazes to <b>SHATTER</b> hazards!</span>
+            </div>
+          </div>
+
+          <div class="action-row">
+            <button class="swiss-btn primary" id="startBtn">LAUNCH CRAFT →</button>
+            <span style="font-size:11px; font-weight:700; opacity:0.78;">HOLD [SPACE] OR CLICK TO ORBIT</span>
+          </div>
         </div>
-        <div class="mechanic-box">
-          <strong>02 / GRAZE & OVERHEAT</strong>
-          <span>Skim Bauhaus spikes for <b>+CHAIN</b>. Don't stay tethered until redline!</span>
+
+        <!-- TAB 2: ATELIER (COSMETIC SHOP) -->
+        <div class="tab-pane" id="atelierTab">
+          <div class="poster-header-strip">
+            <span>SWISS DESIGN ATELIER</span>
+            <span>BALANCE: <strong id="atelierInkCount">0</strong> INK</span>
+          </div>
+
+          <div class="shop-section-title">
+            <span>I. VESSEL CHASSIS</span>
+            <span style="font-size:10px; font-family:'Space Mono';">SELECT HULL</span>
+          </div>
+          <div class="shop-grid" id="shopShipsGrid"></div>
+
+          <div class="shop-section-title">
+            <span>II. INK TRAILS</span>
+            <span style="font-size:10px; font-family:'Space Mono';">CONTRAIL STYLE</span>
+          </div>
+          <div class="shop-grid" id="shopTrailsGrid"></div>
+
+          <div class="shop-section-title">
+            <span>III. PAPER STOCKS</span>
+            <span style="font-size:10px; font-family:'Space Mono';">PRINT PALETTE</span>
+          </div>
+          <div class="shop-grid" id="shopThemesGrid"></div>
         </div>
-      </div>
 
-      <div class="control-banner">
-        HOLD <em>MOUSE / TOUCH / SPACE</em> TO ORBIT &nbsp;•&nbsp; RELEASE TO FIRE
-      </div>
+        <!-- TAB 3: MISSIONS -->
+        <div class="tab-pane" id="missionsTab">
+          <div class="poster-header-strip">
+            <span>FIELD DIRECTIVES</span>
+            <span>AUTO-VERIFIED ON COMPLETION</span>
+          </div>
+          <div class="mission-list" id="missionListContainer"></div>
+          <div style="margin-top:14px; display:flex; justify-content:flex-end;">
+            <button class="swiss-btn" id="refreshMissionsBtn">ISSUE NEW DIRECTIVES ↻</button>
+          </div>
+        </div>
 
-      <div class="action-row">
-        <button class="swiss-btn primary" id="startBtn">LAUNCH CRAFT →</button>
-        <span class="shortcut-hint">OR PRESS [SPACE]</span>
+        <!-- TAB 4: CALIBRATION (SETTINGS) -->
+        <div class="tab-pane" id="settingsTab">
+          <div class="poster-header-strip">
+            <span>INSTRUMENT CALIBRATION</span>
+            <span>SAVED AUTOMATICALLY</span>
+          </div>
+          <div class="setting-list">
+            <div class="setting-row">
+              <div>
+                <strong>SCREEN SHAKE INTENSITY</strong>
+                <small>Tactile camera recoil on launches &amp; shatters</small>
+              </div>
+              <button class="swiss-btn" id="toggleShakeBtn">FULL</button>
+            </div>
+            <div class="setting-row">
+              <div>
+                <strong>HITSTOP FREEZE FRAMES</strong>
+                <small>Micro-pause impact crunch on grazes &amp; shatters</small>
+              </div>
+              <button class="swiss-btn" id="toggleHitstopBtn">ON</button>
+            </div>
+            <div class="setting-row">
+              <div>
+                <strong>TRAJECTORY GUIDE ARC</strong>
+                <small>Dotted tangential aim projection while tethered</small>
+              </div>
+              <button class="swiss-btn" id="toggleGuideBtn">EXTENDED</button>
+            </div>
+            <div class="setting-row">
+              <div>
+                <strong>SYNTHESIZER AUDIO</strong>
+                <small>Web Audio procedural chimes, wind &amp; bass</small>
+              </div>
+              <button class="swiss-btn" id="settingsMuteBtn">ENABLED</button>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </section>
 
-  <!-- Game Over Overlay -->
+  <!-- PAUSE OVERLAY -->
+  <section class="overlay hidden" id="pauseOverlay">
+    <div class="poster-card">
+      <div class="poster-header-strip">
+        <span><i class="badge-dot"></i>FLIGHT SUSPENDED</span>
+        <span>ORBITA ’74</span>
+      </div>
+      <h2 class="poster-title" style="font-size:44px;">PAUSED</h2>
+      <p class="poster-subtitle">Telemetry locked. Resume flight or return to the Atelier hub.</p>
+      <div class="action-row">
+        <button class="swiss-btn primary" id="resumeBtn">RESUME →</button>
+        <button class="swiss-btn" id="pauseMenuBtn">MAIN HUB</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- GAME OVER OVERLAY -->
   <section class="overlay hidden" id="gameOverOverlay">
     <div class="poster-card">
       <div class="poster-header-strip">
@@ -523,101 +953,255 @@
       </div>
 
       <div id="newRecordBadge" class="new-record-ribbon" style="display:none;">★ NEW ARCHIVE RECORD ★</div>
-      <h2 class="poster-title" style="font-size: clamp(36px, 7vw, 52px);">SIGNAL<span>LOST</span></h2>
+      <h2 class="poster-title" style="font-size: clamp(34px, 7vw, 48px);">SIGNAL<span>LOST</span></h2>
 
       <div class="stats-row">
         <div class="stat-cell highlight">
           <span class="k">FINAL SCORE</span>
           <span class="v" id="finalScore">0</span>
         </div>
+        <div class="stat-cell ink-earned">
+          <span class="k">INK EARNED</span>
+          <span class="v" id="finalInkEarned">+0</span>
+        </div>
         <div class="stat-cell">
           <span class="k">BEST SCORE</span>
           <span class="v" id="finalBest">0</span>
         </div>
         <div class="stat-cell">
-          <span class="k">MAX CHAIN</span>
-          <span class="v" id="finalMaxChain">x1</span>
+          <span class="k">MAX CHAIN / SHATTERS</span>
+          <span class="v" id="finalExtra">x1 / 0</span>
         </div>
       </div>
 
+      <div id="goMissionSummary" style="font-size:11px; font-weight:700; margin-bottom:16px; color:var(--sage);"></div>
+
       <div class="action-row">
         <button class="swiss-btn primary" id="restartBtn">RE-LAUNCH ↺</button>
-        <span class="shortcut-hint">PRESS [SPACE] FOR INSTANT RETRY</span>
+        <button class="swiss-btn cobalt" id="goMenuBtn">ATELIER / HUB</button>
       </div>
     </div>
   </section>
 
   <script>
-    /**
-     * ORBITA '74 — Complete Single-File Orbital Slingshot Arcade Game
-     * Aesthetic: 1970s Swiss International Typographic Style / Bauhaus Kinetic Art
-     * Audio: Web Audio API Procedural Synthesizer
-     */
-
     (() => {
       'use strict';
 
       // =========================================================================
-      // 1. DESIGN TOKENS & PALETTE
+      // 1. COSMETIC CATALOG & PAPER THEMES
       // =========================================================================
-      const PALETTE = {
-        paper: '#F4EFE6',
-        paperDark: '#E6DEC8',
-        ink: '#1C1B18',
-        inkFaint: 'rgba(28, 27, 24, 0.08)',
-        inkMid: 'rgba(28, 27, 24, 0.24)',
-        vermilion: '#E03C28',
-        ochre: '#E8A825',
-        cobalt: '#1D6F8A',
-        sage: '#3B7A57'
+      const THEMES = {
+        cream: {
+          id: 'cream',
+          name: 'ARCHIVAL CREAM',
+          desc: '1974 Basel Warm Stock',
+          cost: 0,
+          dark: false,
+          paper: '#F4EFE6',
+          paperDark: '#E6DEC8',
+          ink: '#181715',
+          inkFaint: 'rgba(24, 23, 21, 0.08)',
+          vermilion: '#E03C28',
+          ochre: '#F0A818',
+          cobalt: '#1D4ED8',
+          sage: '#2A7B5C'
+        },
+        cyan: {
+          id: 'cyan',
+          name: 'BLUEPRINT CYAN',
+          desc: 'Architectural Cyanotype',
+          cost: 120,
+          dark: false,
+          paper: '#E3EEF5',
+          paperDark: '#CFE0EC',
+          ink: '#0F2537',
+          inkFaint: 'rgba(15, 37, 55, 0.09)',
+          vermilion: '#E03C28',
+          ochre: '#F0A818',
+          cobalt: '#0284C7',
+          sage: '#15803D'
+        },
+        manila: {
+          id: 'manila',
+          name: 'MANILA DRAFT',
+          desc: 'Golden Kraft Folder',
+          cost: 220,
+          dark: false,
+          paper: '#EFE3C8',
+          paperDark: '#E0CFA8',
+          ink: '#231D16',
+          inkFaint: 'rgba(35, 29, 22, 0.09)',
+          vermilion: '#D9381E',
+          ochre: '#E59500',
+          cobalt: '#1E40AF',
+          sage: '#2F6F4E'
+        },
+        charcoal: {
+          id: 'charcoal',
+          name: 'CHARCOAL PRESS',
+          desc: 'Inverted Dark Risograph',
+          cost: 350,
+          dark: true,
+          paper: '#1A1918',
+          paperDark: '#262422',
+          ink: '#F4EFE6',
+          inkFaint: 'rgba(244, 239, 230, 0.08)',
+          vermilion: '#FF4D36',
+          ochre: '#FFB82E',
+          cobalt: '#3B82F6',
+          sage: '#34D399'
+        }
       };
 
+      const SHIPS = [
+        { id: 'monolith', name: '01. MONOLITH', desc: 'Classic Swiss Dart', cost: 0 },
+        { id: 'concorde', name: '02. CONCORDE', desc: 'Twin-Fin Delta Wing', cost: 100 },
+        { id: 'sputnik',  name: '03. SPUTNIK',  desc: 'Orbital Sphere + Moonlet', cost: 200 },
+        { id: 'vector',   name: '04. VECTOR',   desc: 'Sharp Bauhaus Prism', cost: 320 }
+      ];
+
+      const TRAILS = [
+        { id: 'ribbon',   name: 'VERMILION RIBBON', desc: 'Tapered Solid Ink', cost: 0 },
+        { id: 'dotted',   name: 'TELEMETRY TICKS',  desc: 'Dashed Survey Line', cost: 90 },
+        { id: 'halftone', name: 'HALFTONE DOTS',    desc: 'Risograph Ink Drops', cost: 180 },
+        { id: 'prism',    name: 'PRISM SPECTRUM',   desc: 'Tri-Color Swiss Bars', cost: 280 }
+      ];
+
       // =========================================================================
-      // 2. PROCEDURAL WEB AUDIO SYNTHESIZER (No external assets)
+      // 2. PERSISTENT PROFILE, UNLOCKS, MISSIONS & SETTINGS
+      // =========================================================================
+      const SAVE_KEY = 'orbita74_save_v2';
+      const defaultSave = {
+        highScore: 0,
+        ink: 60, // Starter Ink so player can test buying a cosmetic right away
+        unlockedShips: ['monolith'],
+        unlockedTrails: ['ribbon'],
+        unlockedThemes: ['cream'],
+        equippedShip: 'monolith',
+        equippedTrail: 'ribbon',
+        equippedTheme: 'cream',
+        settings: {
+          shake: 'FULL',     // 'FULL' | 'SUBTLE' | 'OFF'
+          hitstop: true,
+          guide: 'EXTENDED', // 'EXTENDED' | 'SHORT'
+          muted: false
+        },
+        missions: null
+      };
+
+      let save = Object.assign({}, defaultSave, JSON.parse(localStorage.getItem(SAVE_KEY) || '{}'));
+      save.settings = Object.assign({}, defaultSave.settings, save.settings || {});
+
+      function persistSave() {
+        localStorage.setItem(SAVE_KEY, JSON.stringify(save));
+      }
+
+      let PALETTE = THEMES[save.equippedTheme] || THEMES.cream;
+
+      function applyTheme(themeId) {
+        PALETTE = THEMES[themeId] || THEMES.cream;
+        const r = document.documentElement.style;
+        r.setProperty('--paper', PALETTE.paper);
+        r.setProperty('--paper-dark', PALETTE.paperDark);
+        r.setProperty('--ink', PALETTE.ink);
+        r.setProperty('--vermilion', PALETTE.vermilion);
+        r.setProperty('--ochre', PALETTE.ochre);
+        r.setProperty('--cobalt', PALETTE.cobalt);
+        r.setProperty('--sage', PALETTE.sage);
+        document.body.classList.toggle('dark-theme', !!PALETTE.dark);
+      }
+      applyTheme(save.equippedTheme);
+
+      // Mission Generator
+      const MISSION_POOL = [
+        { type: 'graze', target: 3, reward: 65, title: 'Perform 3 Near-Miss Grazes in one run' },
+        { type: 'graze', target: 6, reward: 120, title: 'Perform 6 Near-Miss Grazes in one run' },
+        { type: 'stars', target: 8, reward: 60, title: 'Collect 8 Golden Stars in one run' },
+        { type: 'stars', target: 16, reward: 115, title: 'Collect 16 Golden Stars in one run' },
+        { type: 'overdrive', target: 1, reward: 75, title: 'Ignite Fever Overdrive Mode' },
+        { type: 'shatter', target: 2, reward: 95, title: 'Shatter 2 Hazards during Overdrive' },
+        { type: 'score', target: 1500, reward: 80, title: 'Score 1,500 points in a single flight' },
+        { type: 'score', target: 3500, reward: 150, title: 'Score 3,500 points in a single flight' },
+        { type: 'sonic', target: 3, reward: 70, title: 'Launch from 3 Cobalt Pulse Anchors' }
+      ];
+
+      function generateMissions() {
+        const shuffled = [...MISSION_POOL].sort(() => Math.random() - 0.5);
+        const picked = [];
+        const usedTypes = new Set();
+        for (const m of shuffled) {
+          if (!usedTypes.has(m.type) && picked.length < 3) {
+            usedTypes.add(m.type);
+            picked.push({ ...m, progress: 0, completed: false });
+          }
+        }
+        save.missions = picked;
+        persistSave();
+      }
+
+      if (!save.missions || !Array.isArray(save.missions) || save.missions.length !== 3) {
+        generateMissions();
+      }
+
+      // =========================================================================
+      // 3. ENHANCED PROCEDURAL WEB AUDIO SYNTHESIZER
       // =========================================================================
       class SoundEngine {
         constructor() {
           this.ctx = null;
-          this.muted = false;
+          this.muted = !!save.settings.muted;
           this.chargeOsc = null;
           this.chargeGain = null;
-          this.pentatonic = [261.63, 293.66, 329.63, 392.00, 440.00, 523.25, 587.33, 659.25, 783.99];
+          this.pentatonic = [261.63, 293.66, 329.63, 392.00, 440.00, 523.25, 587.33, 659.25, 783.99, 880.00];
         }
 
         init() {
           if (!this.ctx) {
             const AudioCtx = window.AudioContext || window.webkitAudioContext;
-            if (AudioCtx) {
-              this.ctx = new AudioCtx();
-            }
+            if (AudioCtx) this.ctx = new AudioCtx();
           }
           if (this.ctx && this.ctx.state === 'suspended') {
             this.ctx.resume();
           }
         }
 
-        toggleMute() {
-          this.muted = !this.muted;
+        setMuted(m) {
+          this.muted = m;
+          save.settings.muted = m;
+          persistSave();
           if (this.muted) this.stopCharge();
-          return this.muted;
         }
 
-        playLatch() {
+        playClick(pitch = 620) {
           if (this.muted) return;
           this.init();
           if (!this.ctx) return;
-
           const now = this.ctx.currentTime;
-          // Warm analog bass thump
           const osc = this.ctx.createOscillator();
           const gain = this.ctx.createGain();
           osc.type = 'triangle';
-          osc.frequency.setValueAtTime(165, now);
+          osc.frequency.setValueAtTime(pitch, now);
+          osc.frequency.exponentialRampToValueAtTime(pitch * 0.45, now + 0.045);
+          gain.gain.setValueAtTime(0.14, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.05);
+          osc.connect(gain);
+          gain.connect(this.ctx.destination);
+          osc.start(now);
+          osc.stop(now + 0.055);
+        }
+
+        playLatch(isPulse = false) {
+          if (this.muted) return;
+          this.init();
+          if (!this.ctx) return;
+          const now = this.ctx.currentTime;
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+          osc.type = isPulse ? 'sawtooth' : 'triangle';
+          osc.frequency.setValueAtTime(isPulse ? 220 : 165, now);
           osc.frequency.exponentialRampToValueAtTime(58, now + 0.14);
-
-          gain.gain.setValueAtTime(0.28, now);
+          gain.gain.setValueAtTime(0.26, now);
           gain.gain.exponentialRampToValueAtTime(0.001, now + 0.16);
-
           osc.connect(gain);
           gain.connect(this.ctx.destination);
           osc.start(now);
@@ -629,16 +1213,13 @@
           this.init();
           if (!this.ctx) return;
           this.stopCharge();
-
           const now = this.ctx.currentTime;
           this.chargeOsc = this.ctx.createOscillator();
           this.chargeGain = this.ctx.createGain();
           this.chargeOsc.type = 'sine';
           this.chargeOsc.frequency.setValueAtTime(140, now);
-
           this.chargeGain.gain.setValueAtTime(0.001, now);
-          this.chargeGain.gain.linearRampToValueAtTime(0.07, now + 0.08);
-
+          this.chargeGain.gain.linearRampToValueAtTime(0.065, now + 0.08);
           this.chargeOsc.connect(this.chargeGain);
           this.chargeGain.connect(this.ctx.destination);
           this.chargeOsc.start(now);
@@ -647,11 +1228,8 @@
         updateCharge(heatRatio, speedRatio) {
           if (this.muted || !this.chargeOsc || !this.ctx) return;
           const now = this.ctx.currentTime;
-          const targetFreq = 140 + speedRatio * 180 + heatRatio * 220;
+          const targetFreq = 140 + speedRatio * 180 + heatRatio * 230;
           this.chargeOsc.frequency.setTargetAtTime(targetFreq, now, 0.04);
-          if (this.chargeGain) {
-            this.chargeGain.gain.setTargetAtTime(0.06 + heatRatio * 0.06, now, 0.04);
-          }
         }
 
         stopCharge() {
@@ -665,53 +1243,66 @@
           }
         }
 
-        playRelease(powerRatio = 0.5) {
+        playRelease(powerRatio = 0.5, isSonic = false) {
           this.stopCharge();
           if (this.muted) return;
           this.init();
           if (!this.ctx) return;
-
           const now = this.ctx.currentTime;
-          // Crisp mechanical snap + upward pitch sweep
+
+          // Pitch sweep
           const osc = this.ctx.createOscillator();
           const gain = this.ctx.createGain();
-          osc.type = 'sine';
-          const base = 240 + powerRatio * 140;
+          osc.type = isSonic ? 'sawtooth' : 'sine';
+          const base = (isSonic ? 310 : 230) + powerRatio * 150;
           osc.frequency.setValueAtTime(base, now);
-          osc.frequency.exponentialRampToValueAtTime(base * 2.1, now + 0.13);
-
+          osc.frequency.exponentialRampToValueAtTime(base * 2.2, now + 0.15);
           gain.gain.setValueAtTime(0.2, now);
-          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.14);
-
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.16);
           osc.connect(gain);
           gain.connect(this.ctx.destination);
           osc.start(now);
-          osc.stop(now + 0.15);
+          osc.stop(now + 0.17);
+
+          // Airy wind whoosh noise burst
+          const bufLen = Math.floor(this.ctx.sampleRate * 0.16);
+          const buf = this.ctx.createBuffer(1, bufLen, this.ctx.sampleRate);
+          const data = buf.getChannelData(0);
+          for (let i = 0; i < bufLen; i++) {
+            data[i] = (Math.random() * 2 - 1) * Math.sin((i / bufLen) * Math.PI);
+          }
+          const noise = this.ctx.createBufferSource();
+          noise.buffer = buf;
+          const filter = this.ctx.createBiquadFilter();
+          filter.type = 'bandpass';
+          filter.frequency.setValueAtTime(600 + powerRatio * 900, now);
+          filter.Q.value = 1.8;
+          const nGain = this.ctx.createGain();
+          nGain.gain.setValueAtTime(0.14 + powerRatio * 0.12, now);
+          nGain.gain.exponentialRampToValueAtTime(0.001, now + 0.16);
+          noise.connect(filter);
+          filter.connect(nGain);
+          nGain.connect(this.ctx.destination);
+          noise.start(now);
         }
 
         playPickup(comboIndex = 0) {
           if (this.muted) return;
           this.init();
           if (!this.ctx) return;
-
           const now = this.ctx.currentTime;
           const freq = this.pentatonic[comboIndex % this.pentatonic.length];
-
-          // Marimba-like dual harmonic chime
           [1, 2].forEach((mult, idx) => {
             const osc = this.ctx.createOscillator();
             const gain = this.ctx.createGain();
             osc.type = idx === 0 ? 'sine' : 'triangle';
             osc.frequency.setValueAtTime(freq * mult, now);
-
-            const amp = idx === 0 ? 0.22 : 0.08;
-            gain.gain.setValueAtTime(amp, now);
-            gain.gain.exponentialRampToValueAtTime(0.001, now + (idx === 0 ? 0.32 : 0.16));
-
+            gain.gain.setValueAtTime(idx === 0 ? 0.2 : 0.08, now);
+            gain.gain.exponentialRampToValueAtTime(0.001, now + (idx === 0 ? 0.28 : 0.14));
             osc.connect(gain);
             gain.connect(this.ctx.destination);
             osc.start(now);
-            osc.stop(now + 0.34);
+            osc.stop(now + 0.3);
           });
         }
 
@@ -719,24 +1310,59 @@
           if (this.muted) return;
           this.init();
           if (!this.ctx) return;
-
           const now = this.ctx.currentTime;
           const idx = Math.min(chain + 1, this.pentatonic.length - 1);
           const freq = this.pentatonic[idx] * 1.5;
-
           const osc = this.ctx.createOscillator();
           const gain = this.ctx.createGain();
           osc.type = 'triangle';
           osc.frequency.setValueAtTime(freq * 0.85, now);
-          osc.frequency.exponentialRampToValueAtTime(freq * 1.25, now + 0.11);
-
+          osc.frequency.exponentialRampToValueAtTime(freq * 1.3, now + 0.12);
           gain.gain.setValueAtTime(0.24, now);
-          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.18);
-
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.19);
           osc.connect(gain);
           gain.connect(this.ctx.destination);
           osc.start(now);
           osc.stop(now + 0.2);
+        }
+
+        playOverdrive() {
+          if (this.muted) return;
+          this.init();
+          if (!this.ctx) return;
+          const now = this.ctx.currentTime;
+          const chord = [261.63, 329.63, 392.00, 523.25, 659.25];
+          chord.forEach((f, i) => {
+            const osc = this.ctx.createOscillator();
+            const gain = this.ctx.createGain();
+            osc.type = 'sawtooth';
+            osc.frequency.setValueAtTime(f, now + i * 0.035);
+            gain.gain.setValueAtTime(0.09, now + i * 0.035);
+            gain.gain.exponentialRampToValueAtTime(0.001, now + i * 0.035 + 0.38);
+            osc.connect(gain);
+            gain.connect(this.ctx.destination);
+            osc.start(now + i * 0.035);
+            osc.stop(now + i * 0.035 + 0.4);
+          });
+        }
+
+        playShatter() {
+          if (this.muted) return;
+          this.init();
+          if (!this.ctx) return;
+          const now = this.ctx.currentTime;
+          // Crisp high shatter chime + punchy bass
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+          osc.type = 'square';
+          osc.frequency.setValueAtTime(520, now);
+          osc.frequency.exponentialRampToValueAtTime(95, now + 0.18);
+          gain.gain.setValueAtTime(0.24, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.2);
+          osc.connect(gain);
+          gain.connect(this.ctx.destination);
+          osc.start(now);
+          osc.stop(now + 0.21);
         }
 
         playCrash() {
@@ -744,56 +1370,36 @@
           if (this.muted) return;
           this.init();
           if (!this.ctx) return;
-
           const now = this.ctx.currentTime;
-          // Filtered white noise burst + low sub drop
-          const bufferSize = this.ctx.sampleRate * 0.35;
+          const bufferSize = Math.floor(this.ctx.sampleRate * 0.36);
           const buffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
           const data = buffer.getChannelData(0);
           for (let i = 0; i < bufferSize; i++) {
             data[i] = (Math.random() * 2 - 1) * Math.exp(-i / (this.ctx.sampleRate * 0.11));
           }
-
           const noise = this.ctx.createBufferSource();
           noise.buffer = buffer;
-
           const filter = this.ctx.createBiquadFilter();
           filter.type = 'lowpass';
           filter.frequency.setValueAtTime(950, now);
-          filter.frequency.exponentialRampToValueAtTime(110, now + 0.32);
-
+          filter.frequency.exponentialRampToValueAtTime(100, now + 0.34);
           const gain = this.ctx.createGain();
           gain.gain.setValueAtTime(0.38, now);
-          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.34);
-
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.35);
           noise.connect(filter);
           filter.connect(gain);
           gain.connect(this.ctx.destination);
           noise.start(now);
-
-          // Sub impact
-          const sub = this.ctx.createOscillator();
-          const subGain = this.ctx.createGain();
-          sub.type = 'sawtooth';
-          sub.frequency.setValueAtTime(110, now);
-          sub.frequency.exponentialRampToValueAtTime(32, now + 0.3);
-          subGain.gain.setValueAtTime(0.25, now);
-          subGain.gain.exponentialRampToValueAtTime(0.001, now + 0.32);
-          sub.connect(subGain);
-          subGain.connect(this.ctx.destination);
-          sub.start(now);
-          sub.stop(now + 0.33);
         }
       }
 
       const sound = new SoundEngine();
 
       // =========================================================================
-      // 3. CANVAS SETUP & RESPONSIVE HIGH-DPI SCALING
+      // 4. CANVAS SETUP & HIGH-DPI SCALING
       // =========================================================================
       const canvas = document.getElementById('gameCanvas');
       const ctx = canvas.getContext('2d');
-
       let width = window.innerWidth;
       let height = window.innerHeight;
       let dpr = Math.min(window.devicePixelRatio || 1, 2);
@@ -806,65 +1412,302 @@
         canvas.height = Math.floor(height * dpr);
         ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
       }
-
       window.addEventListener('resize', resizeCanvas);
       resizeCanvas();
 
       // =========================================================================
-      // 4. DOM ELEMENTS & STORAGE
+      // 5. DOM REFERENCES & UI BUILDERS
       // =========================================================================
       const hudScore = document.getElementById('hudScore');
       const hudMult = document.getElementById('hudMult');
       const hudMultBox = document.getElementById('hudMultBox');
-      const hudBest = document.getElementById('hudBest');
-      const bottomHint = document.getElementById('bottomHint');
+      const hudInk = document.getElementById('hudInk');
+      const hudOverdriveBox = document.getElementById('hudOverdriveBox');
+      const odSegmentsWrap = document.getElementById('odSegments');
+      const odLabel = document.getElementById('odLabel');
+      const odPct = document.getElementById('odPct');
 
-      const titleOverlay = document.getElementById('titleOverlay');
+      const menuOverlay = document.getElementById('menuOverlay');
+      const pauseOverlay = document.getElementById('pauseOverlay');
       const gameOverOverlay = document.getElementById('gameOverOverlay');
-      const startBtn = document.getElementById('startBtn');
-      const restartBtn = document.getElementById('restartBtn');
+      const pauseBtn = document.getElementById('pauseBtn');
       const muteBtn = document.getElementById('muteBtn');
       const muteIcon = document.getElementById('muteIcon');
       const muteText = document.getElementById('muteText');
+      const bottomHint = document.getElementById('bottomHint');
 
-      const finalScoreEl = document.getElementById('finalScore');
-      const finalBestEl = document.getElementById('finalBest');
-      const finalMaxChainEl = document.getElementById('finalMaxChain');
-      const deathReasonEl = document.getElementById('deathReason');
-      const newRecordBadge = document.getElementById('newRecordBadge');
+      // Build 10 segmented Fever bars
+      const odSegEls = [];
+      for (let i = 0; i < 10; i++) {
+        const seg = document.createElement('div');
+        seg.className = 'od-seg';
+        odSegmentsWrap.appendChild(seg);
+        odSegEls.push(seg);
+      }
 
-      const STORAGE_KEY = 'orbita74_high_score_v1';
-      let highScore = parseInt(localStorage.getItem(STORAGE_KEY) || '0', 10) || 0;
-      hudBest.textContent = String(highScore).padStart(4, '0');
+      function syncInkDisplays() {
+        hudInk.textContent = save.ink;
+        document.getElementById('atelierInkCount').textContent = save.ink;
+        document.getElementById('menuBestScore').textContent = String(save.highScore).padStart(4, '0');
+      }
+
+      function updateMuteUI() {
+        const m = sound.muted;
+        muteIcon.textContent = m ? '○' : '●';
+        muteText.textContent = m ? 'MUTED' : 'AUDIO';
+        document.getElementById('settingsMuteBtn').textContent = m ? 'MUTED' : 'ENABLED';
+      }
+
+      // Render Atelier Shop
+      function renderShop() {
+        syncInkDisplays();
+
+        // Ships
+        const shipsGrid = document.getElementById('shopShipsGrid');
+        shipsGrid.innerHTML = '';
+        SHIPS.forEach(item => {
+          const owned = save.unlockedShips.includes(item.id);
+          const equipped = save.equippedShip === item.id;
+          const el = document.createElement('div');
+          el.className = 'shop-item' + (equipped ? ' equipped' : '');
+          el.innerHTML = `
+            <div class="item-meta">
+              <div class="item-swatch" style="background:var(--paper); color:var(--vermilion);">▲</div>
+              <div class="item-info">
+                <strong>${item.name}</strong>
+                <small>${item.desc}</small>
+              </div>
+            </div>
+            <button class="shop-action-btn ${equipped ? 'active-tag' : owned ? 'equip' : ''}"
+              ${!owned && save.ink < item.cost ? 'disabled' : ''}>
+              ${equipped ? 'EQUIPPED' : owned ? 'EQUIP' : `${item.cost} INK`}
+            </button>
+          `;
+          el.querySelector('button').addEventListener('click', () => {
+            if (equipped) return;
+            sound.playClick(700);
+            if (!owned && save.ink >= item.cost) {
+              save.ink -= item.cost;
+              save.unlockedShips.push(item.id);
+            }
+            if (save.unlockedShips.includes(item.id)) {
+              save.equippedShip = item.id;
+              persistSave();
+              renderShop();
+            }
+          });
+          shipsGrid.appendChild(el);
+        });
+
+        // Trails
+        const trailsGrid = document.getElementById('shopTrailsGrid');
+        trailsGrid.innerHTML = '';
+        TRAILS.forEach(item => {
+          const owned = save.unlockedTrails.includes(item.id);
+          const equipped = save.equippedTrail === item.id;
+          elTrail(trailsGrid, item, owned, equipped);
+        });
+
+        // Themes
+        const themesGrid = document.getElementById('shopThemesGrid');
+        themesGrid.innerHTML = '';
+        Object.values(THEMES).forEach(t => {
+          const owned = save.unlockedThemes.includes(t.id);
+          const equipped = save.equippedTheme === t.id;
+          const el = document.createElement('div');
+          el.className = 'shop-item' + (equipped ? ' equipped' : '');
+          el.innerHTML = `
+            <div class="item-meta">
+              <div class="item-swatch" style="background:${t.paper}; color:${t.ink}; border-color:${t.ink};">Aa</div>
+              <div class="item-info">
+                <strong>${t.name}</strong>
+                <small>${t.desc}</small>
+              </div>
+            </div>
+            <button class="shop-action-btn ${equipped ? 'active-tag' : owned ? 'equip' : ''}"
+              ${!owned && save.ink < t.cost ? 'disabled' : ''}>
+              ${equipped ? 'EQUIPPED' : owned ? 'EQUIP' : `${t.cost} INK`}
+            </button>
+          `;
+          el.querySelector('button').addEventListener('click', () => {
+            if (equipped) return;
+            sound.playClick(640);
+            if (!owned && save.ink >= t.cost) {
+              save.ink -= t.cost;
+              save.unlockedThemes.push(t.id);
+            }
+            if (save.unlockedThemes.includes(t.id)) {
+              save.equippedTheme = t.id;
+              applyTheme(t.id);
+              persistSave();
+              renderShop();
+            }
+          });
+          themesGrid.appendChild(el);
+        });
+      }
+
+      function elTrail(container, item, owned, equipped) {
+        const el = document.createElement('div');
+        el.className = 'shop-item' + (equipped ? ' equipped' : '');
+        el.innerHTML = `
+          <div class="item-meta">
+            <div class="item-swatch" style="background:var(--ochre); color:#181715;">≈</div>
+            <div class="item-info">
+              <strong>${item.name}</strong>
+              <small>${item.desc}</small>
+            </div>
+          </div>
+          <button class="shop-action-btn ${equipped ? 'active-tag' : owned ? 'equip' : ''}"
+            ${!owned && save.ink < item.cost ? 'disabled' : ''}>
+            ${equipped ? 'EQUIPPED' : owned ? 'EQUIP' : `${item.cost} INK`}
+          </button>
+        `;
+        el.querySelector('button').addEventListener('click', () => {
+          if (equipped) return;
+          sound.playClick(760);
+          if (!owned && save.ink >= item.cost) {
+            save.ink -= item.cost;
+            save.unlockedTrails.push(item.id);
+          }
+          if (save.unlockedTrails.includes(item.id)) {
+            save.equippedTrail = item.id;
+            persistSave();
+            renderShop();
+          }
+        });
+        container.appendChild(el);
+      }
+
+      // Render Missions
+      function renderMissions() {
+        const list = document.getElementById('missionListContainer');
+        list.innerHTML = '';
+        let activeCount = 0;
+
+        save.missions.forEach(m => {
+          if (!m.completed) activeCount++;
+          const pct = Math.min(100, Math.round((m.progress / m.target) * 100));
+          const card = document.createElement('div');
+          card.className = 'mission-card' + (m.completed ? ' completed' : '');
+          card.innerHTML = `
+            <div style="flex:1;">
+              <div class="mission-title">${m.title}</div>
+              <div style="font-size:11px; opacity:0.8;">PROGRESS: ${Math.min(m.progress, m.target)} / ${m.target}</div>
+              <div class="mission-bar-wrap">
+                <div class="mission-bar-fill" style="width:${pct}%;"></div>
+              </div>
+            </div>
+            ${m.completed
+              ? `<div class="stamp-verified">VERIFIED +${m.reward}</div>`
+              : `<div class="mission-reward-pill">+${m.reward} INK</div>`
+            }
+          `;
+          list.appendChild(card);
+        });
+
+        const badge = document.getElementById('missionBadge');
+        badge.textContent = activeCount > 0 ? activeCount : '✓';
+      }
+
+      document.getElementById('refreshMissionsBtn').addEventListener('click', () => {
+        sound.playClick(540);
+        generateMissions();
+        renderMissions();
+      });
+
+      // Tab Navigation
+      document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          sound.playClick(680);
+          document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+          document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+          btn.classList.add('active');
+          document.getElementById(btn.dataset.tab).classList.add('active');
+          if (btn.dataset.tab === 'atelierTab') renderShop();
+          if (btn.dataset.tab === 'missionsTab') renderMissions();
+        });
+      });
+
+      // Calibration Settings Controls
+      const toggleShakeBtn = document.getElementById('toggleShakeBtn');
+      const toggleHitstopBtn = document.getElementById('toggleHitstopBtn');
+      const toggleGuideBtn = document.getElementById('toggleGuideBtn');
+
+      function syncSettingsUI() {
+        toggleShakeBtn.textContent = save.settings.shake;
+        toggleHitstopBtn.textContent = save.settings.hitstop ? 'ON' : 'OFF';
+        toggleGuideBtn.textContent = save.settings.guide;
+        updateMuteUI();
+      }
+
+      toggleShakeBtn.addEventListener('click', () => {
+        sound.playClick(600);
+        const order = ['FULL', 'SUBTLE', 'OFF'];
+        save.settings.shake = order[(order.indexOf(save.settings.shake) + 1) % order.length];
+        persistSave();
+        syncSettingsUI();
+      });
+
+      toggleHitstopBtn.addEventListener('click', () => {
+        sound.playClick(600);
+        save.settings.hitstop = !save.settings.hitstop;
+        persistSave();
+        syncSettingsUI();
+      });
+
+      toggleGuideBtn.addEventListener('click', () => {
+        sound.playClick(600);
+        save.settings.guide = save.settings.guide === 'EXTENDED' ? 'SHORT' : 'EXTENDED';
+        persistSave();
+        syncSettingsUI();
+      });
+
+      document.getElementById('settingsMuteBtn').addEventListener('click', () => {
+        sound.setMuted(!sound.muted);
+        sound.playClick(600);
+        syncSettingsUI();
+      });
+
+      muteBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        sound.setMuted(!sound.muted);
+        sound.playClick(600);
+        syncSettingsUI();
+      });
 
       // =========================================================================
-      // 5. GAME STATE & ENTITIES
+      // 6. GAME STATE, JUICE & SIMULATION VARIABLES
       // =========================================================================
-      const STATE = {
-        TITLE: 'TITLE',
-        PLAYING: 'PLAYING',
-        GAMEOVER: 'GAMEOVER'
-      };
+      const STATE = { MENU: 'MENU', PLAYING: 'PLAYING', PAUSED: 'PAUSED', GAMEOVER: 'GAMEOVER' };
+      let gameState = STATE.MENU;
 
-      let gameState = STATE.TITLE;
       let score = 0;
+      let runInkEarned = 0;
       let multiplier = 1;
       let maxMultiplier = 1;
       let pickupStreak = 0;
-      let difficulty = 0; // 0 to 1+ scaling with score/height
 
-      // Juice timers
+      // Fever / Overdrive State
+      let overdriveCharge = 0; // 0..100
+      let overdriveTimer = 0;  // >0 when active
+      const OVERDRIVE_DURATION = 6.2;
+
+      // Run telemetry for missions
+      let runStats = { graze: 0, stars: 0, overdrive: 0, shatter: 0, sonic: 0 };
+      let newlyCompletedMissions = [];
+
+      // Visual Juice timers
       let shakeTime = 0;
       let shakeIntensity = 0;
       let hitstopTimer = 0;
       let flashAlpha = 0;
       let flashColor = PALETTE.ochre;
+      let chromaticTimer = 0;
 
-      // Camera tracks upward progress smoothly
       let cameraY = 0;
       let highestWorldY = 0;
 
-      // Player object
       const player = {
         x: 0,
         y: 0,
@@ -872,42 +1715,45 @@
         vy: 0,
         radius: 10,
         angle: -Math.PI / 2,
+        squashX: 1,
+        squashY: 1,
         trail: [],
         tetheredAnchor: null,
         orbitRadius: 68,
         orbitAngle: 0,
         angularVel: 0,
         orbitDir: 1,
-        orbitHeat: 0, // 0..1 (1 = overheat snap)
-        invulnTimer: 0
+        orbitHeat: 0,
+        magnetTimer: 0
       };
 
-      // World entity pools
       let anchors = [];
       let nodes = [];
       let hazards = [];
       let particles = [];
       let shockwaves = [];
       let popups = [];
+      let snappedTethers = []; // Plucked vibrating string visuals!
       let nextSpawnY = 0;
       let anchorCounter = 0;
-
-      // Input state
       let isHolding = false;
 
       // =========================================================================
-      // 6. HELPER FUNCTIONS (Math & Juice)
+      // 7. JUICE, OVERDRIVE & MISSION HELPERS
       // =========================================================================
       const rand = (min, max) => Math.random() * (max - min) + min;
       const clamp = (val, min, max) => Math.max(min, Math.min(max, val));
       const dist = (x1, y1, x2, y2) => Math.hypot(x2 - x1, y2 - y1);
 
       function triggerShake(intensity, duration = 0.18) {
-        shakeIntensity = Math.max(shakeIntensity, intensity);
+        if (save.settings.shake === 'OFF') return;
+        const mult = save.settings.shake === 'SUBTLE' ? 0.45 : 1.0;
+        shakeIntensity = Math.max(shakeIntensity, intensity * mult);
         shakeTime = Math.max(shakeTime, duration);
       }
 
       function triggerHitstop(duration = 0.036) {
+        if (!save.settings.hitstop) return;
         hitstopTimer = Math.max(hitstopTimer, duration);
       }
 
@@ -916,26 +1762,101 @@
         flashAlpha = alpha;
       }
 
-      function addScore(points, x, y, labelOverride = null, color = PALETTE.ink) {
-        const total = Math.round(points * multiplier);
-        score += total;
-        hudScore.textContent = String(score).padStart(4, '0');
+      function triggerChromatic(duration = 0.22) {
+        chromaticTimer = Math.max(chromaticTimer, duration);
+      }
 
-        if (score > highScore) {
-          highScore = score;
-          hudBest.textContent = String(highScore).padStart(4, '0');
+      function updateOverdriveHUD() {
+        const active = overdriveTimer > 0;
+        const pct = active
+          ? Math.ceil((overdriveTimer / OVERDRIVE_DURATION) * 100)
+          : Math.floor(overdriveCharge);
+
+        hudOverdriveBox.classList.toggle('active', active);
+        document.body.classList.toggle('overdrive-active', active);
+        odLabel.textContent = active ? 'FEVER ACTIVE!' : 'OVERDRIVE';
+        odPct.textContent = `${pct}%`;
+
+        const litCount = Math.ceil(pct / 10);
+        for (let i = 0; i < 10; i++) {
+          odSegEls[i].classList.toggle('filled', i < litCount);
         }
+      }
+
+      function addOverdriveCharge(amount) {
+        if (overdriveTimer > 0 || gameState !== STATE.PLAYING) return;
+        overdriveCharge = Math.min(100, overdriveCharge + amount);
+        if (overdriveCharge >= 100) {
+          activateOverdrive();
+        }
+        updateOverdriveHUD();
+      }
+
+      function activateOverdrive() {
+        overdriveCharge = 0;
+        overdriveTimer = OVERDRIVE_DURATION;
+        runStats.overdrive++;
+        recordMissionProgress('overdrive', 1);
+
+        sound.playOverdrive();
+        triggerShake(10, 0.28);
+        triggerFlash(PALETTE.ochre, 0.25);
+        triggerChromatic(0.45);
+        spawnShockwave(player.x, player.y, 160, PALETTE.vermilion, 4);
+        spawnParticles(player.x, player.y, 26, [PALETTE.vermilion, PALETTE.ochre, PALETTE.cobalt], 100, 340);
 
         popups.push({
-          x,
-          y,
-          vy: -58,
-          text: labelOverride || `+${total}`,
-          color,
-          life: 0.85,
-          maxLife: 0.85,
-          scale: 1.15
+          x: player.x,
+          y: player.y - 26,
+          vy: -70,
+          text: 'FEVER OVERDRIVE!',
+          color: PALETTE.vermilion,
+          life: 1.15,
+          maxLife: 1.15
         });
+        updateOverdriveHUD();
+      }
+
+      function awardInk(amount, x, y) {
+        if (gameState !== STATE.PLAYING) return;
+        runInkEarned += amount;
+        save.ink += amount;
+        hudInk.textContent = save.ink;
+        if (x !== undefined && y !== undefined) {
+          popups.push({
+            x,
+            y: y - 16,
+            vy: -52,
+            text: `+${amount} INK`,
+            color: PALETTE.cobalt,
+            life: 0.75,
+            maxLife: 0.75
+          });
+        }
+      }
+
+      function addScore(points, x, y, labelOverride = null, color = PALETTE.ink) {
+        const odMult = overdriveTimer > 0 ? 2 : 1;
+        const total = Math.round(points * multiplier * odMult);
+        score += total;
+        hudScore.textContent = String(score).padStart(4, '0');
+        recordMissionProgress('score', score, true);
+
+        if (score > save.highScore) {
+          save.highScore = score;
+        }
+
+        if (x !== undefined && y !== undefined) {
+          popups.push({
+            x,
+            y,
+            vy: -58,
+            text: labelOverride || `+${total}`,
+            color,
+            life: 0.85,
+            maxLife: 0.85
+          });
+        }
       }
 
       function bumpMultiplier(amount = 1, x = player.x, y = player.y, tag = 'GRAZE') {
@@ -955,8 +1876,7 @@
           text: `${tag} x${multiplier}!`,
           color: PALETTE.vermilion,
           life: 0.95,
-          maxLife: 0.95,
-          scale: 1.3
+          maxLife: 0.95
         });
       }
 
@@ -966,6 +1886,39 @@
           hudMult.textContent = 'x1';
           hudMultBox.classList.remove('hot');
         }
+      }
+
+      function recordMissionProgress(type, value, isAbsolute = false) {
+        if (gameState !== STATE.PLAYING) return;
+        let changed = false;
+        for (const m of save.missions) {
+          if (m.completed || m.type !== type) continue;
+          if (isAbsolute) {
+            m.progress = Math.max(m.progress, value);
+          } else {
+            m.progress += value;
+          }
+          if (m.progress >= m.target) {
+            m.progress = m.target;
+            m.completed = true;
+            save.ink += m.reward;
+            runInkEarned += m.reward;
+            hudInk.textContent = save.ink;
+            newlyCompletedMissions.push(m);
+            changed = true;
+
+            popups.push({
+              x: player.x,
+              y: player.y - 40,
+              vy: -50,
+              text: `DIRECTIVE VERIFIED! +${m.reward} INK`,
+              color: PALETTE.sage,
+              life: 1.35,
+              maxLife: 1.35
+            });
+          }
+        }
+        if (changed) persistSave();
       }
 
       function spawnParticles(x, y, count, colors, speedMin = 60, speedMax = 240, shape = 'mixed') {
@@ -979,7 +1932,7 @@
             y,
             vx: Math.cos(ang) * spd,
             vy: Math.sin(ang) * spd,
-            size: rand(4, 9),
+            size: rand(4, 9.5),
             rot: rand(0, Math.PI * 2),
             vRot: rand(-9, 9),
             color: colors[Math.floor(Math.random() * colors.length)],
@@ -998,43 +1951,53 @@
           maxR,
           color,
           lineWidth,
-          life: 0.42,
-          maxLife: 0.42
+          life: 0.44,
+          maxLife: 0.44
         });
       }
 
       // =========================================================================
-      // 7. PROCEDURAL LEVEL GENERATION (Anchors, Golden Nodes & Bauhaus Hazards)
+      // 8. PROCEDURAL TRACK GENERATION (Anchors, Stars, Magnets & Hazards)
       // =========================================================================
       function createAnchor(x, y, isStart = false) {
         anchorCounter++;
-        const diff = clamp(score / 3500, 0, 1);
-        const baseCaptureR = isStart ? 155 : rand(125 - diff * 18, 152 - diff * 12);
-        const coreR = isStart ? 18 : rand(13, 17);
-        const moves = !isStart && anchorCounter > 3 && Math.random() < (0.22 + diff * 0.45);
+        const diff = clamp(score / 3600, 0, 1);
+
+        // Anchor types: 'standard', 'pulse' (Cobalt booster), 'fragile' (Shatters after 1 launch)
+        let kind = 'standard';
+        if (!isStart && anchorCounter > 2) {
+          const roll = Math.random();
+          if (roll < 0.24) kind = 'pulse';
+          else if (roll < 0.42) kind = 'fragile';
+        }
+
+        const baseCaptureR = isStart ? 155 : rand(126 - diff * 16, 154 - diff * 12);
+        const coreR = isStart ? 18 : (kind === 'pulse' ? 16 : 14);
+        const moves = !isStart && anchorCounter > 3 && Math.random() < (0.24 + diff * 0.45);
 
         return {
           id: anchorCounter,
+          kind,
           x,
           y,
           baseX: x,
           coreR,
-          captureR: Math.max(96, baseCaptureR),
+          captureR: Math.max(98, baseCaptureR),
           used: false,
+          shattered: false,
           heat: 0,
-          moveAmp: moves ? rand(35, Math.min(110, width * 0.22)) : 0,
-          moveSpeed: rand(1.1, 2.1 + diff * 0.8),
+          moveAmp: moves ? rand(35, Math.min(115, width * 0.22)) : 0,
+          moveSpeed: rand(1.1, 2.2 + diff * 0.8),
           movePhase: rand(0, Math.PI * 2),
           pulsePhase: rand(0, Math.PI * 2),
-          label: `S-${String(anchorCounter).padStart(2, '0')}`
+          label: kind === 'pulse' ? `P-${anchorCounter}` : kind === 'fragile' ? `F-${anchorCounter}` : `S-${String(anchorCounter).padStart(2, '0')}`
         };
       }
 
       function spawnRow(y) {
-        const margin = Math.max(95, width * 0.16);
+        const margin = Math.max(92, width * 0.16);
         const safeWidth = Math.max(160, width - margin * 2);
 
-        // Place main anchor
         const prevAnchor = anchors[anchors.length - 1];
         let ax = margin + Math.random() * safeWidth;
         if (prevAnchor && Math.abs(ax - prevAnchor.baseX) < 85) {
@@ -1046,55 +2009,56 @@
         const anchor = createAnchor(ax, y, false);
         anchors.push(anchor);
 
-        // Spawn 1-2 Golden Score Nodes between previous anchor and this anchor
         if (prevAnchor) {
-          const midX = (prevAnchor.baseX + ax) * 0.5 + rand(-55, 55);
+          // Spawn Golden Star cluster or Magnet Pickup
+          const midX = (prevAnchor.baseX + ax) * 0.5 + rand(-50, 50);
           const midY = (prevAnchor.y + y) * 0.5;
+          const isMagnet = anchorCounter > 4 && Math.random() < 0.11;
+
           nodes.push({
             x: clamp(midX, 55, width - 55),
             y: midY,
-            r: 11,
+            r: isMagnet ? 13 : 11,
+            kind: isMagnet ? 'magnet' : 'star',
             collected: false,
             phase: rand(0, Math.PI * 2)
           });
 
-          // Occasional second bonus node off to the side
-          if (Math.random() < 0.48) {
-            const sideX = ax > width * 0.5 ? rand(60, ax - 95) : rand(ax + 95, width - 60);
+          if (Math.random() < 0.52) {
+            const sideX = ax > width * 0.5 ? rand(60, ax - 90) : rand(ax + 90, width - 60);
             nodes.push({
               x: sideX,
               y: y + rand(-35, 35),
               r: 10,
+              kind: 'star',
               collected: false,
               phase: rand(0, Math.PI * 2)
             });
           }
 
-          // Spawn Bauhaus Hazard Spikes / Rotating Bars as difficulty climbs
-          const diff = clamp(score / 3000, 0, 1);
-          const hazardChance = anchorCounter <= 2 ? 0.35 : (0.68 + diff * 0.28);
+          // Spawn Bauhaus Hazards
+          const diff = clamp(score / 3200, 0, 1);
+          const hazardChance = anchorCounter <= 2 ? 0.4 : (0.72 + diff * 0.25);
           if (Math.random() < hazardChance) {
-            // Place hazard slightly offset from direct line so player can skim past for GRAZE!
             const lineX = (prevAnchor.baseX + ax) * 0.5;
             const offsetDir = Math.random() < 0.5 ? -1 : 1;
-            let hx = lineX + offsetDir * rand(58, 125);
-            hx = clamp(hx, 60, width - 60);
+            let hx = clamp(lineX + offsetDir * rand(54, 122), 58, width - 58);
             const hy = (prevAnchor.y + y) * 0.5 + rand(-35, 35);
 
-            // Ensure hazard isn't overlapping an anchor core or capture zone awkwardly
-            if (dist(hx, hy, ax, y) > anchor.captureR * 0.72 && dist(hx, hy, prevAnchor.baseX, prevAnchor.y) > prevAnchor.captureR * 0.72) {
+            if (dist(hx, hy, ax, y) > anchor.captureR * 0.7 && dist(hx, hy, prevAnchor.baseX, prevAnchor.y) > prevAnchor.captureR * 0.7) {
               hazards.push({
                 x: hx,
                 y: hy,
                 baseX: hx,
                 r: rand(16, 22 + diff * 5),
-                grazeR: 48,
+                grazeR: 50,
                 grazed: false,
+                shattered: false,
                 rot: rand(0, Math.PI * 2),
-                vRot: (Math.random() < 0.5 ? -1 : 1) * rand(1.2, 2.8 + diff * 1.4),
+                vRot: (Math.random() < 0.5 ? -1 : 1) * rand(1.3, 3.0 + diff * 1.4),
                 type: Math.random() < 0.55 ? 'triangle' : 'cross',
-                driftAmp: diff > 0.25 && Math.random() < 0.5 ? rand(25, 65) : 0,
-                driftSpeed: rand(1.2, 2.2),
+                driftAmp: diff > 0.2 && Math.random() < 0.52 ? rand(28, 68) : 0,
+                driftSpeed: rand(1.2, 2.3),
                 driftPhase: rand(0, Math.PI * 2)
               });
             }
@@ -1104,20 +2068,28 @@
 
       function initWorld(isDemo = false) {
         score = 0;
+        runInkEarned = 0;
         multiplier = 1;
         maxMultiplier = 1;
         pickupStreak = 0;
+        overdriveCharge = 0;
+        overdriveTimer = 0;
         anchorCounter = 0;
+        runStats = { graze: 0, stars: 0, overdrive: 0, shatter: 0, sonic: 0 };
+        newlyCompletedMissions = [];
+
         anchors = [];
         nodes = [];
         hazards = [];
         particles = [];
         shockwaves = [];
         popups = [];
+        snappedTethers = [];
 
         hudScore.textContent = '0000';
         hudMult.textContent = 'x1';
         hudMultBox.classList.remove('hot');
+        updateOverdriveHUD();
 
         const startX = width * 0.5;
         const startY = height * 0.66;
@@ -1127,38 +2099,38 @@
         cameraY = 0;
         highestWorldY = startY;
 
-        // Place player already orbiting the starting solar anchor so gameplay starts immediately with momentum
         player.tetheredAnchor = firstAnchor;
         player.orbitRadius = 66;
         player.orbitAngle = -Math.PI * 0.25;
         player.orbitDir = 1;
-        player.angularVel = 3.5;
+        player.angularVel = 3.6;
         player.orbitHeat = 0;
+        player.magnetTimer = 0;
+        player.squashX = 1;
+        player.squashY = 1;
         player.trail = [];
         player.x = firstAnchor.x + Math.cos(player.orbitAngle) * player.orbitRadius;
         player.y = firstAnchor.y + Math.sin(player.orbitAngle) * player.orbitRadius;
         player.vx = -Math.sin(player.orbitAngle) * player.angularVel * player.orbitRadius;
         player.vy = Math.cos(player.orbitAngle) * player.angularVel * player.orbitRadius;
 
-        // Populate initial upward track
         nextSpawnY = startY - 235;
         for (let i = 0; i < 8; i++) {
           spawnRow(nextSpawnY);
-          nextSpawnY -= rand(220, 265);
+          nextSpawnY -= rand(215, 260);
         }
 
-        if (isDemo) {
-          isHolding = true;
-        }
+        if (isDemo) isHolding = true;
       }
 
       // =========================================================================
-      // 8. ORBITAL MECHANICS & INPUT CONTROLS
+      // 9. ORBITAL PHYSICS & INPUT HANDLERS
       // =========================================================================
       function findNearestAnchor(x, y) {
         let best = null;
         let bestDist = Infinity;
         for (const a of anchors) {
+          if (a.shattered) continue;
           const d = dist(x, y, a.x, a.y);
           if (d <= a.captureR && d < bestDist) {
             best = a;
@@ -1176,23 +2148,28 @@
         player.orbitRadius = currentR;
         player.orbitAngle = Math.atan2(dy, dx);
 
-        // Determine natural clockwise vs counter-clockwise direction from entry velocity
         const cross = dx * player.vy - dy * player.vx;
         player.orbitDir = cross >= 0 ? 1 : -1;
 
-        const entrySpeed = Math.max(230, Math.hypot(player.vx, player.vy));
+        const entrySpeed = Math.max(240, Math.hypot(player.vx, player.vy));
         player.angularVel = (entrySpeed / currentR) * player.orbitDir;
         player.orbitHeat = anchor.heat || 0;
 
-        // First visit bonus
+        // Squash impact on latch
+        player.squashX = 0.78;
+        player.squashY = 1.26;
+
         if (!anchor.used && gameState === STATE.PLAYING) {
           anchor.used = true;
-          addScore(25, anchor.x, anchor.y - anchor.coreR - 14, `+${25 * multiplier}`, PALETTE.cobalt);
+          const pts = anchor.kind === 'fragile' ? 60 : 25;
+          addScore(pts, anchor.x, anchor.y - anchor.coreR - 14, `+${pts * multiplier}`, PALETTE.cobalt);
+          addOverdriveCharge(6);
         }
 
-        spawnShockwave(anchor.x, anchor.y, anchor.captureR * 0.65, PALETTE.cobalt, 2.5);
-        spawnParticles(player.x, player.y, 8, [PALETTE.cobalt, PALETTE.ink], 40, 130, 'circle');
-        sound.playLatch();
+        const isPulse = anchor.kind === 'pulse';
+        spawnShockwave(anchor.x, anchor.y, anchor.captureR * 0.7, isPulse ? PALETTE.cobalt : PALETTE.ink, 2.5);
+        spawnParticles(player.x, player.y, 9, [PALETTE.cobalt, PALETTE.ink], 40, 140, 'circle');
+        sound.playLatch(isPulse);
         sound.startCharge();
       }
 
@@ -1200,28 +2177,56 @@
         if (!player.tetheredAnchor) return;
         const anchor = player.tetheredAnchor;
 
-        // Tangential launch velocity
+        // Spawn plucked vibrating tether string effect
+        snappedTethers.push({
+          x1: anchor.x,
+          y1: anchor.y,
+          x2: player.x,
+          y2: player.y,
+          life: 0.35,
+          maxLife: 0.35,
+          amp: 14
+        });
+
         const tangentAngle = player.orbitAngle + (Math.PI / 2) * player.orbitDir;
         const tangentialSpeed = Math.abs(player.angularVel) * player.orbitRadius;
-        const boost = overheated ? 0.85 : 1.16;
-        const launchSpeed = clamp(tangentialSpeed * boost, 310, 690);
+        const isPulse = anchor.kind === 'pulse';
+        const boost = overheated ? 0.85 : (isPulse ? 1.38 : 1.18);
+        const launchSpeed = clamp(tangentialSpeed * boost, 320, isPulse ? 780 : 700);
 
         player.vx = Math.cos(tangentAngle) * launchSpeed;
         player.vy = Math.sin(tangentAngle) * launchSpeed;
         player.angle = tangentAngle;
         player.tetheredAnchor = null;
 
-        const powerRatio = clamp((launchSpeed - 310) / 380, 0, 1);
-        triggerShake(4 + powerRatio * 6, 0.14);
-        spawnShockwave(player.x, player.y, 44 + powerRatio * 26, overheated ? PALETTE.vermilion : PALETTE.ink, 2.5);
+        // Dramatic stretch on launch
+        player.squashX = 1.42;
+        player.squashY = 0.68;
+
+        const powerRatio = clamp((launchSpeed - 320) / 420, 0, 1);
+        triggerShake(isPulse ? 8 : (4 + powerRatio * 6), 0.15);
+        spawnShockwave(player.x, player.y, isPulse ? 78 : (46 + powerRatio * 26), isPulse ? PALETTE.cobalt : PALETTE.ink, 3);
         spawnParticles(
           player.x,
           player.y,
-          12,
-          overheated ? [PALETTE.vermilion, PALETTE.ochre] : [PALETTE.ochre, PALETTE.ink, PALETTE.vermilion],
+          isPulse ? 18 : 12,
+          isPulse ? [PALETTE.cobalt, PALETTE.ochre, PALETTE.ink] : [PALETTE.ochre, PALETTE.ink, PALETTE.vermilion],
           80,
-          240
+          260
         );
+
+        if (isPulse && gameState === STATE.PLAYING && !overheated) {
+          runStats.sonic++;
+          recordMissionProgress('sonic', 1);
+          addScore(50, player.x, player.y - 20, 'SONIC LAUNCH!', PALETTE.cobalt);
+          triggerChromatic(0.18);
+        }
+
+        if (anchor.kind === 'fragile') {
+          anchor.shattered = true;
+          spawnParticles(anchor.x, anchor.y, 16, [PALETTE.ochre, PALETTE.ink], 60, 200, 'triangle');
+          spawnShockwave(anchor.x, anchor.y, 55, PALETTE.ochre, 2.5);
+        }
 
         if (overheated && gameState === STATE.PLAYING) {
           resetMultiplier();
@@ -1232,24 +2237,20 @@
             text: 'OVERHEAT!',
             color: PALETTE.vermilion,
             life: 0.8,
-            maxLife: 0.8,
-            scale: 1.1
+            maxLife: 0.8
           });
         }
 
-        sound.playRelease(powerRatio);
+        sound.playRelease(powerRatio, isPulse);
       }
 
       function handlePressStart() {
         sound.init();
         if (gameState !== STATE.PLAYING) return;
         isHolding = true;
-
         if (!player.tetheredAnchor) {
           const candidate = findNearestAnchor(player.x, player.y);
-          if (candidate) {
-            latchToAnchor(candidate);
-          }
+          if (candidate) latchToAnchor(candidate);
         }
       }
 
@@ -1261,302 +2262,379 @@
         }
       }
 
-      // Pointer / Touch / Keyboard Listeners
       canvas.addEventListener('pointerdown', (e) => {
         e.preventDefault();
         handlePressStart();
       });
 
-      window.addEventListener('pointerup', (e) => {
-        if (isHolding) {
-          handlePressEnd();
-        }
+      window.addEventListener('pointerup', () => {
+        if (isHolding) handlePressEnd();
       });
 
       window.addEventListener('keydown', (e) => {
         if (e.code === 'Space' || e.code === 'ArrowUp' || e.code === 'KeyW') {
           e.preventDefault();
           if (e.repeat) return;
-          if (gameState === STATE.TITLE) {
+          if (gameState === STATE.MENU || gameState === STATE.GAMEOVER) {
             startGame();
-          } else if (gameState === STATE.GAMEOVER) {
-            startGame();
+          } else if (gameState === STATE.PAUSED) {
+            resumeGame();
           } else if (gameState === STATE.PLAYING) {
             handlePressStart();
           }
-        } else if (e.code === 'KeyM') {
-          toggleMuteUI();
+        } else if (e.code === 'Escape' || e.code === 'KeyP') {
+          if (gameState === STATE.PLAYING) pauseGame();
+          else if (gameState === STATE.PAUSED) resumeGame();
         }
       });
 
       window.addEventListener('keyup', (e) => {
         if (e.code === 'Space' || e.code === 'ArrowUp' || e.code === 'KeyW') {
-          if (gameState === STATE.PLAYING && isHolding) {
-            handlePressEnd();
-          }
+          if (gameState === STATE.PLAYING && isHolding) handlePressEnd();
         }
       });
 
-      function toggleMuteUI() {
-        const muted = sound.toggleMute();
-        muteIcon.textContent = muted ? '○' : '●';
-        muteText.textContent = muted ? 'MUTED' : 'AUDIO ON';
-        muteBtn.style.opacity = muted ? '0.65' : '1';
-      }
-
-      muteBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        toggleMuteUI();
-      });
-
+      // State Transitions
       function startGame() {
         sound.init();
+        sound.playClick(780);
         gameState = STATE.PLAYING;
         isHolding = false;
-        titleOverlay.classList.add('hidden');
+        menuOverlay.classList.add('hidden');
+        pauseOverlay.classList.add('hidden');
         gameOverOverlay.classList.add('hidden');
+        hudOverdriveBox.classList.remove('hidden-in-menu');
+        pauseBtn.style.display = 'inline-flex';
         bottomHint.style.opacity = '1';
 
         initWorld(false);
-        // Immediately release or hold depending on user input; start tethered cleanly
         sound.playLatch();
+      }
+
+      function pauseGame() {
+        if (gameState !== STATE.PLAYING) return;
+        gameState = STATE.PAUSED;
+        isHolding = false;
+        sound.stopCharge();
+        pauseOverlay.classList.remove('hidden');
+      }
+
+      function resumeGame() {
+        if (gameState !== STATE.PAUSED) return;
+        gameState = STATE.PLAYING;
+        pauseOverlay.classList.add('hidden');
+      }
+
+      function returnToMenu() {
+        sound.stopCharge();
+        sound.playClick(540);
+        gameState = STATE.MENU;
+        overdriveTimer = 0;
+        document.body.classList.remove('overdrive-active');
+        pauseOverlay.classList.add('hidden');
+        gameOverOverlay.classList.add('hidden');
+        menuOverlay.classList.remove('hidden');
+        hudOverdriveBox.classList.add('hidden-in-menu');
+        pauseBtn.style.display = 'none';
+        bottomHint.style.opacity = '0';
+        syncInkDisplays();
+        renderShop();
+        renderMissions();
+        initWorld(true);
       }
 
       function triggerGameOver(reason = 'HULL BREACH') {
         if (gameState === STATE.GAMEOVER) return;
         gameState = STATE.GAMEOVER;
         isHolding = false;
+        overdriveTimer = 0;
+        document.body.classList.remove('overdrive-active');
+        pauseBtn.style.display = 'none';
+        bottomHint.style.opacity = '0';
+
         sound.playCrash();
-        triggerShake(15, 0.35);
-        triggerFlash(PALETTE.vermilion, 0.28);
+        triggerShake(16, 0.36);
+        triggerFlash(PALETTE.vermilion, 0.3);
+        triggerChromatic(0.4);
 
-        spawnParticles(player.x, player.y, 32, [PALETTE.vermilion, PALETTE.ink, PALETTE.ochre], 90, 380);
-        spawnShockwave(player.x, player.y, 120, PALETTE.vermilion, 4);
+        spawnParticles(player.x, player.y, 34, [PALETTE.vermilion, PALETTE.ink, PALETTE.ochre], 90, 390);
+        spawnShockwave(player.x, player.y, 130, PALETTE.vermilion, 4);
 
-        const prevBest = parseInt(localStorage.getItem(STORAGE_KEY) || '0', 10) || 0;
-        const isNewRecord = score > prevBest && score > 0;
-        if (score > prevBest) {
-          localStorage.setItem(STORAGE_KEY, String(score));
-          highScore = score;
+        // Bonus Ink from score
+        const scoreInkBonus = Math.floor(score / 120);
+        if (scoreInkBonus > 0) {
+          save.ink += scoreInkBonus;
+          runInkEarned += scoreInkBonus;
         }
 
-        deathReasonEl.textContent = reason;
-        finalScoreEl.textContent = score;
-        finalBestEl.textContent = highScore;
-        finalMaxChainEl.textContent = `x${maxMultiplier}`;
-        newRecordBadge.style.display = isNewRecord ? 'inline-block' : 'none';
-        bottomHint.style.opacity = '0';
+        const isNewRecord = score >= save.highScore && score > 0;
+        persistSave();
+        syncInkDisplays();
+
+        document.getElementById('deathReason').textContent = reason;
+        document.getElementById('finalScore').textContent = score;
+        document.getElementById('finalInkEarned').textContent = `+${runInkEarned}`;
+        document.getElementById('finalBest').textContent = save.highScore;
+        document.getElementById('finalExtra').textContent = `x${maxMultiplier} / ${runStats.shatter}`;
+        document.getElementById('newRecordBadge').style.display = isNewRecord ? 'inline-block' : 'none';
+
+        const summaryEl = document.getElementById('goMissionSummary');
+        summaryEl.textContent = newlyCompletedMissions.length > 0
+          ? `★ ${newlyCompletedMissions.length} DIRECTIVE(S) VERIFIED THIS RUN!`
+          : '';
 
         setTimeout(() => {
           if (gameState === STATE.GAMEOVER) {
             gameOverOverlay.classList.remove('hidden');
           }
-        }, 420);
+        }, 400);
       }
 
-      startBtn.addEventListener('click', startGame);
-      restartBtn.addEventListener('click', startGame);
+      document.getElementById('startBtn').addEventListener('click', startGame);
+      document.getElementById('restartBtn').addEventListener('click', startGame);
+      pauseBtn.addEventListener('click', pauseGame);
+      document.getElementById('resumeBtn').addEventListener('click', resumeGame);
+      document.getElementById('pauseMenuBtn').addEventListener('click', returnToMenu);
+      document.getElementById('goMenuBtn').addEventListener('click', returnToMenu);
 
       // =========================================================================
-      // 9. MAIN SIMULATION UPDATE
+      // 10. SIMULATION UPDATE LOOP
       // =========================================================================
       function update(dt) {
-        // Decay screen flash & shake
+        if (gameState === STATE.PAUSED) return;
+
         if (flashAlpha > 0) flashAlpha = Math.max(0, flashAlpha - dt * 0.9);
+        if (chromaticTimer > 0) chromaticTimer = Math.max(0, chromaticTimer - dt);
         if (shakeTime > 0) {
           shakeTime = Math.max(0, shakeTime - dt);
           if (shakeTime === 0) shakeIntensity = 0;
         }
 
-        // Hitstop freeze for tactile crunch on grazes/pickups
         if (hitstopTimer > 0) {
           hitstopTimer = Math.max(0, hitstopTimer - dt);
           return;
         }
 
+        // Recover vessel squash & stretch smoothly back to (1,1)
+        player.squashX += (1 - player.squashX) * Math.min(1, dt * 12);
+        player.squashY += (1 - player.squashY) * Math.min(1, dt * 12);
+
+        if (player.magnetTimer > 0) player.magnetTimer = Math.max(0, player.magnetTimer - dt);
+
+        if (overdriveTimer > 0 && gameState === STATE.PLAYING) {
+          overdriveTimer = Math.max(0, overdriveTimer - dt);
+          updateOverdriveHUD();
+        }
+
         const time = performance.now() * 0.001;
 
-        // Update anchors (oscillation + pulse)
         for (const a of anchors) {
-          a.pulsePhase += dt * 3.2;
+          if (a.shattered) continue;
+          a.pulsePhase += dt * 3.4;
           if (a.moveAmp > 0) {
             a.x = a.baseX + Math.sin(time * a.moveSpeed + a.movePhase) * a.moveAmp;
           }
         }
 
-        // Update hazards
         for (const h of hazards) {
+          if (h.shattered) continue;
           h.rot += h.vRot * dt;
           if (h.driftAmp > 0) {
             h.x = h.baseX + Math.sin(time * h.driftSpeed + h.driftPhase) * h.driftAmp;
           }
         }
 
-        // Update nodes
+        // Star & Magnet attraction (during Overdrive or Magnet powerup!)
+        const magnetActive = overdriveTimer > 0 || player.magnetTimer > 0;
+        const magnetRange = overdriveTimer > 0 ? 250 : 210;
         for (const n of nodes) {
-          n.phase += dt * 4;
-        }
-
-        // Autonomous demo pilot on Title screen
-        if (gameState === STATE.TITLE) {
-          if (player.tetheredAnchor) {
-            const a = player.tetheredAnchor;
-            const tangentAngle = player.orbitAngle + (Math.PI / 2) * player.orbitDir;
-            // Launch when pointing generally upward
-            if (Math.sin(tangentAngle) < -0.78 && player.orbitHeat > 0.28) {
-              releaseOrbit(false);
-            }
-          } else {
-            const cand = findNearestAnchor(player.x, player.y);
-            if (cand && dist(player.x, player.y, cand.x, cand.y) < cand.captureR * 0.78) {
-              latchToAnchor(cand);
-            }
-            // Keep demo player centered if drifting
-            if (player.x < 120) player.vx += 450 * dt;
-            if (player.x > width - 120) player.vx -= 450 * dt;
-            if (player.y - cameraY > height * 0.82) {
-              initWorld(true);
+          if (n.collected) continue;
+          n.phase += dt * 4.2;
+          if (magnetActive && gameState === STATE.PLAYING) {
+            const d = dist(player.x, player.y, n.x, n.y);
+            if (d < magnetRange && d > 1) {
+              const pull = 460 * dt;
+              n.x += ((player.x - n.x) / d) * pull;
+              n.y += ((player.y - n.y) / d) * pull;
             }
           }
         }
 
-        // Player Movement & Orbit Physics
-        if (gameState === STATE.PLAYING || gameState === STATE.TITLE) {
+        // Autonomous demo pilot behind Main Menu
+        if (gameState === STATE.MENU) {
+          if (player.tetheredAnchor) {
+            const tangentAngle = player.orbitAngle + (Math.PI / 2) * player.orbitDir;
+            if (Math.sin(tangentAngle) < -0.78 && player.orbitHeat > 0.25) {
+              releaseOrbit(false);
+            }
+          } else {
+            const cand = findNearestAnchor(player.x, player.y);
+            if (cand && dist(player.x, player.y, cand.x, cand.y) < cand.captureR * 0.8) {
+              latchToAnchor(cand);
+            }
+            if (player.x < 120) player.vx += 450 * dt;
+            if (player.x > width - 120) player.vx -= 450 * dt;
+            if (player.y - cameraY > height * 0.82) initWorld(true);
+          }
+        }
+
+        // Player Motion
+        if (gameState === STATE.PLAYING || gameState === STATE.MENU) {
           if (player.tetheredAnchor) {
             const a = player.tetheredAnchor;
-
-            // Pulling inward tightens orbit and accelerates angular velocity (conservation of momentum!)
             const minR = a.coreR + 20;
             if (player.orbitRadius > minR) {
-              player.orbitRadius = Math.max(minR, player.orbitRadius - 36 * dt);
+              player.orbitRadius = Math.max(minR, player.orbitRadius - 38 * dt);
             }
 
-            // Build tangential speed up to a crisp cap
-            const targetSpeed = clamp(320 + player.orbitHeat * 250, 320, 620);
+            const pulseMult = a.kind === 'pulse' ? 1.25 : 1.0;
+            const targetSpeed = clamp((330 + player.orbitHeat * 260) * pulseMult, 330, 680);
             const targetAngVel = (targetSpeed / player.orbitRadius) * player.orbitDir;
-            player.angularVel += (targetAngVel - player.angularVel) * Math.min(1, dt * 6);
+            player.angularVel += (targetAngVel - player.angularVel) * Math.min(1, dt * 6.5);
 
             player.orbitAngle += player.angularVel * dt;
             player.x = a.x + Math.cos(player.orbitAngle) * player.orbitRadius;
             player.y = a.y + Math.sin(player.orbitAngle) * player.orbitRadius;
             player.angle = player.orbitAngle + (Math.PI / 2) * player.orbitDir;
 
-            // Overheat tension mechanic (prevents infinite camping on one anchor)
-            const heatRate = gameState === STATE.TITLE ? 0.25 : (0.31 + clamp(score / 6000, 0, 0.22));
+            const heatRate = gameState === STATE.MENU ? 0.24 : (0.31 + clamp(score / 6000, 0, 0.22));
             player.orbitHeat += heatRate * dt;
             a.heat = player.orbitHeat;
 
             if (gameState === STATE.PLAYING) {
-              sound.updateCharge(player.orbitHeat, (targetSpeed - 320) / 300);
-              if (player.orbitHeat > 0.72) {
-                triggerShake(2.2, 0.05);
-              }
-              if (player.orbitHeat >= 1.0) {
-                releaseOrbit(true);
-              }
+              sound.updateCharge(player.orbitHeat, (targetSpeed - 330) / 350);
+              if (player.orbitHeat > 0.72) triggerShake(2.2, 0.05);
+              if (player.orbitHeat >= 1.0) releaseOrbit(true);
             }
           } else {
-            // Free-flight ballistic motion
-            // Gentle upward-friendly drag & wall deflection/bounds
-            player.x += player.vx * dt;
-            player.y += player.vy * dt;
+            const odSpeedMult = overdriveTimer > 0 ? 1.12 : 1.0;
+            player.x += player.vx * odSpeedMult * dt;
+            player.y += player.vy * odSpeedMult * dt;
             player.angle = Math.atan2(player.vy, player.vx);
 
-            // Auto-latch if player is holding input down while entering an anchor's gravity ring
             if (isHolding && gameState === STATE.PLAYING) {
               const cand = findNearestAnchor(player.x, player.y);
-              if (cand) {
-                latchToAnchor(cand);
-              }
+              if (cand) latchToAnchor(cand);
             }
 
-            // Side boundary behavior: crisp elastic bounce off left/right Swiss poster rails
+            // Crisp elastic bounce off poster telemetry rails
             const railMargin = 22;
             if (player.x < railMargin) {
               player.x = railMargin;
-              player.vx = Math.abs(player.vx) * 0.92;
-              spawnParticles(player.x, player.y, 6, [PALETTE.ink, PALETTE.ochre], 40, 120, 'line');
-              triggerShake(3, 0.08);
+              player.vx = Math.abs(player.vx) * 0.94;
+              player.squashX = 0.72;
+              player.squashY = 1.32;
+              spawnParticles(player.x, player.y, 7, [PALETTE.ink, PALETTE.ochre], 45, 130, 'line');
+              triggerShake(3.5, 0.08);
             } else if (player.x > width - railMargin) {
               player.x = width - railMargin;
-              player.vx = -Math.abs(player.vx) * 0.92;
-              spawnParticles(player.x, player.y, 6, [PALETTE.ink, PALETTE.ochre], 40, 120, 'line');
-              triggerShake(3, 0.08);
+              player.vx = -Math.abs(player.vx) * 0.94;
+              player.squashX = 0.72;
+              player.squashY = 1.32;
+              spawnParticles(player.x, player.y, 7, [PALETTE.ink, PALETTE.ochre], 45, 130, 'line');
+              triggerShake(3.5, 0.08);
             }
           }
 
-          // Record ribbon trail
           player.trail.push({ x: player.x, y: player.y });
-          if (player.trail.length > 26) {
-            player.trail.shift();
-          }
+          if (player.trail.length > 28) player.trail.shift();
 
-          // Track vertical ascent & award altitude points
           if (player.y < highestWorldY) {
             const climbed = highestWorldY - player.y;
             highestWorldY = player.y;
             if (gameState === STATE.PLAYING) {
-              score += Math.floor(climbed * 0.12);
+              score += Math.floor(climbed * 0.14);
               hudScore.textContent = String(score).padStart(4, '0');
-              if (score > highScore) {
-                highScore = score;
-                hudBest.textContent = String(highScore).padStart(4, '0');
-              }
+              recordMissionProgress('score', score, true);
+              if (score > save.highScore) save.highScore = score;
             }
           }
 
-          // Smooth camera follow (keeps player comfortably around 62% down the viewport)
           const targetCamY = Math.min(cameraY, player.y - height * 0.58);
-          cameraY += (targetCamY - cameraY) * Math.min(1, dt * 7.5);
+          cameraY += (targetCamY - cameraY) * Math.min(1, dt * 8);
 
-          // Spawn ahead & prune far below
           while (nextSpawnY > cameraY - height * 0.6) {
             spawnRow(nextSpawnY);
-            const diff = clamp(score / 3500, 0, 1);
-            nextSpawnY -= rand(215, 260 + diff * 25);
+            const diff = clamp(score / 3600, 0, 1);
+            nextSpawnY -= rand(212, 255 + diff * 25);
           }
 
           const cullY = cameraY + height + 260;
-          anchors = anchors.filter(a => a.y < cullY);
+          anchors = anchors.filter(a => !a.shattered && a.y < cullY);
           nodes = nodes.filter(n => !n.collected && n.y < cullY);
-          hazards = hazards.filter(h => h.y < cullY);
+          hazards = hazards.filter(h => !h.shattered && h.y < cullY);
 
-          // Check Golden Target Node Pickups
           if (gameState === STATE.PLAYING) {
+            // Node Pickups (Stars & Magnets)
             for (const n of nodes) {
-              if (!n.collected && dist(player.x, player.y, n.x, n.y) <= player.radius + n.r + 6) {
+              if (!n.collected && dist(player.x, player.y, n.x, n.y) <= player.radius + n.r + 7) {
                 n.collected = true;
                 pickupStreak++;
-                addScore(100, n.x, n.y, null, PALETTE.ochre);
-                spawnShockwave(n.x, n.y, 46, PALETTE.ochre, 3);
-                spawnParticles(n.x, n.y, 14, [PALETTE.ochre, PALETTE.ink, PALETTE.vermilion], 60, 220);
-                triggerHitstop(0.025);
-                triggerShake(3.5, 0.1);
                 sound.playPickup(pickupStreak);
+
+                if (n.kind === 'magnet') {
+                  player.magnetTimer = 6.0;
+                  addScore(150, n.x, n.y, 'MAGNET FIELD!', PALETTE.cobalt);
+                  spawnShockwave(n.x, n.y, 70, PALETTE.cobalt, 3);
+                  spawnParticles(n.x, n.y, 16, [PALETTE.cobalt, PALETTE.ochre], 70, 230);
+                } else {
+                  runStats.stars++;
+                  recordMissionProgress('stars', 1);
+                  addScore(100, n.x, n.y, null, PALETTE.ochre);
+                  awardInk(2, n.x, n.y);
+                  addOverdriveCharge(14);
+                  spawnShockwave(n.x, n.y, 46, PALETTE.ochre, 3);
+                  spawnParticles(n.x, n.y, 14, [PALETTE.ochre, PALETTE.ink, PALETTE.vermilion], 60, 220);
+                }
+                triggerHitstop(0.022);
+                triggerShake(3.5, 0.1);
               }
             }
 
-            // Check Hazard Collisions & Near-Miss GRAZE Risk-Reward!
+            // Hazards: Shatter during Overdrive OR Near-Miss Graze OR Fatal Impact
             for (const h of hazards) {
+              if (h.shattered) continue;
               const d = dist(player.x, player.y, h.x, h.y);
               const hitDist = player.radius + h.r * 0.78;
+
               if (d < hitDist) {
-                triggerGameOver('HAZARD IMPACT');
-                return;
+                if (overdriveTimer > 0) {
+                  // SMASH THROUGH HAZARD!
+                  h.shattered = true;
+                  runStats.shatter++;
+                  recordMissionProgress('shatter', 1);
+                  bumpMultiplier(1, h.x, h.y, 'SHATTER');
+                  addScore(200, h.x, h.y, null, PALETTE.vermilion);
+                  awardInk(5, h.x, h.y);
+                  sound.playShatter();
+                  triggerHitstop(0.048);
+                  triggerShake(11, 0.22);
+                  triggerChromatic(0.28);
+                  triggerFlash(PALETTE.vermilion, 0.18);
+                  spawnShockwave(h.x, h.y, 95, PALETTE.vermilion, 4);
+                  spawnParticles(h.x, h.y, 24, [PALETTE.vermilion, PALETTE.ink, PALETTE.ochre], 110, 340, 'triangle');
+                } else {
+                  triggerGameOver('HAZARD IMPACT');
+                  return;
+                }
               } else if (!h.grazed && d < h.grazeR + player.radius && !player.tetheredAnchor) {
                 h.grazed = true;
+                runStats.graze++;
+                recordMissionProgress('graze', 1);
                 bumpMultiplier(1, h.x, h.y, 'GRAZE');
-                addScore(75, player.x, player.y, null, PALETTE.vermilion);
-                spawnShockwave(h.x, h.y, h.grazeR * 1.25, PALETTE.vermilion, 2.5);
-                spawnParticles(player.x, player.y, 10, [PALETTE.vermilion, PALETTE.ochre], 70, 190, 'triangle');
+                addScore(85, player.x, player.y, null, PALETTE.vermilion);
+                awardInk(3, player.x, player.y);
+                addOverdriveCharge(24);
+                spawnShockwave(h.x, h.y, h.grazeR * 1.3, PALETTE.vermilion, 2.5);
+                spawnParticles(player.x, player.y, 12, [PALETTE.vermilion, PALETTE.ochre], 70, 200, 'triangle');
                 triggerHitstop(0.036);
                 triggerFlash(PALETTE.ochre, 0.14);
-                triggerShake(5, 0.12);
+                triggerChromatic(0.2);
+                triggerShake(5.5, 0.12);
                 sound.playGraze(multiplier);
               }
             }
 
-            // Check Out-of-Bounds bottom fall
             if (player.y - cameraY > height + 36) {
               triggerGameOver('DRIFTED OUT OF RANGE');
               return;
@@ -1564,7 +2642,7 @@
           }
         }
 
-        // Update Particles
+        // Update FX pools
         for (let i = particles.length - 1; i >= 0; i--) {
           const p = particles[i];
           p.x += p.vx * dt;
@@ -1576,17 +2654,19 @@
           if (p.life <= 0) particles.splice(i, 1);
         }
 
-        // Update Shockwaves
         for (let i = shockwaves.length - 1; i >= 0; i--) {
           const s = shockwaves[i];
           s.life -= dt;
           const t = 1 - Math.max(0, s.life / s.maxLife);
-          const ease = 1 - Math.pow(1 - t, 3);
-          s.r = 8 + (s.maxR - 8) * ease;
+          s.r = 8 + (s.maxR - 8) * (1 - Math.pow(1 - t, 3));
           if (s.life <= 0) shockwaves.splice(i, 1);
         }
 
-        // Update Floating Popups
+        for (let i = snappedTethers.length - 1; i >= 0; i--) {
+          snappedTethers[i].life -= dt;
+          if (snappedTethers[i].life <= 0) snappedTethers.splice(i, 1);
+        }
+
         for (let i = popups.length - 1; i >= 0; i--) {
           const pop = popups[i];
           pop.y += pop.vy * dt;
@@ -1597,7 +2677,7 @@
       }
 
       // =========================================================================
-      // 10. SWISS POSTER VECTOR RENDERER
+      // 11. SWISS POSTER & RISOGRAPH RENDERER
       // =========================================================================
       function drawSwissGrid() {
         const gridSize = 80;
@@ -1605,7 +2685,6 @@
 
         ctx.strokeStyle = PALETTE.inkFaint;
         ctx.lineWidth = 1;
-
         ctx.beginPath();
         for (let x = gridSize; x < width; x += gridSize) {
           ctx.moveTo(x, 0);
@@ -1617,8 +2696,8 @@
         }
         ctx.stroke();
 
-        // Swiss architectural registration crosshairs at major intersections
-        ctx.strokeStyle = 'rgba(28, 27, 24, 0.16)';
+        // Crosshairs
+        ctx.strokeStyle = PALETTE.inkFaint;
         for (let x = gridSize * 2; x < width; x += gridSize * 2) {
           for (let y = offsetY; y < height; y += gridSize * 2) {
             ctx.beginPath();
@@ -1630,8 +2709,9 @@
           }
         }
 
-        // Side telemetry rails
-        ctx.strokeStyle = 'rgba(28, 27, 24, 0.25)';
+        // Side rails
+        ctx.strokeStyle = PALETTE.ink;
+        ctx.globalAlpha = 0.25;
         ctx.lineWidth = 1.5;
         ctx.beginPath();
         ctx.moveTo(22, 0);
@@ -1639,48 +2719,68 @@
         ctx.moveTo(width - 22, 0);
         ctx.lineTo(width - 22, height);
         ctx.stroke();
+        ctx.globalAlpha = 1;
+      }
+
+      function drawSpeedLines() {
+        const spd = Math.hypot(player.vx, player.vy);
+        const active = overdriveTimer > 0 || (!player.tetheredAnchor && spd > 460);
+        if (!active || gameState !== STATE.PLAYING) return;
+
+        const time = performance.now() * 0.025;
+        ctx.save();
+        ctx.strokeStyle = overdriveTimer > 0 ? PALETTE.vermilion : PALETTE.ink;
+        ctx.globalAlpha = overdriveTimer > 0 ? 0.35 : 0.18;
+        ctx.lineWidth = 2;
+
+        for (let i = 0; i < 14; i++) {
+          const side = i % 2 === 0 ? 1 : -1;
+          const x = side === 1 ? rand(26, 62) : rand(width - 62, width - 26);
+          const y = ((i * 97 + time * 28) % height);
+          const len = rand(35, 85);
+          ctx.beginPath();
+          ctx.moveTo(x, y);
+          ctx.lineTo(x, y + len);
+          ctx.stroke();
+        }
+        ctx.restore();
       }
 
       function drawTrajectoryPreview() {
         if (!player.tetheredAnchor || gameState !== STATE.PLAYING) return;
-
+        const anchor = player.tetheredAnchor;
         const tangentAngle = player.orbitAngle + (Math.PI / 2) * player.orbitDir;
-        const speed = clamp(Math.abs(player.angularVel) * player.orbitRadius * 1.16, 310, 690);
+        const isPulse = anchor.kind === 'pulse';
+        const speed = clamp(Math.abs(player.angularVel) * player.orbitRadius * (isPulse ? 1.38 : 1.18), 320, isPulse ? 780 : 700);
         const vx = Math.cos(tangentAngle) * speed;
         const vy = Math.sin(tangentAngle) * speed;
 
         ctx.save();
-        ctx.strokeStyle = player.orbitHeat > 0.72 ? PALETTE.vermilion : PALETTE.ink;
-        ctx.lineWidth = 2;
+        ctx.strokeStyle = player.orbitHeat > 0.72 ? PALETTE.vermilion : (isPulse ? PALETTE.cobalt : PALETTE.ink);
+        ctx.lineWidth = 2.2;
         ctx.setLineDash([6, 6]);
         ctx.beginPath();
         ctx.moveTo(player.x, player.y);
 
-        // Predict short trajectory accounting for rail bounce
         let px = player.x;
         let py = player.y;
         let pvx = vx;
         let pvy = vy;
-        const step = 0.045;
-        for (let i = 0; i < 9; i++) {
+        const steps = save.settings.guide === 'EXTENDED' ? 11 : 5;
+        const step = 0.042;
+        for (let i = 0; i < steps; i++) {
           px += pvx * step;
           py += pvy * step;
-          if (px < 22) {
-            px = 22;
-            pvx = Math.abs(pvx) * 0.92;
-          } else if (px > width - 22) {
-            px = width - 22;
-            pvx = -Math.abs(pvx) * 0.92;
-          }
+          if (px < 22) { px = 22; pvx = Math.abs(pvx) * 0.94; }
+          else if (px > width - 22) { px = width - 22; pvx = -Math.abs(pvx) * 0.94; }
           ctx.lineTo(px, py);
         }
         ctx.stroke();
 
-        // Aim arrowhead tip
         ctx.setLineDash([]);
-        ctx.fillStyle = player.orbitHeat > 0.72 ? PALETTE.vermilion : PALETTE.ink;
+        ctx.fillStyle = ctx.strokeStyle;
         ctx.beginPath();
-        ctx.arc(px, py, 3.5, 0, Math.PI * 2);
+        ctx.arc(px, py, 3.8, 0, Math.PI * 2);
         ctx.fill();
         ctx.restore();
       }
@@ -1689,59 +2789,75 @@
         const candidate = !player.tetheredAnchor ? findNearestAnchor(player.x, player.y) : null;
 
         for (const a of anchors) {
+          if (a.shattered) continue;
           const isTethered = player.tetheredAnchor === a;
           const isCandidate = candidate === a;
+          const isPulse = a.kind === 'pulse';
+          const isFragile = a.kind === 'fragile';
 
-          // Capture radius dashed ring
           ctx.save();
+          // Outer capture ring
           ctx.beginPath();
           ctx.arc(a.x, a.y, a.captureR, 0, Math.PI * 2);
           ctx.strokeStyle = isTethered
             ? PALETTE.vermilion
             : isCandidate
               ? PALETTE.cobalt
-              : 'rgba(28, 27, 24, 0.28)';
-          ctx.lineWidth = isTethered || isCandidate ? 2.2 : 1.3;
-          ctx.setLineDash([5, 6]);
+              : isPulse
+                ? PALETTE.cobalt
+                : PALETTE.ink;
+          ctx.globalAlpha = (isTethered || isCandidate) ? 0.9 : 0.3;
+          ctx.lineWidth = (isTethered || isCandidate) ? 2.4 : 1.4;
+          ctx.setLineDash(isFragile ? [3, 7] : [6, 6]);
           ctx.stroke();
           ctx.setLineDash([]);
+          ctx.globalAlpha = 1;
 
-          // Active orbit ring & Overheat gauge arc
-          if (isTethered) {
-            // Current orbit track
+          // Double ring for Pulse anchors
+          if (isPulse) {
             ctx.beginPath();
-            ctx.arc(a.x, a.y, player.orbitRadius, 0, Math.PI * 2);
-            ctx.strokeStyle = 'rgba(28, 27, 24, 0.2)';
+            ctx.arc(a.x, a.y, a.captureR - 10, 0, Math.PI * 2);
+            ctx.strokeStyle = PALETTE.cobalt;
+            ctx.globalAlpha = 0.25;
             ctx.lineWidth = 1.5;
             ctx.stroke();
+            ctx.globalAlpha = 1;
+          }
 
-            // Overheat progress arc around core
-            const heatColor = a.heat > 0.72 ? PALETTE.vermilion : PALETTE.ochre;
+          if (isTethered) {
             ctx.beginPath();
-            ctx.arc(
-              a.x,
-              a.y,
-              a.coreR + 7,
-              -Math.PI / 2,
-              -Math.PI / 2 + Math.PI * 2 * clamp(a.heat, 0, 1)
-            );
-            ctx.strokeStyle = heatColor;
-            ctx.lineWidth = 4;
+            ctx.arc(a.x, a.y, player.orbitRadius, 0, Math.PI * 2);
+            ctx.strokeStyle = PALETTE.ink;
+            ctx.globalAlpha = 0.22;
+            ctx.lineWidth = 1.5;
+            ctx.stroke();
+            ctx.globalAlpha = 1;
+
+            // Overheat ring
+            ctx.beginPath();
+            ctx.arc(a.x, a.y, a.coreR + 7, -Math.PI / 2, -Math.PI / 2 + Math.PI * 2 * clamp(a.heat, 0, 1));
+            ctx.strokeStyle = a.heat > 0.72 ? PALETTE.vermilion : PALETTE.ochre;
+            ctx.lineWidth = 4.2;
             ctx.stroke();
           }
 
-          // Hard offset shadow for Bauhaus anchor disc
+          // Hard offset shadow
           ctx.fillStyle = PALETTE.ink;
           ctx.beginPath();
           ctx.arc(a.x + 3, a.y + 3, a.coreR, 0, Math.PI * 2);
           ctx.fill();
 
-          // Anchor core fill
+          // Anchor disc fill
           ctx.fillStyle = isTethered
             ? (a.heat > 0.72 ? PALETTE.vermilion : PALETTE.ochre)
-            : a.used
-              ? PALETTE.paperDark
-              : PALETTE.cobalt;
+            : isPulse
+              ? PALETTE.cobalt
+              : isFragile
+                ? PALETTE.ochre
+                : a.used
+                  ? PALETTE.paperDark
+                  : PALETTE.sage;
+
           ctx.strokeStyle = PALETTE.ink;
           ctx.lineWidth = 2.5;
           ctx.beginPath();
@@ -1749,14 +2865,13 @@
           ctx.fill();
           ctx.stroke();
 
-          // Center pin
-          ctx.fillStyle = PALETTE.ink;
+          ctx.fillStyle = PALETTE.paper;
           ctx.beginPath();
           ctx.arc(a.x, a.y, 3.5, 0, Math.PI * 2);
           ctx.fill();
 
-          // Swiss index micro-label
-          ctx.fillStyle = 'rgba(28, 27, 24, 0.55)';
+          ctx.fillStyle = PALETTE.ink;
+          ctx.globalAlpha = 0.55;
           ctx.font = '700 9px "Space Mono", monospace';
           ctx.fillText(a.label, a.x + a.coreR + 8, a.y + 3);
           ctx.restore();
@@ -1767,53 +2882,74 @@
         for (const n of nodes) {
           if (n.collected) continue;
           const bob = Math.sin(n.phase) * 2.5;
-
           ctx.save();
           ctx.translate(n.x, n.y + bob);
 
-          // Outer subtle ring
-          ctx.strokeStyle = 'rgba(232, 168, 37, 0.55)';
-          ctx.lineWidth = 1.5;
-          ctx.beginPath();
-          ctx.arc(0, 0, n.r + 5 + Math.sin(n.phase * 1.5) * 2, 0, Math.PI * 2);
-          ctx.stroke();
+          if (n.kind === 'magnet') {
+            // Cobalt Magnet Orb
+            ctx.fillStyle = PALETTE.ink;
+            ctx.beginPath();
+            ctx.arc(2.5, 2.5, n.r, 0, Math.PI * 2);
+            ctx.fill();
 
-          // Hard shadow diamond
-          ctx.rotate(Math.PI / 4);
-          ctx.fillStyle = PALETTE.ink;
-          ctx.fillRect(-n.r + 2.5, -n.r + 2.5, n.r * 2, n.r * 2);
+            ctx.fillStyle = PALETTE.cobalt;
+            ctx.strokeStyle = PALETTE.ink;
+            ctx.lineWidth = 2.2;
+            ctx.beginPath();
+            ctx.arc(0, 0, n.r, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.stroke();
 
-          // Ochre gold diamond
-          ctx.fillStyle = PALETTE.ochre;
-          ctx.strokeStyle = PALETTE.ink;
-          ctx.lineWidth = 2.2;
-          ctx.fillRect(-n.r, -n.r, n.r * 2, n.r * 2);
-          ctx.strokeRect(-n.r, -n.r, n.r * 2, n.r * 2);
+            ctx.fillStyle = '#F4EFE6';
+            ctx.font = '700 11px "Archivo Black", sans-serif';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText('M', 0, 0.5);
+          } else {
+            // Golden Star Diamond
+            ctx.strokeStyle = PALETTE.ochre;
+            ctx.globalAlpha = 0.55;
+            ctx.lineWidth = 1.5;
+            ctx.beginPath();
+            ctx.arc(0, 0, n.r + 5 + Math.sin(n.phase * 1.5) * 2, 0, Math.PI * 2);
+            ctx.stroke();
+            ctx.globalAlpha = 1;
 
+            ctx.rotate(Math.PI / 4);
+            ctx.fillStyle = PALETTE.ink;
+            ctx.fillRect(-n.r + 2.5, -n.r + 2.5, n.r * 2, n.r * 2);
+
+            ctx.fillStyle = PALETTE.ochre;
+            ctx.strokeStyle = PALETTE.ink;
+            ctx.lineWidth = 2.2;
+            ctx.fillRect(-n.r, -n.r, n.r * 2, n.r * 2);
+            ctx.strokeRect(-n.r, -n.r, n.r * 2, n.r * 2);
+          }
           ctx.restore();
         }
       }
 
       function drawHazards() {
         for (const h of hazards) {
+          if (h.shattered) continue;
           ctx.save();
           ctx.translate(h.x, h.y);
 
-          // Graze proximity halo (subtle dotted ring showing near-miss zone)
-          if (!h.grazed) {
+          if (!h.grazed && overdriveTimer <= 0) {
             ctx.beginPath();
             ctx.arc(0, 0, h.grazeR, 0, Math.PI * 2);
-            ctx.strokeStyle = 'rgba(224, 60, 40, 0.16)';
+            ctx.strokeStyle = PALETTE.vermilion;
+            ctx.globalAlpha = 0.18;
             ctx.lineWidth = 1;
             ctx.setLineDash([3, 5]);
             ctx.stroke();
             ctx.setLineDash([]);
+            ctx.globalAlpha = 1;
           }
 
           ctx.rotate(h.rot);
 
           if (h.type === 'triangle') {
-            // Hard shadow
             ctx.fillStyle = PALETTE.ink;
             ctx.beginPath();
             for (let i = 0; i < 3; i++) {
@@ -1825,7 +2961,6 @@
             ctx.closePath();
             ctx.fill();
 
-            // Vermilion Bauhaus Triangle
             ctx.fillStyle = PALETTE.vermilion;
             ctx.strokeStyle = PALETTE.ink;
             ctx.lineWidth = 2.5;
@@ -1840,16 +2975,13 @@
             ctx.fill();
             ctx.stroke();
 
-            // Inner eye dot
             ctx.fillStyle = PALETTE.paper;
             ctx.beginPath();
             ctx.arc(0, 0, 3.5, 0, Math.PI * 2);
             ctx.fill();
           } else {
-            // Rotating Bauhaus Cross Bar
             const w = h.r * 1.9;
             const t = h.r * 0.56;
-
             ctx.fillStyle = PALETTE.ink;
             ctx.fillRect(-w / 2 + 3, -t / 2 + 3, w, t);
             ctx.fillRect(-t / 2 + 3, -w / 2 + 3, t, w);
@@ -1867,7 +2999,59 @@
             ctx.arc(0, 0, 3.5, 0, Math.PI * 2);
             ctx.fill();
           }
+          ctx.restore();
+        }
+      }
 
+      function drawPlayerTrail() {
+        if (player.trail.length < 2) return;
+        const trailStyle = save.equippedTrail;
+
+        for (let i = 1; i < player.trail.length; i++) {
+          const p0 = player.trail[i - 1];
+          const p1 = player.trail[i];
+          const ratio = i / player.trail.length;
+
+          ctx.save();
+          if (trailStyle === 'halftone') {
+            if (i % 2 === 0) {
+              ctx.fillStyle = overdriveTimer > 0 ? PALETTE.vermilion : PALETTE.ink;
+              ctx.globalAlpha = ratio * 0.65;
+              ctx.beginPath();
+              ctx.arc(p1.x, p1.y, ratio * 5.2, 0, Math.PI * 2);
+              ctx.fill();
+            }
+          } else if (trailStyle === 'dotted') {
+            if (i % 2 === 1) {
+              ctx.strokeStyle = overdriveTimer > 0 ? PALETTE.vermilion : PALETTE.cobalt;
+              ctx.globalAlpha = ratio * 0.75;
+              ctx.lineWidth = 3;
+              ctx.beginPath();
+              ctx.moveTo(p0.x, p0.y);
+              ctx.lineTo(p1.x, p1.y);
+              ctx.stroke();
+            }
+          } else if (trailStyle === 'prism') {
+            const colors = [PALETTE.vermilion, PALETTE.ochre, PALETTE.cobalt];
+            ctx.strokeStyle = colors[i % 3];
+            ctx.globalAlpha = ratio * 0.7;
+            ctx.lineWidth = ratio * 7;
+            ctx.lineCap = 'round';
+            ctx.beginPath();
+            ctx.moveTo(p0.x, p0.y);
+            ctx.lineTo(p1.x, p1.y);
+            ctx.stroke();
+          } else {
+            // Classic Vermilion / Ink Ribbon
+            ctx.strokeStyle = (overdriveTimer > 0 || multiplier >= 3) ? PALETTE.vermilion : PALETTE.ink;
+            ctx.globalAlpha = ratio * 0.5;
+            ctx.lineWidth = ratio * 6.5;
+            ctx.lineCap = 'round';
+            ctx.beginPath();
+            ctx.moveTo(p0.x, p0.y);
+            ctx.lineTo(p1.x, p1.y);
+            ctx.stroke();
+          }
           ctx.restore();
         }
       }
@@ -1875,77 +3059,177 @@
       function drawPlayer() {
         if (gameState === STATE.GAMEOVER) return;
 
-        // Tapered ink ribbon trail
-        if (player.trail.length > 1) {
-          for (let i = 1; i < player.trail.length; i++) {
-            const p0 = player.trail[i - 1];
-            const p1 = player.trail[i];
-            const ratio = i / player.trail.length;
-            ctx.strokeStyle = multiplier >= 3 ? PALETTE.vermilion : PALETTE.ink;
-            ctx.globalAlpha = ratio * 0.45;
-            ctx.lineWidth = ratio * 6;
-            ctx.lineCap = 'round';
-            ctx.beginPath();
-            ctx.moveTo(p0.x, p0.y);
-            ctx.lineTo(p1.x, p1.y);
-            ctx.stroke();
-          }
-          ctx.globalAlpha = 1;
+        // Snapped plucked tether strings
+        for (const st of snappedTethers) {
+          const alpha = st.life / st.maxLife;
+          const mx = (st.x1 + st.x2) * 0.5 + Math.sin(st.life * 75) * st.amp * alpha;
+          const my = (st.y1 + st.y2) * 0.5 + Math.cos(st.life * 75) * st.amp * alpha;
+          ctx.save();
+          ctx.strokeStyle = PALETTE.vermilion;
+          ctx.globalAlpha = alpha * 0.7;
+          ctx.lineWidth = 2;
+          ctx.beginPath();
+          ctx.moveTo(st.x1, st.y1);
+          ctx.quadraticCurveTo(mx, my, st.x2, st.y2);
+          ctx.stroke();
+          ctx.restore();
         }
 
-        // Tether line connecting spacecraft to active anchor
+        drawPlayerTrail();
+
+        // Active tether line
         if (player.tetheredAnchor) {
           const a = player.tetheredAnchor;
           ctx.strokeStyle = a.heat > 0.72 ? PALETTE.vermilion : PALETTE.ink;
-          ctx.lineWidth = 2.5;
+          ctx.lineWidth = 2.6;
           ctx.beginPath();
           ctx.moveTo(a.x, a.y);
           ctx.lineTo(player.x, player.y);
           ctx.stroke();
         }
 
-        // Geometric Spacecraft Dart
+        // Overdrive aura ring around vessel
+        if (overdriveTimer > 0) {
+          ctx.save();
+          ctx.translate(player.x, player.y);
+          ctx.strokeStyle = PALETTE.vermilion;
+          ctx.lineWidth = 2.5;
+          ctx.setLineDash([4, 4]);
+          ctx.beginPath();
+          ctx.arc(0, 0, 22 + Math.sin(performance.now() * 0.02) * 3, 0, Math.PI * 2);
+          ctx.stroke();
+          ctx.restore();
+        }
+
+        // Render Equipped Vessel Chassis with Squash & Stretch
         ctx.save();
         ctx.translate(player.x, player.y);
         ctx.rotate(player.angle);
+        ctx.scale(player.squashX, player.squashY);
 
-        // Hard offset shadow
-        ctx.fillStyle = PALETTE.ink;
-        ctx.beginPath();
-        ctx.moveTo(15, 3);
-        ctx.lineTo(-10, -8);
-        ctx.lineTo(-5, 3);
-        ctx.lineTo(-10, 14);
-        ctx.closePath();
-        ctx.fill();
+        const shipType = save.equippedShip;
 
-        // Craft body
-        ctx.fillStyle = PALETTE.paper;
-        ctx.strokeStyle = PALETTE.ink;
-        ctx.lineWidth = 2.5;
-        ctx.beginPath();
-        ctx.moveTo(13, 0);
-        ctx.lineTo(-11, -10);
-        ctx.lineTo(-6, 0);
-        ctx.lineTo(-11, 10);
-        ctx.closePath();
-        ctx.fill();
-        ctx.stroke();
+        if (shipType === 'concorde') {
+          // Sleek Twin-Fin Delta Wing
+          ctx.fillStyle = PALETTE.ink;
+          ctx.beginPath();
+          ctx.moveTo(18, 3);
+          ctx.lineTo(-12, -10);
+          ctx.lineTo(-7, 3);
+          ctx.lineTo(-12, 16);
+          ctx.closePath();
+          ctx.fill();
 
-        // Nose cone accent
-        ctx.fillStyle = PALETTE.vermilion;
-        ctx.beginPath();
-        ctx.moveTo(13, 0);
-        ctx.lineTo(2, -4.5);
-        ctx.lineTo(2, 4.5);
-        ctx.closePath();
-        ctx.fill();
+          ctx.fillStyle = PALETTE.paper;
+          ctx.strokeStyle = PALETTE.ink;
+          ctx.lineWidth = 2.4;
+          ctx.beginPath();
+          ctx.moveTo(16, 0);
+          ctx.lineTo(-14, -12);
+          ctx.lineTo(-9, 0);
+          ctx.lineTo(-14, 12);
+          ctx.closePath();
+          ctx.fill();
+          ctx.stroke();
+
+          ctx.strokeStyle = PALETTE.cobalt;
+          ctx.lineWidth = 2.5;
+          ctx.beginPath();
+          ctx.moveTo(6, 0);
+          ctx.lineTo(-9, 0);
+          ctx.stroke();
+        } else if (shipType === 'sputnik') {
+          // Retro Bauhaus Sphere + Orbiting Moonlet
+          ctx.fillStyle = PALETTE.ink;
+          ctx.beginPath();
+          ctx.arc(2.5, 2.5, 10, 0, Math.PI * 2);
+          ctx.fill();
+
+          ctx.fillStyle = PALETTE.ochre;
+          ctx.strokeStyle = PALETTE.ink;
+          ctx.lineWidth = 2.4;
+          ctx.beginPath();
+          ctx.arc(0, 0, 10, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.stroke();
+
+          // Swept antennae
+          ctx.beginPath();
+          ctx.moveTo(-6, -6);
+          ctx.lineTo(-17, -12);
+          ctx.moveTo(-6, 6);
+          ctx.lineTo(-17, 12);
+          ctx.stroke();
+
+          // Orbiting mini moonlet
+          const mAng = performance.now() * 0.008;
+          ctx.fillStyle = PALETTE.vermilion;
+          ctx.beginPath();
+          ctx.arc(Math.cos(mAng) * 16, Math.sin(mAng) * 16, 3.5, 0, Math.PI * 2);
+          ctx.fill();
+        } else if (shipType === 'vector') {
+          // Sharp Bauhaus Diamond Prism
+          ctx.fillStyle = PALETTE.ink;
+          ctx.beginPath();
+          ctx.moveTo(17, 3);
+          ctx.lineTo(0, -8);
+          ctx.lineTo(-13, 3);
+          ctx.lineTo(0, 14);
+          ctx.closePath();
+          ctx.fill();
+
+          ctx.fillStyle = PALETTE.cobalt;
+          ctx.strokeStyle = PALETTE.ink;
+          ctx.lineWidth = 2.4;
+          ctx.beginPath();
+          ctx.moveTo(15, 0);
+          ctx.lineTo(-2, -10);
+          ctx.lineTo(-15, 0);
+          ctx.lineTo(-2, 10);
+          ctx.closePath();
+          ctx.fill();
+          ctx.stroke();
+
+          ctx.fillStyle = PALETTE.ochre;
+          ctx.beginPath();
+          ctx.arc(2, 0, 3.5, 0, Math.PI * 2);
+          ctx.fill();
+        } else {
+          // 01. MONOLITH (Classic Swiss Dart)
+          ctx.fillStyle = PALETTE.ink;
+          ctx.beginPath();
+          ctx.moveTo(15, 3);
+          ctx.lineTo(-10, -8);
+          ctx.lineTo(-5, 3);
+          ctx.lineTo(-10, 14);
+          ctx.closePath();
+          ctx.fill();
+
+          ctx.fillStyle = PALETTE.paper;
+          ctx.strokeStyle = PALETTE.ink;
+          ctx.lineWidth = 2.5;
+          ctx.beginPath();
+          ctx.moveTo(13, 0);
+          ctx.lineTo(-11, -10);
+          ctx.lineTo(-6, 0);
+          ctx.lineTo(-11, 10);
+          ctx.closePath();
+          ctx.fill();
+          ctx.stroke();
+
+          ctx.fillStyle = PALETTE.vermilion;
+          ctx.beginPath();
+          ctx.moveTo(13, 0);
+          ctx.lineTo(2, -4.5);
+          ctx.lineTo(2, 4.5);
+          ctx.closePath();
+          ctx.fill();
+        }
 
         ctx.restore();
       }
 
       function drawParticlesAndFX() {
-        // Shockwaves
         for (const s of shockwaves) {
           const alpha = clamp(s.life / s.maxLife, 0, 1);
           ctx.save();
@@ -1958,7 +3242,6 @@
           ctx.restore();
         }
 
-        // Geometric Confetti Particles
         for (const p of particles) {
           const alpha = clamp(p.life / p.maxLife, 0, 1);
           ctx.save();
@@ -1994,20 +3277,17 @@
           ctx.restore();
         }
 
-        // Floating Space Mono Score & Graze Popups
         for (const pop of popups) {
           const alpha = clamp(pop.life / pop.maxLife, 0, 1);
           ctx.save();
           ctx.globalAlpha = alpha;
-          ctx.font = '700 13px "Space Mono", monospace';
+          ctx.font = '700 12px "Space Mono", monospace';
           ctx.textAlign = 'center';
 
           const metrics = ctx.measureText(pop.text);
-          const padX = 6;
-          const boxW = metrics.width + padX * 2;
+          const boxW = metrics.width + 12;
           const boxH = 20;
 
-          // Crisp Swiss tag behind floating popup
           ctx.fillStyle = PALETTE.ink;
           ctx.fillRect(pop.x - boxW / 2 + 2, pop.y - boxH + 6, boxW, boxH);
 
@@ -2024,14 +3304,12 @@
       }
 
       function render() {
-        // Clear archival paper canvas
         ctx.fillStyle = PALETTE.paper;
         ctx.fillRect(0, 0, width, height);
 
-        // Background Swiss Grid
         drawSwissGrid();
+        drawSpeedLines();
 
-        // Apply camera transform + screen shake
         ctx.save();
         let sx = 0;
         let sy = 0;
@@ -2050,7 +3328,19 @@
 
         ctx.restore();
 
-        // Subtle impact tint flash
+        // Risograph Chromatic Misregistration Accent Border on Big Events
+        if (chromaticTimer > 0) {
+          const off = chromaticTimer * 16;
+          ctx.save();
+          ctx.strokeStyle = PALETTE.vermilion;
+          ctx.globalAlpha = 0.45;
+          ctx.lineWidth = 3;
+          ctx.strokeRect(10 - off, 10, width - 20, height - 20);
+          ctx.strokeStyle = PALETTE.cobalt;
+          ctx.strokeRect(10 + off, 10, width - 20, height - 20);
+          ctx.restore();
+        }
+
         if (flashAlpha > 0) {
           ctx.fillStyle = flashColor;
           ctx.globalAlpha = flashAlpha;
@@ -2060,14 +3350,14 @@
       }
 
       // =========================================================================
-      // 11. GAME LOOP BOOTSTRAP
+      // 12. BOOTSTRAP
       // =========================================================================
       let lastTime = performance.now();
 
       function gameLoop(now) {
         const rawDt = (now - lastTime) / 1000;
         lastTime = now;
-        const dt = Math.min(rawDt, 0.05); // Cap dt for tab-switch safety
+        const dt = Math.min(rawDt, 0.05);
 
         update(dt);
         render();
@@ -2075,6 +3365,10 @@
       }
 
       window.onload = () => {
+        syncInkDisplays();
+        syncSettingsUI();
+        renderShop();
+        renderMissions();
         initWorld(true);
         lastTime = performance.now();
         requestAnimationFrame(gameLoop);
