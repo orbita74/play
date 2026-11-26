@@ -3,20 +3,22 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title> Classroom </title>
+  <title>Classroom</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Space+Mono:ital,wght@0,400;0,700;1,700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Instrument+Serif:ital@0;1&family=Space+Mono:ital,wght@0,400;0,700;1,700&display=swap" rel="stylesheet">
   <style>
     :root {
-      --paper: #F4EFE6;
-      --paper-dark: #E6DEC8;
-      --ink: #181715;
-      --vermilion: #E03C28;
-      --ochre: #F0A818;
-      --cobalt: #1D4ED8;
-      --sage: #2A7B5C;
-      --border-w: 2.5px;
+      --paper: #F6F1E7;
+      --paper-mid: #ECE4D3;
+      --paper-dark: #E1D6C0;
+      --ink: #161618;
+      --ink-soft: rgba(22, 22, 24, 0.65);
+      --vermilion: #E53924;
+      --ochre: #F2A922;
+      --cobalt: #1C5D99;
+      --verdigris: #2A9D8F;
+      --border-w: 2px;
     }
 
     * {
@@ -48,39 +50,54 @@
       cursor: crosshair;
     }
 
-    /* Tactile Archival Paper Grain */
+    /* Tactile Cotton-Rag Printmaking Grain */
     .paper-grain {
       position: fixed;
       inset: 0;
       z-index: 2;
       pointer-events: none;
-      opacity: 0.30;
+      opacity: 0.34;
       mix-blend-mode: multiply;
-      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.55'/%3E%3C/svg%3E");
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 220 220' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='ragNoise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.82' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23ragNoise)' opacity='0.52'/%3E%3C/svg%3E");
     }
 
-    body.dark-theme .paper-grain {
-      mix-blend-mode: screen;
-      opacity: 0.14;
+    /* Subtle Museum Vignette & Plate Emboss */
+    .plate-vignette {
+      position: fixed;
+      inset: 0;
+      z-index: 3;
+      pointer-events: none;
+      box-shadow: inset 0 0 85px rgba(22, 22, 24, 0.11);
     }
 
-    /* Swiss Registration Frame Border */
+    /* Architectural Registration Frame with Corner Crosshairs */
     .poster-frame {
       position: fixed;
       inset: 10px;
-      border: 2px solid var(--ink);
-      opacity: 0.35;
-      z-index: 3;
+      border: 1.5px solid rgba(22, 22, 24, 0.32);
+      z-index: 4;
       pointer-events: none;
-      transition: border-color 0.2s ease, border-width 0.2s ease, opacity 0.2s ease;
+      transition: border-color 0.2s ease, border-width 0.2s ease;
     }
+
+    .poster-frame::before,
+    .poster-frame::after {
+      content: '⊕';
+      position: absolute;
+      font-size: 11px;
+      line-height: 1;
+      color: var(--ink);
+      opacity: 0.55;
+    }
+
+    .poster-frame::before { top: -7px; left: -6px; }
+    .poster-frame::after { bottom: -7px; right: -6px; }
 
     body.overdrive-active .poster-frame {
-      border: 5px solid var(--vermilion);
-      opacity: 0.95;
+      border: 4px solid var(--vermilion);
     }
 
-    /* Top Minimal HUD */
+    /* Top Minimalist Observatory HUD */
     #hud {
       position: fixed;
       top: 18px;
@@ -105,18 +122,18 @@
       background: var(--paper);
       border: var(--border-w) solid var(--ink);
       box-shadow: 3px 3px 0px var(--ink);
-      padding: 5px 10px;
+      padding: 5px 11px;
       display: flex;
       flex-direction: column;
-      min-width: 78px;
+      min-width: 82px;
     }
 
     .swiss-tag .label {
       font-size: 9px;
       font-weight: 700;
-      letter-spacing: 0.12em;
+      letter-spacing: 0.13em;
       text-transform: uppercase;
-      opacity: 0.72;
+      color: var(--ink-soft);
       line-height: 1.1;
     }
 
@@ -129,7 +146,7 @@
     }
 
     .swiss-tag.ink-bank {
-      background: var(--paper-dark);
+      background: var(--paper-mid);
     }
 
     .swiss-tag.ink-bank .val {
@@ -138,23 +155,27 @@
 
     .multiplier-pill {
       background: var(--ochre);
-      color: #181715;
+      color: var(--ink);
       border: var(--border-w) solid var(--ink);
       box-shadow: 3px 3px 0px var(--ink);
       padding: 5px 10px;
       display: flex;
       flex-direction: column;
       min-width: 68px;
-      transition: transform 0.12s cubic-bezier(0.2, 1.5, 0.4, 1), background-color 0.15s ease;
+      transition: transform 0.14s cubic-bezier(0.2, 1.6, 0.4, 1), background-color 0.15s ease, color 0.15s ease;
     }
 
     .multiplier-pill.hot {
       background: var(--vermilion);
-      color: #F4EFE6;
+      color: var(--paper);
+    }
+
+    .multiplier-pill.hot .label {
+      color: rgba(246, 241, 231, 0.85);
     }
 
     .multiplier-pill.pop {
-      transform: scale(1.16) rotate(-2deg);
+      transform: scale(1.18) rotate(-2.5deg);
     }
 
     /* Segmented Fever / Overdrive Gauge */
@@ -163,7 +184,7 @@
       border: var(--border-w) solid var(--ink);
       box-shadow: 3px 3px 0px var(--ink);
       padding: 5px 10px;
-      min-width: 132px;
+      min-width: 136px;
       display: flex;
       flex-direction: column;
       gap: 4px;
@@ -202,13 +223,13 @@
       background: var(--vermilion);
     }
 
-    /* Tactile Swiss Buttons */
+    /* Tactile Silkscreen Buttons */
     .swiss-btn {
       pointer-events: auto;
       font-family: 'Space Mono', monospace;
       font-weight: 700;
-      font-size: 12px;
-      letter-spacing: 0.07em;
+      font-size: 11.5px;
+      letter-spacing: 0.08em;
       text-transform: uppercase;
       background: var(--paper);
       color: var(--ink);
@@ -216,7 +237,7 @@
       box-shadow: 4px 4px 0px var(--ink);
       padding: 8px 13px;
       cursor: pointer;
-      transition: transform 0.07s ease, box-shadow 0.07s ease, background-color 0.12s ease, color 0.12s ease;
+      transition: transform 0.08s cubic-bezier(0.2, 1.4, 0.4, 1), box-shadow 0.08s ease, background-color 0.12s ease, color 0.12s ease;
       display: inline-flex;
       align-items: center;
       justify-content: center;
@@ -225,9 +246,9 @@
 
     .swiss-btn:hover:not(:disabled) {
       background: var(--ochre);
-      color: #181715;
-      transform: translate(-1px, -1px);
-      box-shadow: 5px 5px 0px var(--ink);
+      color: var(--ink);
+      transform: translate(-1.5px, -1.5px);
+      box-shadow: 5.5px 5.5px 0px var(--ink);
     }
 
     .swiss-btn:active:not(:disabled) {
@@ -236,33 +257,33 @@
     }
 
     .swiss-btn:disabled {
-      opacity: 0.45;
+      opacity: 0.42;
       cursor: not-allowed;
     }
 
     .swiss-btn.primary {
       background: var(--vermilion);
-      color: #F4EFE6;
+      color: var(--paper);
       font-family: 'Archivo Black', sans-serif;
-      font-size: 17px;
-      letter-spacing: 0.04em;
+      font-size: 16px;
+      letter-spacing: 0.05em;
       padding: 14px 26px;
       box-shadow: 5px 5px 0px var(--ink);
     }
 
     .swiss-btn.primary:hover {
-      background: #c9301d;
-      color: #F4EFE6;
+      background: #cf2f1b;
+      color: var(--paper);
     }
 
     .swiss-btn.cobalt {
       background: var(--cobalt);
-      color: #F4EFE6;
+      color: var(--paper);
     }
 
     .swiss-btn.cobalt:hover {
-      background: #173ea8;
-      color: #F4EFE6;
+      background: #154b7d;
+      color: var(--paper);
     }
 
     /* Overlays */
@@ -275,7 +296,7 @@
       justify-content: center;
       padding: 16px;
       padding-top: 72px;
-      background: rgba(24, 23, 21, 0.16);
+      background: rgba(22, 22, 24, 0.12);
       backdrop-filter: blur(1.5px);
       -webkit-backdrop-filter: blur(1.5px);
       transition: opacity 0.22s ease, visibility 0.22s ease;
@@ -287,22 +308,22 @@
       pointer-events: none;
     }
 
-    /* Main Menu Hub Card */
+    /* Museum Exhibition Poster Hub Card */
     .hub-card {
       background: var(--paper);
-      border: 3px solid var(--ink);
+      border: 2.5px solid var(--ink);
       box-shadow: 10px 10px 0px var(--ink);
-      max-width: 680px;
+      max-width: 720px;
       width: 100%;
-      max-height: calc(100vh - 96px);
+      max-height: calc(100vh - 94px);
       display: flex;
       flex-direction: column;
       overflow: hidden;
-      animation: posterEnter 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      animation: posterEnter 0.32s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
     @keyframes posterEnter {
-      from { opacity: 0; transform: translateY(14px) scale(0.98); }
+      from { opacity: 0; transform: translateY(14px) scale(0.985); }
       to { opacity: 1; transform: translateY(0) scale(1); }
     }
 
@@ -310,14 +331,14 @@
     .tab-bar {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
-      border-bottom: 3px solid var(--ink);
-      background: var(--paper-dark);
+      border-bottom: 2.5px solid var(--ink);
+      background: var(--paper-mid);
     }
 
     .tab-btn {
       font-family: 'Space Mono', monospace;
       font-weight: 700;
-      font-size: 12px;
+      font-size: 11.5px;
       letter-spacing: 0.08em;
       text-transform: uppercase;
       padding: 13px 8px;
@@ -327,7 +348,6 @@
       color: var(--ink);
       cursor: pointer;
       transition: background-color 0.12s ease, color 0.12s ease;
-      position: relative;
     }
 
     .tab-btn:last-child {
@@ -335,7 +355,7 @@
     }
 
     .tab-btn:hover {
-      background: rgba(240, 168, 24, 0.32);
+      background: rgba(242, 169, 34, 0.32);
     }
 
     .tab-btn.active {
@@ -346,7 +366,7 @@
     .tab-badge {
       display: inline-block;
       background: var(--vermilion);
-      color: #F4EFE6;
+      color: var(--paper);
       font-size: 9px;
       padding: 1px 5px;
       margin-left: 4px;
@@ -357,7 +377,7 @@
       padding: 22px 26px;
       overflow-y: auto;
       scrollbar-width: thin;
-      scrollbar-color: var(--ink) var(--paper-dark);
+      scrollbar-color: var(--ink) var(--paper-mid);
     }
 
     .tab-pane {
@@ -375,16 +395,16 @@
       border-bottom: 2px solid var(--ink);
       padding-bottom: 8px;
       margin-bottom: 14px;
-      font-size: 11px;
+      font-size: 10.5px;
       font-weight: 700;
-      letter-spacing: 0.12em;
+      letter-spacing: 0.13em;
       text-transform: uppercase;
     }
 
     .badge-dot {
       display: inline-block;
-      width: 10px;
-      height: 10px;
+      width: 9px;
+      height: 9px;
       background: var(--vermilion);
       border: 1.5px solid var(--ink);
       border-radius: 50%;
@@ -392,14 +412,24 @@
       vertical-align: middle;
     }
 
+    .editorial-kicker {
+      font-family: 'Instrument Serif', serif;
+      font-style: italic;
+      font-size: 21px;
+      letter-spacing: 0.01em;
+      color: var(--cobalt);
+      margin-bottom: 2px;
+      display: block;
+    }
+
     .poster-title {
       font-family: 'Archivo Black', sans-serif;
-      font-size: clamp(40px, 8vw, 64px);
-      line-height: 0.92;
+      font-size: clamp(42px, 8vw, 66px);
+      line-height: 0.9;
       letter-spacing: -0.03em;
       text-transform: uppercase;
       color: var(--ink);
-      margin-bottom: 10px;
+      margin-bottom: 12px;
     }
 
     .poster-title span {
@@ -407,8 +437,8 @@
     }
 
     .poster-subtitle {
-      font-size: 13px;
-      line-height: 1.5;
+      font-size: 12.5px;
+      line-height: 1.55;
       margin-bottom: 18px;
       border-left: 4px solid var(--ochre);
       padding-left: 12px;
@@ -422,15 +452,15 @@
     }
 
     .mechanic-box {
-      background: var(--paper-dark);
+      background: var(--paper-mid);
       border: 2px solid var(--ink);
-      padding: 10px;
+      padding: 10px 11px;
     }
 
     .mechanic-box strong {
       display: block;
       font-size: 10px;
-      letter-spacing: 0.08em;
+      letter-spacing: 0.09em;
       text-transform: uppercase;
       color: var(--cobalt);
       margin-bottom: 4px;
@@ -438,14 +468,51 @@
 
     .mechanic-box span {
       font-size: 11px;
-      line-height: 1.35;
+      line-height: 1.38;
       display: block;
+    }
+
+    /* Atelier Live Stage Preview */
+    .atelier-stage-wrap {
+      border: 2px solid var(--ink);
+      background: var(--paper-mid);
+      box-shadow: 4px 4px 0px var(--ink);
+      margin-bottom: 16px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    #atelierPreviewCanvas {
+      display: block;
+      width: 100%;
+      height: 136px;
+    }
+
+    .stage-caption {
+      position: absolute;
+      top: 8px;
+      left: 10px;
+      right: 10px;
+      display: flex;
+      justify-content: space-between;
+      pointer-events: none;
+      font-size: 9.5px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--ink);
+    }
+
+    .stage-caption span {
+      background: var(--paper);
+      border: 1.5px solid var(--ink);
+      padding: 2px 6px;
     }
 
     /* Atelier Shop Sections */
     .shop-section-title {
       font-family: 'Archivo Black', sans-serif;
-      font-size: 14px;
+      font-size: 13.5px;
       letter-spacing: 0.05em;
       text-transform: uppercase;
       margin: 14px 0 8px;
@@ -456,25 +523,25 @@
       align-items: center;
     }
 
-    .shop-section-title:first-child {
-      margin-top: 0;
+    .shop-section-title:first-of-type {
+      margin-top: 4px;
     }
 
     .shop-grid {
       display: grid;
       grid-template-columns: repeat(2, 1fr);
-      gap: 10px;
+      gap: 9px;
     }
 
     .shop-item {
       border: 2px solid var(--ink);
-      background: var(--paper-dark);
-      padding: 10px 12px;
+      background: var(--paper-mid);
+      padding: 9px 11px;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 10px;
-      transition: transform 0.1s ease;
+      gap: 8px;
+      transition: transform 0.1s ease, background-color 0.12s ease;
     }
 
     .shop-item.equipped {
@@ -486,44 +553,53 @@
     .item-meta {
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 9px;
+      min-width: 0;
     }
 
     .item-swatch {
       width: 34px;
       height: 34px;
       border: 2px solid var(--ink);
+      background: var(--paper);
       display: flex;
       align-items: center;
       justify-content: center;
       flex-shrink: 0;
-      font-family: 'Archivo Black', sans-serif;
-      font-size: 12px;
+    }
+
+    .item-info {
+      min-width: 0;
     }
 
     .item-info strong {
       display: block;
-      font-size: 12px;
-      letter-spacing: 0.03em;
+      font-size: 11.5px;
+      letter-spacing: 0.02em;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
 
     .item-info small {
       display: block;
       font-size: 10px;
-      opacity: 0.78;
+      color: var(--ink-soft);
+      line-height: 1.25;
     }
 
     .shop-action-btn {
       font-family: 'Space Mono', monospace;
       font-weight: 700;
-      font-size: 11px;
-      padding: 6px 10px;
+      font-size: 10.5px;
+      padding: 6px 9px;
       border: 2px solid var(--ink);
       background: var(--ochre);
-      color: #181715;
+      color: var(--ink);
       cursor: pointer;
       white-space: nowrap;
       box-shadow: 2px 2px 0px var(--ink);
+      transition: transform 0.08s ease, box-shadow 0.08s ease;
     }
 
     .shop-action-btn:hover:not(:disabled) {
@@ -537,14 +613,14 @@
     }
 
     .shop-action-btn.active-tag {
-      background: var(--sage);
-      color: #F4EFE6;
+      background: var(--verdigris);
+      color: var(--paper);
       cursor: default;
       box-shadow: none;
     }
 
     .shop-action-btn:disabled {
-      opacity: 0.45;
+      opacity: 0.42;
       cursor: not-allowed;
     }
 
@@ -552,12 +628,12 @@
     .mission-list {
       display: flex;
       flex-direction: column;
-      gap: 12px;
+      gap: 11px;
     }
 
     .mission-card {
-      border: 2.5px solid var(--ink);
-      background: var(--paper-dark);
+      border: 2px solid var(--ink);
+      background: var(--paper-mid);
       padding: 12px 14px;
       position: relative;
       display: flex;
@@ -572,13 +648,13 @@
 
     .mission-title {
       font-weight: 700;
-      font-size: 13px;
+      font-size: 12.5px;
       margin-bottom: 4px;
     }
 
     .mission-bar-wrap {
       width: 100%;
-      max-width: 280px;
+      max-width: 300px;
       height: 10px;
       border: 1.5px solid var(--ink);
       background: var(--paper);
@@ -593,7 +669,7 @@
     }
 
     .mission-card.completed .mission-bar-fill {
-      background: var(--sage);
+      background: var(--verdigris);
     }
 
     .stamp-verified {
@@ -610,9 +686,9 @@
 
     .mission-reward-pill {
       font-weight: 700;
-      font-size: 12px;
+      font-size: 11.5px;
       background: var(--ochre);
-      color: #181715;
+      color: var(--ink);
       border: 2px solid var(--ink);
       padding: 5px 9px;
       white-space: nowrap;
@@ -627,7 +703,7 @@
 
     .setting-row {
       border: 2px solid var(--ink);
-      background: var(--paper-dark);
+      background: var(--paper-mid);
       padding: 11px 14px;
       display: flex;
       justify-content: space-between;
@@ -643,13 +719,13 @@
 
     .setting-row small {
       font-size: 11px;
-      opacity: 0.78;
+      color: var(--ink-soft);
     }
 
     /* Standard Modal Poster Card (Pause & Game Over) */
     .poster-card {
       background: var(--paper);
-      border: 3px solid var(--ink);
+      border: 2.5px solid var(--ink);
       box-shadow: 10px 10px 0px var(--ink);
       max-width: 500px;
       width: 100%;
@@ -666,18 +742,18 @@
 
     .stat-cell {
       border: 2px solid var(--ink);
-      background: var(--paper-dark);
+      background: var(--paper-mid);
       padding: 10px 12px;
     }
 
     .stat-cell.highlight {
       background: var(--ochre);
-      color: #181715;
+      color: var(--ink);
     }
 
     .stat-cell.ink-earned {
       background: var(--cobalt);
-      color: #F4EFE6;
+      color: var(--paper);
     }
 
     .stat-cell .k {
@@ -698,7 +774,7 @@
     .new-record-ribbon {
       display: inline-block;
       background: var(--vermilion);
-      color: #F4EFE6;
+      color: var(--paper);
       font-size: 10px;
       font-weight: 700;
       letter-spacing: 0.12em;
@@ -724,7 +800,7 @@
       z-index: 12;
       background: var(--ink);
       color: var(--paper);
-      font-size: 11px;
+      font-size: 10.5px;
       font-weight: 700;
       letter-spacing: 0.09em;
       text-transform: uppercase;
@@ -736,7 +812,7 @@
       white-space: nowrap;
     }
 
-    @media (max-width: 600px) {
+    @media (max-width: 640px) {
       #hud {
         top: 14px;
         left: 14px;
@@ -769,9 +845,10 @@
 
   <canvas id="gameCanvas"></canvas>
   <div class="paper-grain"></div>
+  <div class="plate-vignette"></div>
   <div class="poster-frame"></div>
 
-  <!-- Minimalist Swiss Telemetry HUD -->
+  <!-- Minimalist Observatory HUD -->
   <header id="hud">
     <div class="hud-left">
       <div class="swiss-tag">
@@ -805,7 +882,7 @@
 
   <div id="bottomHint" style="opacity:0;">HOLD CLICK / SPACE TO TETHER ORBIT • RELEASE TO SLINGSHOT</div>
 
-  <!-- MAIN MENU HUB (PLAY / ATELIER / MISSIONS / CALIBRATION) -->
+  <!-- MAIN MENU HUB (PLAY / ATELIER / MISSIONS / CALIBRATE) -->
   <section class="overlay" id="menuOverlay">
     <div class="hub-card">
       <nav class="tab-bar" role="tablist">
@@ -819,13 +896,14 @@
         <!-- TAB 1: PLAY -->
         <div class="tab-pane active" id="playTab">
           <div class="poster-header-strip">
-            <span><i class="badge-dot"></i>KINETIC SERIES NO. 74</span>
+            <span><i class="badge-dot"></i>BASEL CELESTIAL OBSERVATORY • NO. 74</span>
             <span>BEST ARCHIVE: <strong id="menuBestScore">0000</strong></span>
           </div>
 
+          <span class="editorial-kicker">Kinetic Slingshot Telemetry</span>
           <h1 class="poster-title">ORBITA<span>’74</span></h1>
           <p class="poster-subtitle">
-            Latch onto solar anchors, whip around gravity wells, and skim Bauhaus spikes to ignite <strong>OVERDRIVE</strong>—smashing straight through hazards for massive Ink rewards.
+            Latch onto solar brass anchors, whip around gravity wells, and skim Bauhaus spikes to ignite <strong>FEVER OVERDRIVE</strong>—shattering hazards into geometric confetti.
           </p>
 
           <div class="mechanic-grid">
@@ -835,7 +913,7 @@
             </div>
             <div class="mechanic-box">
               <strong>SPECIAL ANCHORS</strong>
-              <span>Cobalt rings give <b>SONIC BOOST</b>; dashed rings shatter after 1 use.</span>
+              <span>Cobalt rings fire <b>SONIC BOOST</b>; dashed ochre rings shatter after 1 use.</span>
             </div>
             <div class="mechanic-box">
               <strong>FEVER OVERDRIVE</strong>
@@ -845,34 +923,37 @@
 
           <div class="action-row">
             <button class="swiss-btn primary" id="startBtn">LAUNCH CRAFT →</button>
-            <span style="font-size:11px; font-weight:700; opacity:0.78;">HOLD [SPACE] OR CLICK TO ORBIT</span>
+            <span style="font-size:11px; font-weight:700; color:var(--ink-soft);">HOLD [SPACE] OR CLICK TO ORBIT</span>
           </div>
         </div>
 
-        <!-- TAB 2: ATELIER (COSMETIC SHOP) -->
+        <!-- TAB 2: ATELIER (VESSEL & INK TRAIL STUDIO — NO COLOR THEMES) -->
         <div class="tab-pane" id="atelierTab">
           <div class="poster-header-strip">
-            <span>SWISS DESIGN ATELIER</span>
+            <span>BAUHAUS CRAFT &amp; INK ATELIER</span>
             <span>BALANCE: <strong id="atelierInkCount">0</strong> INK</span>
+          </div>
+
+          <!-- Live Figure-Eight Preview Canvas -->
+          <div class="atelier-stage-wrap">
+            <div class="stage-caption">
+              <span id="stageVesselLabel">CHASSIS: 01 MONOLITH</span>
+              <span id="stageTrailLabel">TRAIL: VERMILION RIBBON</span>
+            </div>
+            <canvas id="atelierPreviewCanvas"></canvas>
           </div>
 
           <div class="shop-section-title">
             <span>I. VESSEL CHASSIS</span>
-            <span style="font-size:10px; font-family:'Space Mono';">SELECT HULL</span>
+            <span style="font-size:10px; font-family:'Space Mono'; color:var(--ink-soft);">6 ENAMEL HULLS</span>
           </div>
           <div class="shop-grid" id="shopShipsGrid"></div>
 
           <div class="shop-section-title">
-            <span>II. INK TRAILS</span>
-            <span style="font-size:10px; font-family:'Space Mono';">CONTRAIL STYLE</span>
+            <span>II. INK TRAILS &amp; EXHAUST</span>
+            <span style="font-size:10px; font-family:'Space Mono'; color:var(--ink-soft);">6 SILKSCREEN WAKES</span>
           </div>
           <div class="shop-grid" id="shopTrailsGrid"></div>
-
-          <div class="shop-section-title">
-            <span>III. PAPER STOCKS</span>
-            <span style="font-size:10px; font-family:'Space Mono';">PRINT PALETTE</span>
-          </div>
-          <div class="shop-grid" id="shopThemesGrid"></div>
         </div>
 
         <!-- TAB 3: MISSIONS -->
@@ -974,7 +1055,7 @@
         </div>
       </div>
 
-      <div id="goMissionSummary" style="font-size:11px; font-weight:700; margin-bottom:16px; color:var(--sage);"></div>
+      <div id="goMissionSummary" style="font-size:11px; font-weight:700; margin-bottom:16px; color:var(--verdigris);"></div>
 
       <div class="action-row">
         <button class="swiss-btn primary" id="restartBtn">RE-LAUNCH ↺</button>
@@ -988,102 +1069,54 @@
       'use strict';
 
       // =========================================================================
-      // 1. COSMETIC CATALOG & PAPER THEMES
+      // 1. UNIFIED BAUHAUS OBSERVATORY PALETTE & ATELIER CATALOG
       // =========================================================================
-      const THEMES = {
-        cream: {
-          id: 'cream',
-          name: 'ARCHIVAL CREAM',
-          desc: '1974 Basel Warm Stock',
-          cost: 0,
-          dark: false,
-          paper: '#F4EFE6',
-          paperDark: '#E6DEC8',
-          ink: '#181715',
-          inkFaint: 'rgba(24, 23, 21, 0.08)',
-          vermilion: '#E03C28',
-          ochre: '#F0A818',
-          cobalt: '#1D4ED8',
-          sage: '#2A7B5C'
-        },
-        cyan: {
-          id: 'cyan',
-          name: 'BLUEPRINT CYAN',
-          desc: 'Architectural Cyanotype',
-          cost: 120,
-          dark: false,
-          paper: '#E3EEF5',
-          paperDark: '#CFE0EC',
-          ink: '#0F2537',
-          inkFaint: 'rgba(15, 37, 55, 0.09)',
-          vermilion: '#E03C28',
-          ochre: '#F0A818',
-          cobalt: '#0284C7',
-          sage: '#15803D'
-        },
-        manila: {
-          id: 'manila',
-          name: 'MANILA DRAFT',
-          desc: 'Golden Kraft Folder',
-          cost: 220,
-          dark: false,
-          paper: '#EFE3C8',
-          paperDark: '#E0CFA8',
-          ink: '#231D16',
-          inkFaint: 'rgba(35, 29, 22, 0.09)',
-          vermilion: '#D9381E',
-          ochre: '#E59500',
-          cobalt: '#1E40AF',
-          sage: '#2F6F4E'
-        },
-        charcoal: {
-          id: 'charcoal',
-          name: 'CHARCOAL PRESS',
-          desc: 'Inverted Dark Risograph',
-          cost: 350,
-          dark: true,
-          paper: '#1A1918',
-          paperDark: '#262422',
-          ink: '#F4EFE6',
-          inkFaint: 'rgba(244, 239, 230, 0.08)',
-          vermilion: '#FF4D36',
-          ochre: '#FFB82E',
-          cobalt: '#3B82F6',
-          sage: '#34D399'
-        }
+      const PALETTE = {
+        paper: '#F6F1E7',
+        paperMid: '#ECE4D3',
+        paperDark: '#E1D6C0',
+        ink: '#161618',
+        inkFaint: 'rgba(22, 22, 24, 0.075)',
+        inkSubtle: 'rgba(22, 22, 24, 0.16)',
+        vermilion: '#E53924',
+        ochre: '#F2A922',
+        cobalt: '#1C5D99',
+        verdigris: '#2A9D8F'
       };
 
       const SHIPS = [
-        { id: 'monolith', name: '01. MONOLITH', desc: 'Classic Swiss Dart', cost: 0 },
-        { id: 'concorde', name: '02. CONCORDE', desc: 'Twin-Fin Delta Wing', cost: 100 },
-        { id: 'sputnik',  name: '03. SPUTNIK',  desc: 'Orbital Sphere + Moonlet', cost: 200 },
-        { id: 'vector',   name: '04. VECTOR',   desc: 'Sharp Bauhaus Prism', cost: 320 }
+        { id: 'monolith',  name: '01 MONOLITH',  desc: 'Swiss wedge + precision brass core', cost: 0 },
+        { id: 'concorde',  name: '02 CONCORDE',  desc: 'Swept delta needle + twin ink vents', cost: 90 },
+        { id: 'sputnik',   name: '03 SPUTNIK',   desc: 'Orbital sphere + 4 whip antennae', cost: 160 },
+        { id: 'vector',    name: '04 VECTOR',    desc: 'Forward-swept kinetic split-tail dart', cost: 240 },
+        { id: 'astrolabe', name: '05 ASTROLABE', desc: 'Gyroscopic ring + counter-gimbal', cost: 320 },
+        { id: 'valkyrie',  name: '06 VALKYRIE',  desc: 'Tri-wing cruiser + articulated tips', cost: 420 }
       ];
 
       const TRAILS = [
-        { id: 'ribbon',   name: 'VERMILION RIBBON', desc: 'Tapered Solid Ink', cost: 0 },
-        { id: 'dotted',   name: 'TELEMETRY TICKS',  desc: 'Dashed Survey Line', cost: 90 },
-        { id: 'halftone', name: 'HALFTONE DOTS',    desc: 'Risograph Ink Drops', cost: 180 },
-        { id: 'prism',    name: 'PRISM SPECTRUM',   desc: 'Tri-Color Swiss Bars', cost: 280 }
+        { id: 'ribbon',    name: 'VERMILION RIBBON', desc: 'Tapered calligraphy brushstroke', cost: 0 },
+        { id: 'telemetry', name: 'TELEMETRY TICKS',  desc: 'Architectural ruler hash marks', cost: 80 },
+        { id: 'halftone',  name: 'HALFTONE DOTS',    desc: 'Ben-Day risograph dot dissipation', cost: 150 },
+        { id: 'prism',     name: 'PRISM SPECTRUM',   desc: 'Layered Bauhaus tri-ribbon offset', cost: 220 },
+        { id: 'stardust',  name: 'STARDUST SPARKS',  desc: '4-point geometric star glints', cost: 300 },
+        { id: 'sonic',     name: 'SONIC RINGS',      desc: 'Expanding shockwave wake hoops', cost: 380 }
       ];
 
       // =========================================================================
-      // 2. PERSISTENT PROFILE, UNLOCKS, MISSIONS & SETTINGS
+      // 2. PERSISTENT SAVE PROFILE, MISSIONS & CALIBRATION
       // =========================================================================
-      const SAVE_KEY = 'orbita74_save_v2';
+      const SAVE_KEY = 'orbita74_observatory_v3';
       const defaultSave = {
         highScore: 0,
-        ink: 60, // Starter Ink so player can test buying a cosmetic right away
+        ink: 90, // Enough starter Ink to immediately unlock a vessel or trail in Atelier
         unlockedShips: ['monolith'],
         unlockedTrails: ['ribbon'],
-        unlockedThemes: ['cream'],
         equippedShip: 'monolith',
         equippedTrail: 'ribbon',
-        equippedTheme: 'cream',
         settings: {
-          shake: 'FULL',     // 'FULL' | 'SUBTLE' | 'OFF'
+          shake: 'FULL',
           hitstop: true,
-          guide: 'EXTENDED', // 'EXTENDED' | 'SHORT'
+          guide: 'EXTENDED',
           muted: false
         },
         missions: null
@@ -1096,23 +1129,6 @@
         localStorage.setItem(SAVE_KEY, JSON.stringify(save));
       }
 
-      let PALETTE = THEMES[save.equippedTheme] || THEMES.cream;
-
-      function applyTheme(themeId) {
-        PALETTE = THEMES[themeId] || THEMES.cream;
-        const r = document.documentElement.style;
-        r.setProperty('--paper', PALETTE.paper);
-        r.setProperty('--paper-dark', PALETTE.paperDark);
-        r.setProperty('--ink', PALETTE.ink);
-        r.setProperty('--vermilion', PALETTE.vermilion);
-        r.setProperty('--ochre', PALETTE.ochre);
-        r.setProperty('--cobalt', PALETTE.cobalt);
-        r.setProperty('--sage', PALETTE.sage);
-        document.body.classList.toggle('dark-theme', !!PALETTE.dark);
-      }
-      applyTheme(save.equippedTheme);
-
-      // Mission Generator
       const MISSION_POOL = [
         { type: 'graze', target: 3, reward: 65, title: 'Perform 3 Near-Miss Grazes in one run' },
         { type: 'graze', target: 6, reward: 120, title: 'Perform 6 Near-Miss Grazes in one run' },
@@ -1122,7 +1138,7 @@
         { type: 'shatter', target: 2, reward: 95, title: 'Shatter 2 Hazards during Overdrive' },
         { type: 'score', target: 1500, reward: 80, title: 'Score 1,500 points in a single flight' },
         { type: 'score', target: 3500, reward: 150, title: 'Score 3,500 points in a single flight' },
-        { type: 'sonic', target: 3, reward: 70, title: 'Launch from 3 Cobalt Pulse Anchors' }
+        { type: 'sonic', target: 3, reward: 70, title: 'Launch from 3 Cobalt Super-Boost Anchors' }
       ];
 
       function generateMissions() {
@@ -1144,7 +1160,7 @@
       }
 
       // =========================================================================
-      // 3. ENHANCED PROCEDURAL WEB AUDIO SYNTHESIZER
+      // 3. PROCEDURAL WEB AUDIO SYNTHESIZER
       // =========================================================================
       class SoundEngine {
         constructor() {
@@ -1172,7 +1188,7 @@
           if (this.muted) this.stopCharge();
         }
 
-        playClick(pitch = 620) {
+        playClick(pitch = 640) {
           if (this.muted) return;
           this.init();
           if (!this.ctx) return;
@@ -1198,9 +1214,9 @@
           const osc = this.ctx.createOscillator();
           const gain = this.ctx.createGain();
           osc.type = isPulse ? 'sawtooth' : 'triangle';
-          osc.frequency.setValueAtTime(isPulse ? 220 : 165, now);
+          osc.frequency.setValueAtTime(isPulse ? 225 : 170, now);
           osc.frequency.exponentialRampToValueAtTime(58, now + 0.14);
-          gain.gain.setValueAtTime(0.26, now);
+          gain.gain.setValueAtTime(0.25, now);
           gain.gain.exponentialRampToValueAtTime(0.001, now + 0.16);
           osc.connect(gain);
           gain.connect(this.ctx.destination);
@@ -1217,9 +1233,9 @@
           this.chargeOsc = this.ctx.createOscillator();
           this.chargeGain = this.ctx.createGain();
           this.chargeOsc.type = 'sine';
-          this.chargeOsc.frequency.setValueAtTime(140, now);
+          this.chargeOsc.frequency.setValueAtTime(145, now);
           this.chargeGain.gain.setValueAtTime(0.001, now);
-          this.chargeGain.gain.linearRampToValueAtTime(0.065, now + 0.08);
+          this.chargeGain.gain.linearRampToValueAtTime(0.06, now + 0.08);
           this.chargeOsc.connect(this.chargeGain);
           this.chargeGain.connect(this.ctx.destination);
           this.chargeOsc.start(now);
@@ -1228,7 +1244,7 @@
         updateCharge(heatRatio, speedRatio) {
           if (this.muted || !this.chargeOsc || !this.ctx) return;
           const now = this.ctx.currentTime;
-          const targetFreq = 140 + speedRatio * 180 + heatRatio * 230;
+          const targetFreq = 145 + speedRatio * 185 + heatRatio * 230;
           this.chargeOsc.frequency.setTargetAtTime(targetFreq, now, 0.04);
         }
 
@@ -1250,13 +1266,12 @@
           if (!this.ctx) return;
           const now = this.ctx.currentTime;
 
-          // Pitch sweep
           const osc = this.ctx.createOscillator();
           const gain = this.ctx.createGain();
           osc.type = isSonic ? 'sawtooth' : 'sine';
-          const base = (isSonic ? 310 : 230) + powerRatio * 150;
+          const base = (isSonic ? 315 : 235) + powerRatio * 150;
           osc.frequency.setValueAtTime(base, now);
-          osc.frequency.exponentialRampToValueAtTime(base * 2.2, now + 0.15);
+          osc.frequency.exponentialRampToValueAtTime(base * 2.25, now + 0.15);
           gain.gain.setValueAtTime(0.2, now);
           gain.gain.exponentialRampToValueAtTime(0.001, now + 0.16);
           osc.connect(gain);
@@ -1264,8 +1279,7 @@
           osc.start(now);
           osc.stop(now + 0.17);
 
-          // Airy wind whoosh noise burst
-          const bufLen = Math.floor(this.ctx.sampleRate * 0.16);
+          const bufLen = Math.floor(this.ctx.sampleRate * 0.15);
           const buf = this.ctx.createBuffer(1, bufLen, this.ctx.sampleRate);
           const data = buf.getChannelData(0);
           for (let i = 0; i < bufLen; i++) {
@@ -1275,11 +1289,11 @@
           noise.buffer = buf;
           const filter = this.ctx.createBiquadFilter();
           filter.type = 'bandpass';
-          filter.frequency.setValueAtTime(600 + powerRatio * 900, now);
+          filter.frequency.setValueAtTime(620 + powerRatio * 880, now);
           filter.Q.value = 1.8;
           const nGain = this.ctx.createGain();
-          nGain.gain.setValueAtTime(0.14 + powerRatio * 0.12, now);
-          nGain.gain.exponentialRampToValueAtTime(0.001, now + 0.16);
+          nGain.gain.setValueAtTime(0.13 + powerRatio * 0.11, now);
+          nGain.gain.exponentialRampToValueAtTime(0.001, now + 0.15);
           noise.connect(filter);
           filter.connect(nGain);
           nGain.connect(this.ctx.destination);
@@ -1351,7 +1365,6 @@
           this.init();
           if (!this.ctx) return;
           const now = this.ctx.currentTime;
-          // Crisp high shatter chime + punchy bass
           const osc = this.ctx.createOscillator();
           const gain = this.ctx.createGain();
           osc.type = 'square';
@@ -1404,6 +1417,9 @@
       let height = window.innerHeight;
       let dpr = Math.min(window.devicePixelRatio || 1, 2);
 
+      const previewCanvas = document.getElementById('atelierPreviewCanvas');
+      const pCtx = previewCanvas.getContext('2d');
+
       function resizeCanvas() {
         width = window.innerWidth;
         height = window.innerHeight;
@@ -1411,12 +1427,400 @@
         canvas.width = Math.floor(width * dpr);
         canvas.height = Math.floor(height * dpr);
         ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        resizePreviewCanvas();
       }
+
+      function resizePreviewCanvas() {
+        const rect = previewCanvas.getBoundingClientRect();
+        if (rect.width > 0 && rect.height > 0) {
+          previewCanvas.width = Math.floor(rect.width * dpr);
+          previewCanvas.height = Math.floor(rect.height * dpr);
+          pCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        }
+      }
+
       window.addEventListener('resize', resizeCanvas);
       resizeCanvas();
 
       // =========================================================================
-      // 5. DOM REFERENCES & UI BUILDERS
+      // 5. SHARED VECTOR RENDERERS FOR VESSELS & TRAILS (MAIN + ATELIER PREVIEW)
+      // =========================================================================
+      function renderVesselShape(targetCtx, shipType, x, y, angle, scaleX, scaleY, timeSec, isOverdrive = false) {
+        targetCtx.save();
+        targetCtx.translate(x, y);
+        targetCtx.rotate(angle);
+        targetCtx.scale(scaleX, scaleY);
+
+        // Subtle thruster flame pulse
+        const flameLen = 7 + Math.sin(timeSec * 38) * 3.5;
+        targetCtx.fillStyle = isOverdrive ? PALETTE.vermilion : PALETTE.ochre;
+        targetCtx.beginPath();
+        targetCtx.moveTo(-9, -3.5);
+        targetCtx.lineTo(-9 - flameLen, 0);
+        targetCtx.lineTo(-9, 3.5);
+        targetCtx.closePath();
+        targetCtx.fill();
+
+        if (shipType === 'concorde') {
+          // 02 CONCORDE — Swept delta needle with twin ink vents
+          targetCtx.fillStyle = PALETTE.ink;
+          targetCtx.beginPath();
+          targetCtx.moveTo(21, 3.5);
+          targetCtx.lineTo(-12, -8.5);
+          targetCtx.lineTo(-7, 3.5);
+          targetCtx.lineTo(-12, 15.5);
+          targetCtx.closePath();
+          targetCtx.fill();
+
+          targetCtx.fillStyle = PALETTE.paper;
+          targetCtx.strokeStyle = PALETTE.ink;
+          targetCtx.lineWidth = 2.3;
+          targetCtx.beginPath();
+          targetCtx.moveTo(19, 0);
+          targetCtx.lineTo(-14, -11);
+          targetCtx.lineTo(-9, 0);
+          targetCtx.lineTo(-14, 11);
+          targetCtx.closePath();
+          targetCtx.fill();
+          targetCtx.stroke();
+
+          // Twin Prussian Cobalt ink vents & center spine
+          targetCtx.strokeStyle = PALETTE.cobalt;
+          targetCtx.lineWidth = 2.2;
+          targetCtx.beginPath();
+          targetCtx.moveTo(9, 0);
+          targetCtx.lineTo(-9, 0);
+          targetCtx.stroke();
+
+          targetCtx.fillStyle = PALETTE.vermilion;
+          targetCtx.fillRect(-11, -5.5, 4, 2.5);
+          targetCtx.fillRect(-11, 3, 4, 2.5);
+
+        } else if (shipType === 'sputnik') {
+          // 03 SPUTNIK — Orbital enamel sphere with four swept-back whip antennae
+          targetCtx.strokeStyle = PALETTE.ink;
+          targetCtx.lineWidth = 1.9;
+          targetCtx.beginPath();
+          targetCtx.moveTo(-4, -5); targetCtx.lineTo(-19, -13);
+          targetCtx.moveTo(-6, -2); targetCtx.lineTo(-21, -6);
+          targetCtx.moveTo(-6, 2);  targetCtx.lineTo(-21, 6);
+          targetCtx.moveTo(-4, 5);  targetCtx.lineTo(-19, 13);
+          targetCtx.stroke();
+
+          // Hard shadow
+          targetCtx.fillStyle = PALETTE.ink;
+          targetCtx.beginPath();
+          targetCtx.arc(3, 3, 10.5, 0, Math.PI * 2);
+          targetCtx.fill();
+
+          // Enamel sphere
+          targetCtx.fillStyle = PALETTE.ochre;
+          targetCtx.strokeStyle = PALETTE.ink;
+          targetCtx.lineWidth = 2.4;
+          targetCtx.beginPath();
+          targetCtx.arc(0, 0, 10.5, 0, Math.PI * 2);
+          targetCtx.fill();
+          targetCtx.stroke();
+
+          // Equatorial band & specular glint
+          targetCtx.beginPath();
+          targetCtx.moveTo(0, -10.5);
+          targetCtx.lineTo(0, 10.5);
+          targetCtx.stroke();
+
+          targetCtx.fillStyle = PALETTE.paper;
+          targetCtx.beginPath();
+          targetCtx.arc(3.5, -3.5, 2.5, 0, Math.PI * 2);
+          targetCtx.fill();
+
+        } else if (shipType === 'vector') {
+          // 04 VECTOR — Forward-swept kinetic dart with split tail
+          targetCtx.fillStyle = PALETTE.ink;
+          targetCtx.beginPath();
+          targetCtx.moveTo(18, 3.5);
+          targetCtx.lineTo(2, -10.5);
+          targetCtx.lineTo(-11, -5.5);
+          targetCtx.lineTo(-5, 3.5);
+          targetCtx.lineTo(-11, 12.5);
+          targetCtx.lineTo(2, 17.5);
+          targetCtx.closePath();
+          targetCtx.fill();
+
+          targetCtx.fillStyle = PALETTE.cobalt;
+          targetCtx.strokeStyle = PALETTE.ink;
+          targetCtx.lineWidth = 2.3;
+          targetCtx.beginPath();
+          targetCtx.moveTo(16, 0);
+          targetCtx.lineTo(0, -13);
+          targetCtx.lineTo(-13, -8);
+          targetCtx.lineTo(-7, 0);
+          targetCtx.lineTo(-13, 8);
+          targetCtx.lineTo(0, 13);
+          targetCtx.closePath();
+          targetCtx.fill();
+          targetCtx.stroke();
+
+          // Vermilion nose & brass core
+          targetCtx.fillStyle = PALETTE.vermilion;
+          targetCtx.beginPath();
+          targetCtx.moveTo(16, 0);
+          targetCtx.lineTo(4, -4.5);
+          targetCtx.lineTo(4, 4.5);
+          targetCtx.closePath();
+          targetCtx.fill();
+
+          targetCtx.fillStyle = PALETTE.ochre;
+          targetCtx.beginPath();
+          targetCtx.arc(-1, 0, 2.8, 0, Math.PI * 2);
+          targetCtx.fill();
+
+        } else if (shipType === 'astrolabe') {
+          // 05 ASTROLABE — Gyroscopic ring craft with counter-rotating inner gimbal
+          targetCtx.fillStyle = PALETTE.ink;
+          targetCtx.beginPath();
+          targetCtx.arc(3, 3, 13.5, 0, Math.PI * 2);
+          targetCtx.strokeStyle = PALETTE.ink;
+          targetCtx.lineWidth = 3.2;
+          targetCtx.stroke();
+
+          // Outer brass ring
+          targetCtx.strokeStyle = PALETTE.ochre;
+          targetCtx.lineWidth = 4;
+          targetCtx.beginPath();
+          targetCtx.arc(0, 0, 13.5, 0, Math.PI * 2);
+          targetCtx.stroke();
+
+          targetCtx.strokeStyle = PALETTE.ink;
+          targetCtx.lineWidth = 1.8;
+          targetCtx.beginPath();
+          targetCtx.arc(0, 0, 15.5, 0, Math.PI * 2);
+          targetCtx.stroke();
+
+          // Counter-rotating inner gimbal
+          targetCtx.save();
+          targetCtx.rotate(-angle * 2 + timeSec * 4.5);
+          targetCtx.strokeStyle = PALETTE.cobalt;
+          targetCtx.lineWidth = 2.4;
+          targetCtx.strokeRect(-7, -7, 14, 14);
+          targetCtx.restore();
+
+          // Forward pointer & vermilion core
+          targetCtx.fillStyle = PALETTE.vermilion;
+          targetCtx.strokeStyle = PALETTE.ink;
+          targetCtx.lineWidth = 1.8;
+          targetCtx.beginPath();
+          targetCtx.moveTo(19, 0);
+          targetCtx.lineTo(11, -4.5);
+          targetCtx.lineTo(11, 4.5);
+          targetCtx.closePath();
+          targetCtx.fill();
+          targetCtx.stroke();
+
+          targetCtx.fillStyle = PALETTE.vermilion;
+          targetCtx.beginPath();
+          targetCtx.arc(0, 0, 4.2, 0, Math.PI * 2);
+          targetCtx.fill();
+          targetCtx.stroke();
+
+        } else if (shipType === 'valkyrie') {
+          // 06 VALKYRIE — Tri-wing celestial cruiser with articulated wingtips
+          const wingSweep = Math.sin(timeSec * 6) * 0.14;
+          targetCtx.fillStyle = PALETTE.ink;
+          targetCtx.beginPath();
+          targetCtx.moveTo(19, 3.5);
+          targetCtx.lineTo(-10, -12.5);
+          targetCtx.lineTo(-6, 3.5);
+          targetCtx.lineTo(-10, 19.5);
+          targetCtx.closePath();
+          targetCtx.fill();
+
+          // Articulated upper & lower wingtips
+          [-1, 1].forEach(side => {
+            targetCtx.save();
+            targetCtx.translate(-4, side * 9);
+            targetCtx.rotate(side * wingSweep);
+            targetCtx.fillStyle = PALETTE.verdigris;
+            targetCtx.strokeStyle = PALETTE.ink;
+            targetCtx.lineWidth = 2;
+            targetCtx.beginPath();
+            targetCtx.moveTo(4, 0);
+            targetCtx.lineTo(-11, side * 6);
+            targetCtx.lineTo(-8, 0);
+            targetCtx.closePath();
+            targetCtx.fill();
+            targetCtx.stroke();
+            targetCtx.restore();
+          });
+
+          // Main enamel hull
+          targetCtx.fillStyle = PALETTE.paper;
+          targetCtx.strokeStyle = PALETTE.ink;
+          targetCtx.lineWidth = 2.3;
+          targetCtx.beginPath();
+          targetCtx.moveTo(17, 0);
+          targetCtx.lineTo(-11, -13);
+          targetCtx.lineTo(-7, 0);
+          targetCtx.lineTo(-11, 13);
+          targetCtx.closePath();
+          targetCtx.fill();
+          targetCtx.stroke();
+
+          // Ochre dorsal fin & vermilion cockpit
+          targetCtx.fillStyle = PALETTE.ochre;
+          targetCtx.beginPath();
+          targetCtx.moveTo(11, 0);
+          targetCtx.lineTo(-3, -4);
+          targetCtx.lineTo(-3, 4);
+          targetCtx.closePath();
+          targetCtx.fill();
+
+        } else {
+          // 01 MONOLITH — Classic Swiss wedge with precision brass core
+          targetCtx.fillStyle = PALETTE.ink;
+          targetCtx.beginPath();
+          targetCtx.moveTo(16, 3.5);
+          targetCtx.lineTo(-10, -8.5);
+          targetCtx.lineTo(-5, 3.5);
+          targetCtx.lineTo(-10, 15.5);
+          targetCtx.closePath();
+          targetCtx.fill();
+
+          targetCtx.fillStyle = PALETTE.paper;
+          targetCtx.strokeStyle = PALETTE.ink;
+          targetCtx.lineWidth = 2.4;
+          targetCtx.beginPath();
+          targetCtx.moveTo(14, 0);
+          targetCtx.lineTo(-12, -11);
+          targetCtx.lineTo(-7, 0);
+          targetCtx.lineTo(-12, 11);
+          targetCtx.closePath();
+          targetCtx.fill();
+          targetCtx.stroke();
+
+          targetCtx.fillStyle = PALETTE.vermilion;
+          targetCtx.beginPath();
+          targetCtx.moveTo(14, 0);
+          targetCtx.lineTo(2, -5);
+          targetCtx.lineTo(2, 5);
+          targetCtx.closePath();
+          targetCtx.fill();
+
+          targetCtx.fillStyle = PALETTE.ochre;
+          targetCtx.beginPath();
+          targetCtx.arc(-2, 0, 2.6, 0, Math.PI * 2);
+          targetCtx.fill();
+        }
+
+        targetCtx.restore();
+      }
+
+      function renderTrailPoints(targetCtx, points, trailStyle, isHot = false) {
+        if (points.length < 2) return;
+
+        for (let i = 1; i < points.length; i++) {
+          const p0 = points[i - 1];
+          const p1 = points[i];
+          const ratio = i / points.length;
+
+          targetCtx.save();
+          if (trailStyle === 'telemetry') {
+            // Architectural ruler hash marks & coordinates
+            targetCtx.strokeStyle = isHot ? PALETTE.vermilion : PALETTE.cobalt;
+            targetCtx.globalAlpha = ratio * 0.78;
+            targetCtx.lineWidth = 2;
+            if (i % 2 === 1) {
+              targetCtx.beginPath();
+              targetCtx.moveTo(p0.x, p0.y);
+              targetCtx.lineTo(p1.x, p1.y);
+              targetCtx.stroke();
+            }
+            if (i % 4 === 0) {
+              const ang = Math.atan2(p1.y - p0.y, p1.x - p0.x) + Math.PI / 2;
+              const tick = 5.5 * ratio;
+              targetCtx.beginPath();
+              targetCtx.moveTo(p1.x - Math.cos(ang) * tick, p1.y - Math.sin(ang) * tick);
+              targetCtx.lineTo(p1.x + Math.cos(ang) * tick, p1.y + Math.sin(ang) * tick);
+              targetCtx.stroke();
+            }
+          } else if (trailStyle === 'halftone') {
+            // Ben-Day risograph dot matrix dissipation
+            if (i % 2 === 0) {
+              targetCtx.fillStyle = isHot ? PALETTE.vermilion : PALETTE.ink;
+              targetCtx.globalAlpha = ratio * 0.72;
+              targetCtx.beginPath();
+              targetCtx.arc(p1.x, p1.y, ratio * 5.6, 0, Math.PI * 2);
+              targetCtx.fill();
+            }
+          } else if (trailStyle === 'prism') {
+            // Layered Bauhaus tri-ribbon offset
+            const ang = Math.atan2(p1.y - p0.y, p1.x - p0.x) + Math.PI / 2;
+            const spread = 3.2 * ratio;
+            const bands = [
+              { color: PALETTE.vermilion, off: -spread },
+              { color: PALETTE.ochre,     off: 0 },
+              { color: PALETTE.cobalt,    off: spread }
+            ];
+            targetCtx.globalAlpha = ratio * 0.75;
+            targetCtx.lineWidth = Math.max(1.5, ratio * 3.2);
+            targetCtx.lineCap = 'round';
+            for (const b of bands) {
+              targetCtx.strokeStyle = b.color;
+              targetCtx.beginPath();
+              targetCtx.moveTo(p0.x + Math.cos(ang) * b.off, p0.y + Math.sin(ang) * b.off);
+              targetCtx.lineTo(p1.x + Math.cos(ang) * b.off, p1.y + Math.sin(ang) * b.off);
+              targetCtx.stroke();
+            }
+          } else if (trailStyle === 'stardust') {
+            // 4-point geometric star glints & embers
+            if (i % 3 === 0) {
+              const s = ratio * 6.5;
+              targetCtx.translate(p1.x, p1.y);
+              targetCtx.rotate(i * 0.5);
+              targetCtx.fillStyle = i % 6 === 0 ? PALETTE.vermilion : PALETTE.ochre;
+              targetCtx.strokeStyle = PALETTE.ink;
+              targetCtx.lineWidth = 1;
+              targetCtx.globalAlpha = ratio * 0.9;
+              targetCtx.beginPath();
+              targetCtx.moveTo(0, -s);
+              targetCtx.lineTo(s * 0.28, -s * 0.28);
+              targetCtx.lineTo(s, 0);
+              targetCtx.lineTo(s * 0.28, s * 0.28);
+              targetCtx.lineTo(0, s);
+              targetCtx.lineTo(-s * 0.28, s * 0.28);
+              targetCtx.lineTo(-s, 0);
+              targetCtx.lineTo(-s * 0.28, -s * 0.28);
+              targetCtx.closePath();
+              targetCtx.fill();
+              targetCtx.stroke();
+            }
+          } else if (trailStyle === 'sonic') {
+            // Expanding shockwave wake hoops
+            if (i % 4 === 0) {
+              const r = (1 - ratio) * 11 + 3;
+              targetCtx.strokeStyle = isHot ? PALETTE.vermilion : PALETTE.verdigris;
+              targetCtx.globalAlpha = ratio * 0.78;
+              targetCtx.lineWidth = 2;
+              targetCtx.beginPath();
+              targetCtx.arc(p1.x, p1.y, r, 0, Math.PI * 2);
+              targetCtx.stroke();
+            }
+          } else {
+            // VERMILION RIBBON — Tapered calligraphy brushstroke
+            targetCtx.strokeStyle = isHot ? PALETTE.vermilion : PALETTE.ink;
+            targetCtx.globalAlpha = ratio * 0.58;
+            targetCtx.lineWidth = ratio * 7.2;
+            targetCtx.lineCap = 'round';
+            targetCtx.beginPath();
+            targetCtx.moveTo(p0.x, p0.y);
+            targetCtx.lineTo(p1.x, p1.y);
+            targetCtx.stroke();
+          }
+          targetCtx.restore();
+        }
+      }
+
+      // =========================================================================
+      // 6. DOM REFERENCES & ATELIER / MISSION UI BUILDERS
       // =========================================================================
       const hudScore = document.getElementById('hudScore');
       const hudMult = document.getElementById('hudMult');
@@ -1436,7 +1840,6 @@
       const muteText = document.getElementById('muteText');
       const bottomHint = document.getElementById('bottomHint');
 
-      // Build 10 segmented Fever bars
       const odSegEls = [];
       for (let i = 0; i < 10; i++) {
         const seg = document.createElement('div');
@@ -1458,11 +1861,32 @@
         document.getElementById('settingsMuteBtn').textContent = m ? 'MUTED' : 'ENABLED';
       }
 
-      // Render Atelier Shop
+      function drawSwatchIcon(canvasEl, kind, id) {
+        const sCtx = canvasEl.getContext('2d');
+        sCtx.clearRect(0, 0, 34, 34);
+        if (kind === 'ship') {
+          renderVesselShape(sCtx, id, 17, 17, -Math.PI / 4, 0.72, 0.72, 1.2, false);
+        } else {
+          const pts = [
+            { x: 6, y: 26 },
+            { x: 12, y: 20 },
+            { x: 18, y: 15 },
+            { x: 24, y: 10 },
+            { x: 29, y: 6 }
+          ];
+          renderTrailPoints(sCtx, pts, id, true);
+        }
+      }
+
       function renderShop() {
         syncInkDisplays();
 
-        // Ships
+        const currentShip = SHIPS.find(s => s.id === save.equippedShip) || SHIPS[0];
+        const currentTrail = TRAILS.find(t => t.id === save.equippedTrail) || TRAILS[0];
+        document.getElementById('stageVesselLabel').textContent = `CHASSIS: ${currentShip.name}`;
+        document.getElementById('stageTrailLabel').textContent = `TRAIL: ${currentTrail.name}`;
+
+        // Ships Grid
         const shipsGrid = document.getElementById('shopShipsGrid');
         shipsGrid.innerHTML = '';
         SHIPS.forEach(item => {
@@ -1472,7 +1896,7 @@
           el.className = 'shop-item' + (equipped ? ' equipped' : '');
           el.innerHTML = `
             <div class="item-meta">
-              <div class="item-swatch" style="background:var(--paper); color:var(--vermilion);">▲</div>
+              <div class="item-swatch"><canvas width="34" height="34"></canvas></div>
               <div class="item-info">
                 <strong>${item.name}</strong>
                 <small>${item.desc}</small>
@@ -1483,9 +1907,10 @@
               ${equipped ? 'EQUIPPED' : owned ? 'EQUIP' : `${item.cost} INK`}
             </button>
           `;
+          drawSwatchIcon(el.querySelector('canvas'), 'ship', item.id);
           el.querySelector('button').addEventListener('click', () => {
             if (equipped) return;
-            sound.playClick(700);
+            sound.playClick(720);
             if (!owned && save.ink >= item.cost) {
               save.ink -= item.cost;
               save.unlockedShips.push(item.id);
@@ -1499,84 +1924,102 @@
           shipsGrid.appendChild(el);
         });
 
-        // Trails
+        // Trails Grid
         const trailsGrid = document.getElementById('shopTrailsGrid');
         trailsGrid.innerHTML = '';
         TRAILS.forEach(item => {
           const owned = save.unlockedTrails.includes(item.id);
           const equipped = save.equippedTrail === item.id;
-          elTrail(trailsGrid, item, owned, equipped);
-        });
-
-        // Themes
-        const themesGrid = document.getElementById('shopThemesGrid');
-        themesGrid.innerHTML = '';
-        Object.values(THEMES).forEach(t => {
-          const owned = save.unlockedThemes.includes(t.id);
-          const equipped = save.equippedTheme === t.id;
           const el = document.createElement('div');
           el.className = 'shop-item' + (equipped ? ' equipped' : '');
           el.innerHTML = `
             <div class="item-meta">
-              <div class="item-swatch" style="background:${t.paper}; color:${t.ink}; border-color:${t.ink};">Aa</div>
+              <div class="item-swatch"><canvas width="34" height="34"></canvas></div>
               <div class="item-info">
-                <strong>${t.name}</strong>
-                <small>${t.desc}</small>
+                <strong>${item.name}</strong>
+                <small>${item.desc}</small>
               </div>
             </div>
             <button class="shop-action-btn ${equipped ? 'active-tag' : owned ? 'equip' : ''}"
-              ${!owned && save.ink < t.cost ? 'disabled' : ''}>
-              ${equipped ? 'EQUIPPED' : owned ? 'EQUIP' : `${t.cost} INK`}
+              ${!owned && save.ink < item.cost ? 'disabled' : ''}>
+              ${equipped ? 'EQUIPPED' : owned ? 'EQUIP' : `${item.cost} INK`}
             </button>
           `;
+          drawSwatchIcon(el.querySelector('canvas'), 'trail', item.id);
           el.querySelector('button').addEventListener('click', () => {
             if (equipped) return;
-            sound.playClick(640);
-            if (!owned && save.ink >= t.cost) {
-              save.ink -= t.cost;
-              save.unlockedThemes.push(t.id);
+            sound.playClick(780);
+            if (!owned && save.ink >= item.cost) {
+              save.ink -= item.cost;
+              save.unlockedTrails.push(item.id);
             }
-            if (save.unlockedThemes.includes(t.id)) {
-              save.equippedTheme = t.id;
-              applyTheme(t.id);
+            if (save.unlockedTrails.includes(item.id)) {
+              save.equippedTrail = item.id;
               persistSave();
               renderShop();
             }
           });
-          themesGrid.appendChild(el);
+          trailsGrid.appendChild(el);
         });
       }
 
-      function elTrail(container, item, owned, equipped) {
-        const el = document.createElement('div');
-        el.className = 'shop-item' + (equipped ? ' equipped' : '');
-        el.innerHTML = `
-          <div class="item-meta">
-            <div class="item-swatch" style="background:var(--ochre); color:#181715;">≈</div>
-            <div class="item-info">
-              <strong>${item.name}</strong>
-              <small>${item.desc}</small>
-            </div>
-          </div>
-          <button class="shop-action-btn ${equipped ? 'active-tag' : owned ? 'equip' : ''}"
-            ${!owned && save.ink < item.cost ? 'disabled' : ''}>
-            ${equipped ? 'EQUIPPED' : owned ? 'EQUIP' : `${item.cost} INK`}
-          </button>
-        `;
-        el.querySelector('button').addEventListener('click', () => {
-          if (equipped) return;
-          sound.playClick(760);
-          if (!owned && save.ink >= item.cost) {
-            save.ink -= item.cost;
-            save.unlockedTrails.push(item.id);
-          }
-          if (save.unlockedTrails.includes(item.id)) {
-            save.equippedTrail = item.id;
-            persistSave();
-            renderShop();
-          }
-        });
-        container.appendChild(el);
+      // Live Figure-Eight Preview Loop in Atelier
+      let previewTrail = [];
+      function updateAndRenderAtelierPreview(timeSec) {
+        if (!document.getElementById('atelierTab').classList.contains('active') || menuOverlay.classList.contains('hidden')) {
+          return;
+        }
+        const rect = previewCanvas.getBoundingClientRect();
+        const pw = rect.width || 620;
+        const ph = rect.height || 136;
+        if (previewCanvas.width !== Math.floor(pw * dpr)) {
+          resizePreviewCanvas();
+        }
+
+        pCtx.fillStyle = PALETTE.paperMid;
+        pCtx.fillRect(0, 0, pw, ph);
+
+        // Architectural drafting grid & astrolabe circle inside preview stage
+        pCtx.strokeStyle = PALETTE.inkFaint;
+        pCtx.lineWidth = 1;
+        pCtx.beginPath();
+        for (let x = 24; x < pw; x += 24) {
+          pCtx.moveTo(x, 0);
+          pCtx.lineTo(x, ph);
+        }
+        for (let y = 24; y < ph; y += 24) {
+          pCtx.moveTo(0, y);
+          pCtx.lineTo(pw, y);
+        }
+        pCtx.stroke();
+
+        // Twin astrolabe focal rings
+        const cx = pw * 0.5;
+        const cy = ph * 0.54;
+        const rx = Math.min(200, pw * 0.34);
+        const ry = ph * 0.28;
+
+        pCtx.strokeStyle = PALETTE.inkSubtle;
+        pCtx.setLineDash([4, 4]);
+        pCtx.beginPath();
+        pCtx.arc(cx - rx * 0.5, cy, ry * 0.9, 0, Math.PI * 2);
+        pCtx.arc(cx + rx * 0.5, cy, ry * 0.9, 0, Math.PI * 2);
+        pCtx.stroke();
+        pCtx.setLineDash([]);
+
+        // Lissajous figure-eight trajectory
+        const t = timeSec * 1.9;
+        const vx = cx + Math.sin(t) * rx;
+        const vy = cy + Math.sin(t * 2) * ry;
+        const dx = Math.cos(t) * rx;
+        const dy = 2 * Math.cos(t * 2) * ry;
+        const ang = Math.atan2(dy, dx);
+
+        previewTrail.push({ x: vx, y: vy });
+        if (previewTrail.length > 34) previewTrail.shift();
+
+        renderTrailPoints(pCtx, previewTrail, save.equippedTrail, true);
+        renderVesselShape(pCtx, save.equippedShip, vx, vy, ang, 1.15, 1.15, timeSec, false);
       }
 
       // Render Missions
@@ -1593,7 +2036,7 @@
           card.innerHTML = `
             <div style="flex:1;">
               <div class="mission-title">${m.title}</div>
-              <div style="font-size:11px; opacity:0.8;">PROGRESS: ${Math.min(m.progress, m.target)} / ${m.target}</div>
+              <div style="font-size:11px; color:var(--ink-soft);">PROGRESS: ${Math.min(m.progress, m.target)} / ${m.target}</div>
               <div class="mission-bar-wrap">
                 <div class="mission-bar-fill" style="width:${pct}%;"></div>
               </div>
@@ -1624,7 +2067,11 @@
           document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
           btn.classList.add('active');
           document.getElementById(btn.dataset.tab).classList.add('active');
-          if (btn.dataset.tab === 'atelierTab') renderShop();
+          if (btn.dataset.tab === 'atelierTab') {
+            previewTrail = [];
+            renderShop();
+            resizePreviewCanvas();
+          }
           if (btn.dataset.tab === 'missionsTab') renderMissions();
         });
       });
@@ -1677,7 +2124,7 @@
       });
 
       // =========================================================================
-      // 6. GAME STATE, JUICE & SIMULATION VARIABLES
+      // 7. GAME STATE, JUICE & SIMULATION VARIABLES
       // =========================================================================
       const STATE = { MENU: 'MENU', PLAYING: 'PLAYING', PAUSED: 'PAUSED', GAMEOVER: 'GAMEOVER' };
       let gameState = STATE.MENU;
@@ -1688,16 +2135,13 @@
       let maxMultiplier = 1;
       let pickupStreak = 0;
 
-      // Fever / Overdrive State
-      let overdriveCharge = 0; // 0..100
-      let overdriveTimer = 0;  // >0 when active
+      let overdriveCharge = 0;
+      let overdriveTimer = 0;
       const OVERDRIVE_DURATION = 6.2;
 
-      // Run telemetry for missions
       let runStats = { graze: 0, stars: 0, overdrive: 0, shatter: 0, sonic: 0 };
       let newlyCompletedMissions = [];
 
-      // Visual Juice timers
       let shakeTime = 0;
       let shakeIntensity = 0;
       let hitstopTimer = 0;
@@ -1733,17 +2177,47 @@
       let particles = [];
       let shockwaves = [];
       let popups = [];
-      let snappedTethers = []; // Plucked vibrating string visuals!
+      let snappedTethers = [];
+      let astrolabes = [];
+      let dustMotes = [];
       let nextSpawnY = 0;
       let anchorCounter = 0;
       let isHolding = false;
 
       // =========================================================================
-      // 7. JUICE, OVERDRIVE & MISSION HELPERS
+      // 8. JUICE, OVERDRIVE & MISSION HELPERS
       // =========================================================================
       const rand = (min, max) => Math.random() * (max - min) + min;
       const clamp = (val, min, max) => Math.max(min, Math.min(max, val));
       const dist = (x1, y1, x2, y2) => Math.hypot(x2 - x1, y2 - y1);
+
+      function initParallaxAtmosphere() {
+        astrolabes = [];
+        for (let i = 0; i < 6; i++) {
+          astrolabes.push({
+            x: rand(width * 0.1, width * 0.9),
+            y: rand(-height * 2, height * 0.8),
+            r: rand(120, 290),
+            rot: rand(0, Math.PI * 2),
+            vRot: (Math.random() < 0.5 ? -1 : 1) * rand(0.03, 0.09),
+            parallax: rand(0.22, 0.45),
+            ticks: Math.floor(rand(12, 36))
+          });
+        }
+        dustMotes = [];
+        for (let i = 0; i < 38; i++) {
+          dustMotes.push({
+            x: rand(0, width),
+            y: rand(0, height),
+            r: rand(1.1, 2.4),
+            vx: rand(-7, 7),
+            vy: rand(-10, 4),
+            parallax: rand(0.3, 0.7),
+            color: Math.random() < 0.25 ? PALETTE.ochre : PALETTE.ink
+          });
+        }
+      }
+      initParallaxAtmosphere();
 
       function triggerShake(intensity, duration = 0.18) {
         if (save.settings.shake === 'OFF') return;
@@ -1802,8 +2276,8 @@
         triggerShake(10, 0.28);
         triggerFlash(PALETTE.ochre, 0.25);
         triggerChromatic(0.45);
-        spawnShockwave(player.x, player.y, 160, PALETTE.vermilion, 4);
-        spawnParticles(player.x, player.y, 26, [PALETTE.vermilion, PALETTE.ochre, PALETTE.cobalt], 100, 340);
+        spawnShockwave(player.x, player.y, 165, PALETTE.vermilion, 4);
+        spawnParticles(player.x, player.y, 28, [PALETTE.vermilion, PALETTE.ochre, PALETTE.cobalt], 100, 340);
 
         popups.push({
           x: player.x,
@@ -1912,7 +2386,7 @@
               y: player.y - 40,
               vy: -50,
               text: `DIRECTIVE VERIFIED! +${m.reward} INK`,
-              color: PALETTE.sage,
+              color: PALETTE.verdigris,
               life: 1.35,
               maxLife: 1.35
             });
@@ -1957,13 +2431,12 @@
       }
 
       // =========================================================================
-      // 8. PROCEDURAL TRACK GENERATION (Anchors, Stars, Magnets & Hazards)
+      // 9. PROCEDURAL TRACK GENERATION
       // =========================================================================
       function createAnchor(x, y, isStart = false) {
         anchorCounter++;
         const diff = clamp(score / 3600, 0, 1);
 
-        // Anchor types: 'standard', 'pulse' (Cobalt booster), 'fragile' (Shatters after 1 launch)
         let kind = 'standard';
         if (!isStart && anchorCounter > 2) {
           const roll = Math.random();
@@ -1972,7 +2445,7 @@
         }
 
         const baseCaptureR = isStart ? 155 : rand(126 - diff * 16, 154 - diff * 12);
-        const coreR = isStart ? 18 : (kind === 'pulse' ? 16 : 14);
+        const coreR = isStart ? 19 : (kind === 'pulse' ? 17 : 15);
         const moves = !isStart && anchorCounter > 3 && Math.random() < (0.24 + diff * 0.45);
 
         return {
@@ -2010,7 +2483,6 @@
         anchors.push(anchor);
 
         if (prevAnchor) {
-          // Spawn Golden Star cluster or Magnet Pickup
           const midX = (prevAnchor.baseX + ax) * 0.5 + rand(-50, 50);
           const midY = (prevAnchor.y + y) * 0.5;
           const isMagnet = anchorCounter > 4 && Math.random() < 0.11;
@@ -2036,7 +2508,6 @@
             });
           }
 
-          // Spawn Bauhaus Hazards
           const diff = clamp(score / 3200, 0, 1);
           const hazardChance = anchorCounter <= 2 ? 0.4 : (0.72 + diff * 0.25);
           if (Math.random() < hazardChance) {
@@ -2124,7 +2595,7 @@
       }
 
       // =========================================================================
-      // 9. ORBITAL PHYSICS & INPUT HANDLERS
+      // 10. ORBITAL PHYSICS & INPUT HANDLERS
       // =========================================================================
       function findNearestAnchor(x, y) {
         let best = null;
@@ -2155,7 +2626,6 @@
         player.angularVel = (entrySpeed / currentR) * player.orbitDir;
         player.orbitHeat = anchor.heat || 0;
 
-        // Squash impact on latch
         player.squashX = 0.78;
         player.squashY = 1.26;
 
@@ -2177,7 +2647,6 @@
         if (!player.tetheredAnchor) return;
         const anchor = player.tetheredAnchor;
 
-        // Spawn plucked vibrating tether string effect
         snappedTethers.push({
           x1: anchor.x,
           y1: anchor.y,
@@ -2199,7 +2668,6 @@
         player.angle = tangentAngle;
         player.tetheredAnchor = null;
 
-        // Dramatic stretch on launch
         player.squashX = 1.42;
         player.squashY = 0.68;
 
@@ -2294,7 +2762,6 @@
         }
       });
 
-      // State Transitions
       function startGame() {
         sound.init();
         sound.playClick(780);
@@ -2360,7 +2827,6 @@
         spawnParticles(player.x, player.y, 34, [PALETTE.vermilion, PALETTE.ink, PALETTE.ochre], 90, 390);
         spawnShockwave(player.x, player.y, 130, PALETTE.vermilion, 4);
 
-        // Bonus Ink from score
         const scoreInkBonus = Math.floor(score / 120);
         if (scoreInkBonus > 0) {
           save.ink += scoreInkBonus;
@@ -2398,7 +2864,7 @@
       document.getElementById('goMenuBtn').addEventListener('click', returnToMenu);
 
       // =========================================================================
-      // 10. SIMULATION UPDATE LOOP
+      // 11. SIMULATION UPDATE LOOP
       // =========================================================================
       function update(dt) {
         if (gameState === STATE.PAUSED) return;
@@ -2410,12 +2876,27 @@
           if (shakeTime === 0) shakeIntensity = 0;
         }
 
+        // Update parallax astrolabes & dust motes
+        for (const astro of astrolabes) {
+          astro.rot += astro.vRot * dt;
+          if (astro.y - cameraY * astro.parallax > height + astro.r + 80) {
+            astro.y = cameraY * astro.parallax - astro.r - rand(40, 180);
+            astro.x = rand(width * 0.1, width * 0.9);
+          }
+        }
+
+        for (const m of dustMotes) {
+          m.x += m.vx * dt;
+          m.y += m.vy * dt;
+          if (m.x < 0) m.x += width;
+          if (m.x > width) m.x -= width;
+        }
+
         if (hitstopTimer > 0) {
           hitstopTimer = Math.max(0, hitstopTimer - dt);
           return;
         }
 
-        // Recover vessel squash & stretch smoothly back to (1,1)
         player.squashX += (1 - player.squashX) * Math.min(1, dt * 12);
         player.squashY += (1 - player.squashY) * Math.min(1, dt * 12);
 
@@ -2444,16 +2925,15 @@
           }
         }
 
-        // Star & Magnet attraction (during Overdrive or Magnet powerup!)
         const magnetActive = overdriveTimer > 0 || player.magnetTimer > 0;
-        const magnetRange = overdriveTimer > 0 ? 250 : 210;
+        const magnetRange = overdriveTimer > 0 ? 255 : 215;
         for (const n of nodes) {
           if (n.collected) continue;
           n.phase += dt * 4.2;
           if (magnetActive && gameState === STATE.PLAYING) {
             const d = dist(player.x, player.y, n.x, n.y);
             if (d < magnetRange && d > 1) {
-              const pull = 460 * dt;
+              const pull = 470 * dt;
               n.x += ((player.x - n.x) / d) * pull;
               n.y += ((player.y - n.y) / d) * pull;
             }
@@ -2517,7 +2997,6 @@
               if (cand) latchToAnchor(cand);
             }
 
-            // Crisp elastic bounce off poster telemetry rails
             const railMargin = 22;
             if (player.x < railMargin) {
               player.x = railMargin;
@@ -2537,7 +3016,7 @@
           }
 
           player.trail.push({ x: player.x, y: player.y });
-          if (player.trail.length > 28) player.trail.shift();
+          if (player.trail.length > 30) player.trail.shift();
 
           if (player.y < highestWorldY) {
             const climbed = highestWorldY - player.y;
@@ -2565,7 +3044,6 @@
           hazards = hazards.filter(h => !h.shattered && h.y < cullY);
 
           if (gameState === STATE.PLAYING) {
-            // Node Pickups (Stars & Magnets)
             for (const n of nodes) {
               if (!n.collected && dist(player.x, player.y, n.x, n.y) <= player.radius + n.r + 7) {
                 n.collected = true;
@@ -2591,7 +3069,6 @@
               }
             }
 
-            // Hazards: Shatter during Overdrive OR Near-Miss Graze OR Fatal Impact
             for (const h of hazards) {
               if (h.shattered) continue;
               const d = dist(player.x, player.y, h.x, h.y);
@@ -2599,7 +3076,6 @@
 
               if (d < hitDist) {
                 if (overdriveTimer > 0) {
-                  // SMASH THROUGH HAZARD!
                   h.shattered = true;
                   runStats.shatter++;
                   recordMissionProgress('shatter', 1);
@@ -2677,12 +3153,13 @@
       }
 
       // =========================================================================
-      // 11. SWISS POSTER & RISOGRAPH RENDERER
+      // 12. BAUHAUS OBSERVATORY & SILKSCREEN RENDERER
       // =========================================================================
-      function drawSwissGrid() {
+      function drawObservatoryBackdrop() {
         const gridSize = 80;
         const offsetY = -(cameraY % gridSize);
 
+        // Layer 1: Fine Architectural Drafting Grid
         ctx.strokeStyle = PALETTE.inkFaint;
         ctx.lineWidth = 1;
         ctx.beginPath();
@@ -2696,7 +3173,44 @@
         }
         ctx.stroke();
 
-        // Crosshairs
+        // Layer 2: Rotating Parallax Celestial Astrolabe Rings
+        ctx.save();
+        for (const astro of astrolabes) {
+          const screenY = astro.y - cameraY * astro.parallax;
+          if (screenY < -astro.r - 40 || screenY > height + astro.r + 40) continue;
+
+          ctx.save();
+          ctx.translate(astro.x, screenY);
+          ctx.rotate(astro.rot);
+          ctx.strokeStyle = PALETTE.ink;
+          ctx.globalAlpha = 0.085;
+          ctx.lineWidth = 1.25;
+
+          // Outer & inner concentric elevation contours
+          ctx.beginPath();
+          ctx.arc(0, 0, astro.r, 0, Math.PI * 2);
+          ctx.stroke();
+
+          ctx.setLineDash([6, 8]);
+          ctx.beginPath();
+          ctx.arc(0, 0, astro.r * 0.68, 0, Math.PI * 2);
+          ctx.stroke();
+          ctx.setLineDash([]);
+
+          // Degree graduations around perimeter
+          for (let i = 0; i < astro.ticks; i++) {
+            const a = (i / astro.ticks) * Math.PI * 2;
+            const len = i % 3 === 0 ? 10 : 5;
+            ctx.beginPath();
+            ctx.moveTo(Math.cos(a) * (astro.r - len), Math.sin(a) * (astro.r - len));
+            ctx.lineTo(Math.cos(a) * astro.r, Math.sin(a) * astro.r);
+            ctx.stroke();
+          }
+          ctx.restore();
+        }
+        ctx.restore();
+
+        // Layer 3: Intersection Crosshairs
         ctx.strokeStyle = PALETTE.inkFaint;
         for (let x = gridSize * 2; x < width; x += gridSize * 2) {
           for (let y = offsetY; y < height; y += gridSize * 2) {
@@ -2709,17 +3223,39 @@
           }
         }
 
-        // Side rails
+        // Layer 4: Floating Cotton-Paper Micro-Dust Motes
+        ctx.save();
+        for (const m of dustMotes) {
+          const sy = ((m.y - cameraY * m.parallax) % height + height) % height;
+          ctx.fillStyle = m.color;
+          ctx.globalAlpha = 0.22;
+          ctx.beginPath();
+          ctx.arc(m.x, sy, m.r, 0, Math.PI * 2);
+          ctx.fill();
+        }
+        ctx.restore();
+
+        // Layer 5: Calibrated Boundary Rails with Altitude Tick Marks
+        ctx.save();
         ctx.strokeStyle = PALETTE.ink;
-        ctx.globalAlpha = 0.25;
+        ctx.globalAlpha = 0.28;
         ctx.lineWidth = 1.5;
         ctx.beginPath();
         ctx.moveTo(22, 0);
         ctx.lineTo(22, height);
         ctx.moveTo(width - 22, 0);
         ctx.lineTo(width - 22, height);
+
+        const tickStep = 40;
+        const tickOff = -(cameraY % tickStep);
+        for (let y = tickOff; y < height; y += tickStep) {
+          ctx.moveTo(16, y);
+          ctx.lineTo(22, y);
+          ctx.moveTo(width - 22, y);
+          ctx.lineTo(width - 16, y);
+        }
         ctx.stroke();
-        ctx.globalAlpha = 1;
+        ctx.restore();
       }
 
       function drawSpeedLines() {
@@ -2730,7 +3266,7 @@
         const time = performance.now() * 0.025;
         ctx.save();
         ctx.strokeStyle = overdriveTimer > 0 ? PALETTE.vermilion : PALETTE.ink;
-        ctx.globalAlpha = overdriveTimer > 0 ? 0.35 : 0.18;
+        ctx.globalAlpha = overdriveTimer > 0 ? 0.34 : 0.16;
         ctx.lineWidth = 2;
 
         for (let i = 0; i < 14; i++) {
@@ -2796,6 +3332,17 @@
           const isFragile = a.kind === 'fragile';
 
           ctx.save();
+
+          // Subtle silkscreen ink-bleed halo around active or candidate anchors
+          if (isTethered || isCandidate) {
+            ctx.fillStyle = isTethered ? PALETTE.vermilion : PALETTE.cobalt;
+            ctx.globalAlpha = 0.065;
+            ctx.beginPath();
+            ctx.arc(a.x, a.y, a.captureR, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.globalAlpha = 1;
+          }
+
           // Outer capture ring
           ctx.beginPath();
           ctx.arc(a.x, a.y, a.captureR, 0, Math.PI * 2);
@@ -2806,14 +3353,14 @@
               : isPulse
                 ? PALETTE.cobalt
                 : PALETTE.ink;
-          ctx.globalAlpha = (isTethered || isCandidate) ? 0.9 : 0.3;
+          ctx.globalAlpha = (isTethered || isCandidate) ? 0.92 : 0.32;
           ctx.lineWidth = (isTethered || isCandidate) ? 2.4 : 1.4;
           ctx.setLineDash(isFragile ? [3, 7] : [6, 6]);
           ctx.stroke();
           ctx.setLineDash([]);
           ctx.globalAlpha = 1;
 
-          // Double ring for Pulse anchors
+          // Double ring for Cobalt Pulse anchors
           if (isPulse) {
             ctx.beginPath();
             ctx.arc(a.x, a.y, a.captureR - 10, 0, Math.PI * 2);
@@ -2833,7 +3380,7 @@
             ctx.stroke();
             ctx.globalAlpha = 1;
 
-            // Overheat ring
+            // Overheat gauge arc
             ctx.beginPath();
             ctx.arc(a.x, a.y, a.coreR + 7, -Math.PI / 2, -Math.PI / 2 + Math.PI * 2 * clamp(a.heat, 0, 1));
             ctx.strokeStyle = a.heat > 0.72 ? PALETTE.vermilion : PALETTE.ochre;
@@ -2841,13 +3388,13 @@
             ctx.stroke();
           }
 
-          // Hard offset shadow
+          // Tactile offset drop shadow (enamel token feel)
           ctx.fillStyle = PALETTE.ink;
           ctx.beginPath();
-          ctx.arc(a.x + 3, a.y + 3, a.coreR, 0, Math.PI * 2);
+          ctx.arc(a.x + 3.5, a.y + 3.5, a.coreR, 0, Math.PI * 2);
           ctx.fill();
 
-          // Anchor disc fill
+          // Anchor enamel disc fill
           ctx.fillStyle = isTethered
             ? (a.heat > 0.72 ? PALETTE.vermilion : PALETTE.ochre)
             : isPulse
@@ -2856,7 +3403,7 @@
                 ? PALETTE.ochre
                 : a.used
                   ? PALETTE.paperDark
-                  : PALETTE.sage;
+                  : PALETTE.verdigris;
 
           ctx.strokeStyle = PALETTE.ink;
           ctx.lineWidth = 2.5;
@@ -2865,13 +3412,23 @@
           ctx.fill();
           ctx.stroke();
 
+          // Inner brass bezel ring & specular glint
+          ctx.strokeStyle = PALETTE.paper;
+          ctx.globalAlpha = 0.55;
+          ctx.lineWidth = 1.2;
+          ctx.beginPath();
+          ctx.arc(a.x, a.y, a.coreR - 4.5, -Math.PI * 0.85, Math.PI * 0.15);
+          ctx.stroke();
+          ctx.globalAlpha = 1;
+
+          // Center pin
           ctx.fillStyle = PALETTE.paper;
           ctx.beginPath();
           ctx.arc(a.x, a.y, 3.5, 0, Math.PI * 2);
           ctx.fill();
 
           ctx.fillStyle = PALETTE.ink;
-          ctx.globalAlpha = 0.55;
+          ctx.globalAlpha = 0.58;
           ctx.font = '700 9px "Space Mono", monospace';
           ctx.fillText(a.label, a.x + a.coreR + 8, a.y + 3);
           ctx.restore();
@@ -2886,10 +3443,9 @@
           ctx.translate(n.x, n.y + bob);
 
           if (n.kind === 'magnet') {
-            // Cobalt Magnet Orb
             ctx.fillStyle = PALETTE.ink;
             ctx.beginPath();
-            ctx.arc(2.5, 2.5, n.r, 0, Math.PI * 2);
+            ctx.arc(3, 3, n.r, 0, Math.PI * 2);
             ctx.fill();
 
             ctx.fillStyle = PALETTE.cobalt;
@@ -2900,13 +3456,12 @@
             ctx.fill();
             ctx.stroke();
 
-            ctx.fillStyle = '#F4EFE6';
+            ctx.fillStyle = PALETTE.paper;
             ctx.font = '700 11px "Archivo Black", sans-serif';
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
             ctx.fillText('M', 0, 0.5);
           } else {
-            // Golden Star Diamond
             ctx.strokeStyle = PALETTE.ochre;
             ctx.globalAlpha = 0.55;
             ctx.lineWidth = 1.5;
@@ -2917,13 +3472,17 @@
 
             ctx.rotate(Math.PI / 4);
             ctx.fillStyle = PALETTE.ink;
-            ctx.fillRect(-n.r + 2.5, -n.r + 2.5, n.r * 2, n.r * 2);
+            ctx.fillRect(-n.r + 3, -n.r + 3, n.r * 2, n.r * 2);
 
             ctx.fillStyle = PALETTE.ochre;
             ctx.strokeStyle = PALETTE.ink;
             ctx.lineWidth = 2.2;
             ctx.fillRect(-n.r, -n.r, n.r * 2, n.r * 2);
             ctx.strokeRect(-n.r, -n.r, n.r * 2, n.r * 2);
+
+            // Inner specular square
+            ctx.fillStyle = PALETTE.paper;
+            ctx.fillRect(-n.r + 3, -n.r + 3, 4, 4);
           }
           ctx.restore();
         }
@@ -2939,8 +3498,8 @@
             ctx.beginPath();
             ctx.arc(0, 0, h.grazeR, 0, Math.PI * 2);
             ctx.strokeStyle = PALETTE.vermilion;
-            ctx.globalAlpha = 0.18;
-            ctx.lineWidth = 1;
+            ctx.globalAlpha = 0.2;
+            ctx.lineWidth = 1.1;
             ctx.setLineDash([3, 5]);
             ctx.stroke();
             ctx.setLineDash([]);
@@ -2954,8 +3513,8 @@
             ctx.beginPath();
             for (let i = 0; i < 3; i++) {
               const ang = (i * Math.PI * 2) / 3 - Math.PI / 2;
-              const px = Math.cos(ang) * h.r + 3;
-              const py = Math.sin(ang) * h.r + 3;
+              const px = Math.cos(ang) * h.r + 3.5;
+              const py = Math.sin(ang) * h.r + 3.5;
               i === 0 ? ctx.moveTo(px, py) : ctx.lineTo(px, py);
             }
             ctx.closePath();
@@ -2983,8 +3542,8 @@
             const w = h.r * 1.9;
             const t = h.r * 0.56;
             ctx.fillStyle = PALETTE.ink;
-            ctx.fillRect(-w / 2 + 3, -t / 2 + 3, w, t);
-            ctx.fillRect(-t / 2 + 3, -w / 2 + 3, t, w);
+            ctx.fillRect(-w / 2 + 3.5, -t / 2 + 3.5, w, t);
+            ctx.fillRect(-t / 2 + 3.5, -w / 2 + 3.5, t, w);
 
             ctx.fillStyle = PALETTE.vermilion;
             ctx.strokeStyle = PALETTE.ink;
@@ -2994,7 +3553,7 @@
             ctx.fillRect(-t / 2, -w / 2, t, w);
             ctx.strokeRect(-t / 2, -w / 2, t, w);
 
-            ctx.fillStyle = PALETTE.ink;
+            ctx.fillStyle = PALETTE.paper;
             ctx.beginPath();
             ctx.arc(0, 0, 3.5, 0, Math.PI * 2);
             ctx.fill();
@@ -3003,70 +3562,16 @@
         }
       }
 
-      function drawPlayerTrail() {
-        if (player.trail.length < 2) return;
-        const trailStyle = save.equippedTrail;
-
-        for (let i = 1; i < player.trail.length; i++) {
-          const p0 = player.trail[i - 1];
-          const p1 = player.trail[i];
-          const ratio = i / player.trail.length;
-
-          ctx.save();
-          if (trailStyle === 'halftone') {
-            if (i % 2 === 0) {
-              ctx.fillStyle = overdriveTimer > 0 ? PALETTE.vermilion : PALETTE.ink;
-              ctx.globalAlpha = ratio * 0.65;
-              ctx.beginPath();
-              ctx.arc(p1.x, p1.y, ratio * 5.2, 0, Math.PI * 2);
-              ctx.fill();
-            }
-          } else if (trailStyle === 'dotted') {
-            if (i % 2 === 1) {
-              ctx.strokeStyle = overdriveTimer > 0 ? PALETTE.vermilion : PALETTE.cobalt;
-              ctx.globalAlpha = ratio * 0.75;
-              ctx.lineWidth = 3;
-              ctx.beginPath();
-              ctx.moveTo(p0.x, p0.y);
-              ctx.lineTo(p1.x, p1.y);
-              ctx.stroke();
-            }
-          } else if (trailStyle === 'prism') {
-            const colors = [PALETTE.vermilion, PALETTE.ochre, PALETTE.cobalt];
-            ctx.strokeStyle = colors[i % 3];
-            ctx.globalAlpha = ratio * 0.7;
-            ctx.lineWidth = ratio * 7;
-            ctx.lineCap = 'round';
-            ctx.beginPath();
-            ctx.moveTo(p0.x, p0.y);
-            ctx.lineTo(p1.x, p1.y);
-            ctx.stroke();
-          } else {
-            // Classic Vermilion / Ink Ribbon
-            ctx.strokeStyle = (overdriveTimer > 0 || multiplier >= 3) ? PALETTE.vermilion : PALETTE.ink;
-            ctx.globalAlpha = ratio * 0.5;
-            ctx.lineWidth = ratio * 6.5;
-            ctx.lineCap = 'round';
-            ctx.beginPath();
-            ctx.moveTo(p0.x, p0.y);
-            ctx.lineTo(p1.x, p1.y);
-            ctx.stroke();
-          }
-          ctx.restore();
-        }
-      }
-
       function drawPlayer() {
         if (gameState === STATE.GAMEOVER) return;
 
-        // Snapped plucked tether strings
         for (const st of snappedTethers) {
           const alpha = st.life / st.maxLife;
           const mx = (st.x1 + st.x2) * 0.5 + Math.sin(st.life * 75) * st.amp * alpha;
           const my = (st.y1 + st.y2) * 0.5 + Math.cos(st.life * 75) * st.amp * alpha;
           ctx.save();
           ctx.strokeStyle = PALETTE.vermilion;
-          ctx.globalAlpha = alpha * 0.7;
+          ctx.globalAlpha = alpha * 0.72;
           ctx.lineWidth = 2;
           ctx.beginPath();
           ctx.moveTo(st.x1, st.y1);
@@ -3075,9 +3580,8 @@
           ctx.restore();
         }
 
-        drawPlayerTrail();
+        renderTrailPoints(ctx, player.trail, save.equippedTrail, overdriveTimer > 0 || multiplier >= 3);
 
-        // Active tether line
         if (player.tetheredAnchor) {
           const a = player.tetheredAnchor;
           ctx.strokeStyle = a.heat > 0.72 ? PALETTE.vermilion : PALETTE.ink;
@@ -3088,7 +3592,6 @@
           ctx.stroke();
         }
 
-        // Overdrive aura ring around vessel
         if (overdriveTimer > 0) {
           ctx.save();
           ctx.translate(player.x, player.y);
@@ -3096,137 +3599,22 @@
           ctx.lineWidth = 2.5;
           ctx.setLineDash([4, 4]);
           ctx.beginPath();
-          ctx.arc(0, 0, 22 + Math.sin(performance.now() * 0.02) * 3, 0, Math.PI * 2);
+          ctx.arc(0, 0, 23 + Math.sin(performance.now() * 0.02) * 3, 0, Math.PI * 2);
           ctx.stroke();
           ctx.restore();
         }
 
-        // Render Equipped Vessel Chassis with Squash & Stretch
-        ctx.save();
-        ctx.translate(player.x, player.y);
-        ctx.rotate(player.angle);
-        ctx.scale(player.squashX, player.squashY);
-
-        const shipType = save.equippedShip;
-
-        if (shipType === 'concorde') {
-          // Sleek Twin-Fin Delta Wing
-          ctx.fillStyle = PALETTE.ink;
-          ctx.beginPath();
-          ctx.moveTo(18, 3);
-          ctx.lineTo(-12, -10);
-          ctx.lineTo(-7, 3);
-          ctx.lineTo(-12, 16);
-          ctx.closePath();
-          ctx.fill();
-
-          ctx.fillStyle = PALETTE.paper;
-          ctx.strokeStyle = PALETTE.ink;
-          ctx.lineWidth = 2.4;
-          ctx.beginPath();
-          ctx.moveTo(16, 0);
-          ctx.lineTo(-14, -12);
-          ctx.lineTo(-9, 0);
-          ctx.lineTo(-14, 12);
-          ctx.closePath();
-          ctx.fill();
-          ctx.stroke();
-
-          ctx.strokeStyle = PALETTE.cobalt;
-          ctx.lineWidth = 2.5;
-          ctx.beginPath();
-          ctx.moveTo(6, 0);
-          ctx.lineTo(-9, 0);
-          ctx.stroke();
-        } else if (shipType === 'sputnik') {
-          // Retro Bauhaus Sphere + Orbiting Moonlet
-          ctx.fillStyle = PALETTE.ink;
-          ctx.beginPath();
-          ctx.arc(2.5, 2.5, 10, 0, Math.PI * 2);
-          ctx.fill();
-
-          ctx.fillStyle = PALETTE.ochre;
-          ctx.strokeStyle = PALETTE.ink;
-          ctx.lineWidth = 2.4;
-          ctx.beginPath();
-          ctx.arc(0, 0, 10, 0, Math.PI * 2);
-          ctx.fill();
-          ctx.stroke();
-
-          // Swept antennae
-          ctx.beginPath();
-          ctx.moveTo(-6, -6);
-          ctx.lineTo(-17, -12);
-          ctx.moveTo(-6, 6);
-          ctx.lineTo(-17, 12);
-          ctx.stroke();
-
-          // Orbiting mini moonlet
-          const mAng = performance.now() * 0.008;
-          ctx.fillStyle = PALETTE.vermilion;
-          ctx.beginPath();
-          ctx.arc(Math.cos(mAng) * 16, Math.sin(mAng) * 16, 3.5, 0, Math.PI * 2);
-          ctx.fill();
-        } else if (shipType === 'vector') {
-          // Sharp Bauhaus Diamond Prism
-          ctx.fillStyle = PALETTE.ink;
-          ctx.beginPath();
-          ctx.moveTo(17, 3);
-          ctx.lineTo(0, -8);
-          ctx.lineTo(-13, 3);
-          ctx.lineTo(0, 14);
-          ctx.closePath();
-          ctx.fill();
-
-          ctx.fillStyle = PALETTE.cobalt;
-          ctx.strokeStyle = PALETTE.ink;
-          ctx.lineWidth = 2.4;
-          ctx.beginPath();
-          ctx.moveTo(15, 0);
-          ctx.lineTo(-2, -10);
-          ctx.lineTo(-15, 0);
-          ctx.lineTo(-2, 10);
-          ctx.closePath();
-          ctx.fill();
-          ctx.stroke();
-
-          ctx.fillStyle = PALETTE.ochre;
-          ctx.beginPath();
-          ctx.arc(2, 0, 3.5, 0, Math.PI * 2);
-          ctx.fill();
-        } else {
-          // 01. MONOLITH (Classic Swiss Dart)
-          ctx.fillStyle = PALETTE.ink;
-          ctx.beginPath();
-          ctx.moveTo(15, 3);
-          ctx.lineTo(-10, -8);
-          ctx.lineTo(-5, 3);
-          ctx.lineTo(-10, 14);
-          ctx.closePath();
-          ctx.fill();
-
-          ctx.fillStyle = PALETTE.paper;
-          ctx.strokeStyle = PALETTE.ink;
-          ctx.lineWidth = 2.5;
-          ctx.beginPath();
-          ctx.moveTo(13, 0);
-          ctx.lineTo(-11, -10);
-          ctx.lineTo(-6, 0);
-          ctx.lineTo(-11, 10);
-          ctx.closePath();
-          ctx.fill();
-          ctx.stroke();
-
-          ctx.fillStyle = PALETTE.vermilion;
-          ctx.beginPath();
-          ctx.moveTo(13, 0);
-          ctx.lineTo(2, -4.5);
-          ctx.lineTo(2, 4.5);
-          ctx.closePath();
-          ctx.fill();
-        }
-
-        ctx.restore();
+        renderVesselShape(
+          ctx,
+          save.equippedShip,
+          player.x,
+          player.y,
+          player.angle,
+          player.squashX,
+          player.squashY,
+          performance.now() * 0.001,
+          overdriveTimer > 0
+        );
       }
 
       function drawParticlesAndFX() {
@@ -3289,7 +3677,7 @@
           const boxH = 20;
 
           ctx.fillStyle = PALETTE.ink;
-          ctx.fillRect(pop.x - boxW / 2 + 2, pop.y - boxH + 6, boxW, boxH);
+          ctx.fillRect(pop.x - boxW / 2 + 2.5, pop.y - boxH + 6.5, boxW, boxH);
 
           ctx.fillStyle = PALETTE.paper;
           ctx.strokeStyle = PALETTE.ink;
@@ -3307,7 +3695,7 @@
         ctx.fillStyle = PALETTE.paper;
         ctx.fillRect(0, 0, width, height);
 
-        drawSwissGrid();
+        drawObservatoryBackdrop();
         drawSpeedLines();
 
         ctx.save();
@@ -3328,7 +3716,7 @@
 
         ctx.restore();
 
-        // Risograph Chromatic Misregistration Accent Border on Big Events
+        // Silkscreen Chromatic Misregistration Accent Border on Big Events
         if (chromaticTimer > 0) {
           const off = chromaticTimer * 16;
           ctx.save();
@@ -3350,7 +3738,7 @@
       }
 
       // =========================================================================
-      // 12. BOOTSTRAP
+      // 13. BOOTSTRAP
       // =========================================================================
       let lastTime = performance.now();
 
@@ -3361,6 +3749,7 @@
 
         update(dt);
         render();
+        updateAndRenderAtelierPreview(now * 0.001);
         requestAnimationFrame(gameLoop);
       }
 
