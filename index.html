@@ -208,7 +208,7 @@
     top: 92px;
     left: 50%;
     transform: translateX(-50%);
-    width: min(390px, 86vw);
+    width: min(410px, 88vw);
     background: var(--paper-elevated);
     border: 2.5px solid var(--ink);
     box-shadow: 4px 4px 0 var(--ink);
@@ -1056,7 +1056,7 @@
   <!-- LEVIATHAN BOSS HEALTH BAR -->
   <div id="boss-bar-wrap" class="hidden">
     <div class="boss-bar-top">
-      <span>⚠ ARENA LOCKED · LEVIATHAN DREADNOUGHT</span>
+      <span id="boss-title-txt">⚠ LEVIATHAN GUARDIAN</span>
       <span id="boss-cores-txt">3 CORES LEFT</span>
     </div>
     <div class="boss-pips">
@@ -1095,7 +1095,7 @@
           <div class="play-hero">
             <div class="editorial-pitch">
               <div>
-                <div class="editorial-kicker">4 Galactic Sectors · Locked Boss Arenas</div>
+                <div class="editorial-kicker">4 Galactic Sectors · Boss Gateways</div>
                 <h1 class="editorial-headline">Hold to tether into gravity wells. Release to slingshot across the meridian.</h1>
               </div>
               <div class="mechanic-list">
@@ -1104,8 +1104,8 @@
                   <span>Brass Standard, Cobalt Sonic Boost, Fragile Dashed &amp; Sage Gravity Wells.</span>
                 </div>
                 <div class="mechanic-row">
-                  <span class="mech-tag">ARENA</span>
-                  <span>Every 2,500 pts locks the camera for a Leviathan duel—smash all 3 Vermilion Cores!</span>
+                  <span class="mech-tag">BOSSES</span>
+                  <span>Defeat 1 Leviathan per sector! Dodge laser sweeps &amp; slams, or deflect plasma orbs back!</span>
                 </div>
                 <div class="mechanic-row">
                   <span class="mech-tag">FEVER</span>
@@ -1320,7 +1320,7 @@ function bootOrbita() {
     {
       code: 'SEC II',
       name: 'COBALT IONOSPHERE',
-      bgRGB: [232, 238, 245], // Cool Blueprint Mist #E8EEF5
+      bgRGB: [232, 238, 245], // Blueprint Ice Paper #E8EEF5
       gridType: 'blueprint',
       washes: ['rgba(30, 90, 168, 0.17)', 'rgba(56, 125, 100, 0.12)', 'rgba(30, 90, 168, 0.11)']
     },
@@ -1334,11 +1334,23 @@ function bootOrbita() {
     {
       code: 'SEC IV',
       name: 'EVENT HORIZON',
-      bgRGB: [229, 227, 236], // Twilight Slate Paper #E5E3EC
+      bgRGB: [229, 227, 236], // Twilight Gallery Slate #E5E3EC
       gridType: 'double',
       washes: ['rgba(223, 62, 38, 0.16)', 'rgba(30, 90, 168, 0.16)', 'rgba(227, 160, 36, 0.13)']
     }
   ];
+
+  // Strict single-per-sector boss gateways:
+  // Boss 0 guards transition SEC I -> SEC II at 1,800 pts
+  // Boss 1 guards transition SEC II -> SEC III at 5,500 pts
+  // Boss 2 guards transition SEC III -> SEC IV at 10,500 pts
+  // Boss 3+ guards endless sectors every +6,500 pts thereafter
+  function getBossThreshold(bossIndex) {
+    if (bossIndex === 0) return 1800;
+    if (bossIndex === 1) return 5500;
+    if (bossIndex === 2) return 10500;
+    return 10500 + (bossIndex - 2) * 6500;
+  }
 
   const SHIPS = [
     {
@@ -1464,9 +1476,9 @@ function bootOrbita() {
   const MISSION_POOL = [
     { id: 'graze_5',   title: 'Razor Margin',      desc: 'Perform 5 close-call Grazes in a single run.', target: 5,    reward: 65, type: 'run_grazes' },
     { id: 'stars_12',  title: 'Celestial Harvest', desc: 'Collect 12 Gold Ink Atoms in one flight.',     target: 12,   reward: 60, type: 'run_stars' },
-    { id: 'score_25',  title: 'Meridian Crossing', desc: 'Reach Sector II (2,500 pts) in one flight.',   target: 2500, reward: 80, type: 'run_score' },
+    { id: 'score_25',  title: 'Meridian Crossing', desc: 'Reach 2,500 pts in a single flight.',          target: 2500, reward: 80, type: 'run_score' },
     { id: 'fever_1',   title: 'Solar Ignition',    desc: 'Trigger Overdrive Fever Mode.',                target: 1,    reward: 75, type: 'run_fever' },
-    { id: 'boss_1',    title: 'Leviathan Hunter',  desc: 'Defeat an Orbital Leviathan Dreadnought.',     target: 1,    reward: 120, type: 'run_bosses' },
+    { id: 'boss_1',    title: 'Leviathan Hunter',  desc: 'Defeat an Orbital Leviathan Guardian.',        target: 1,    reward: 120, type: 'run_bosses' },
     { id: 'cobalt_4',  title: 'Sonic Slingshot',   desc: 'Launch off 4 Cobalt Pulse Anchors.',           target: 4,    reward: 70, type: 'run_cobalt' }
   ];
 
@@ -1496,7 +1508,7 @@ function bootOrbita() {
 
   function loadSave() {
     try {
-      const raw = window.localStorage.getItem('orbita74_classroom_v2');
+      const raw = window.localStorage.getItem('orbita74_classroom_v3');
       if (!raw) return JSON.parse(JSON.stringify(DEFAULT_SAVE));
       const parsed = JSON.parse(raw);
       return {
@@ -1514,7 +1526,7 @@ function bootOrbita() {
 
   function persist() {
     try {
-      window.localStorage.setItem('orbita74_classroom_v2', JSON.stringify(save));
+      window.localStorage.setItem('orbita74_classroom_v3', JSON.stringify(save));
     } catch (e) {}
   }
 
@@ -1669,6 +1681,25 @@ function bootOrbita() {
           osc.start(now + idx * 0.045);
           osc.stop(now + idx * 0.045 + 0.17);
         });
+      } catch (e) {}
+    }
+
+    playDeflect() {
+      if (!save.settings.sound) return;
+      this.init();
+      if (!this.ctx) return;
+      try {
+        const now = this.ctx.currentTime;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'square';
+        osc.frequency.setValueAtTime(320, now);
+        osc.frequency.exponentialRampToValueAtTime(880, now + 0.15);
+        gain.gain.setValueAtTime(0.18, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.17);
+        osc.connect(gain).connect(this.ctx.destination);
+        osc.start(now);
+        osc.stop(now + 0.18);
       } catch (e) {}
     }
 
@@ -1869,15 +1900,15 @@ function bootOrbita() {
   /* =========================================================
      4. MULTI-PART ANIMATED VESSEL & SILKSCREEN TRAIL RENDERERS
      ========================================================= */
-  function drawVessel(c, x, y, angle, shipId, scale, fever, time, squash) {
+  function drawVessel(c, x, y, angle, shipId, scale, fever, time, squash, sonicBoost) {
     c.save();
     c.translate(x, y);
     c.rotate(angle);
     c.scale(scale * squash, scale / Math.sqrt(Math.max(0.2, squash)));
 
-    if (fever) {
+    if (fever || sonicBoost) {
       c.save();
-      c.strokeStyle = '#DF3E26';
+      c.strokeStyle = fever ? '#DF3E26' : '#1E5AA8';
       c.lineWidth = 2.5;
       c.beginPath();
       c.arc(0, 0, 24 + Math.sin(time * 18) * 3, 0, Math.PI * 2);
@@ -2327,7 +2358,7 @@ function bootOrbita() {
   }
 
   /* =========================================================
-     5. GAMEPLAY, SECTORS & LOCKED LEVIATHAN BOSS ARENA
+     5. GAMEPLAY, SINGLE-PER-SECTOR GATEWAY & ACTIVE BOSS FIGHTS
      ========================================================= */
   let state = 'MENU';
   let globalTime = 0;
@@ -2341,8 +2372,9 @@ function bootOrbita() {
   let shakeMag = 0;
   let camY = 0;
   let currentSectorIdx = 0;
-  let nextBossScore = 2500;
+  let bossesSpawnedCount = 0;
   let boss = null;
+  let bossProjectiles = [];
   let arenaLockCamY = null;
 
   let runStats = { grazes: 0, stars: 0, fever: 0, bosses: 0, cobalt: 0 };
@@ -2353,6 +2385,8 @@ function bootOrbita() {
     angle: -Math.PI / 2,
     radius: 11,
     squash: 1,
+    sonicBoostTimer: 0,
+    invulnTimer: 0,
     trail: [],
     tether: null
   };
@@ -2423,33 +2457,95 @@ function bootOrbita() {
     bannerTimer = setTimeout(() => el.classList.remove('show'), 2600);
   }
 
+  function distToSegment(px, py, x1, y1, x2, y2) {
+    const dx = x2 - x1;
+    const dy = y2 - y1;
+    const lenSq = dx * dx + dy * dy;
+    if (lenSq === 0) return Math.hypot(px - x1, py - y1);
+    let t = ((px - x1) * dx + (py - y1) * dy) / lenSq;
+    t = Math.max(0, Math.min(1, t));
+    return Math.hypot(px - (x1 + t * dx), py - (y1 + t * dy));
+  }
+
+  function damageBossCore(coreObj, cx, cy, labelText) {
+    if (!boss || !coreObj || !coreObj.alive) return;
+    coreObj.alive = false;
+    score += 300;
+    runInk += 5;
+    triggerHitstop(0.055);
+    addShake(14);
+    sfx.playGraze();
+    spawnShockwave(cx, cy, 95, '#DF3E26');
+    spawnParticles(cx, cy, '#DF3E26', 20, 260);
+    spawnPopup(cx, cy - 14, labelText || 'CORE SHATTERED! +300', '#DF3E26');
+    updateBossBar();
+
+    if (boss.cores.every(core => !core.alive)) {
+      const bx = boss.x;
+      const by = boss.y;
+      boss = null;
+      bossProjectiles = [];
+      arenaLockCamY = null;
+      updateBossBar();
+
+      // Advance cleanly into the NEXT sector (never skips straight to Sector 4!)
+      currentSectorIdx += 1;
+      showSectorBanner(currentSectorIdx);
+
+      // Re-anchor altitude generation right above the cleared arena so world flow continues smoothly
+      highestSpawnY = Math.min(highestSpawnY, camY - 220);
+
+      score += 1200;
+      runInk += 25;
+      runStats.bosses++;
+      checkMissions();
+      sfx.playBossBoom();
+      addShake(20);
+      spawnShockwave(bx, by, 240, '#E3A024');
+      spawnParticles(bx, by, '#E3A024', 36, 350);
+      spawnParticles(bx, by, '#DF3E26', 24, 300);
+      spawnPopup(bx, by, 'GUARDIAN DEFEATED! SECTOR UNLOCKED', '#DF3E26');
+
+      player.invulnTimer = 1.2;
+      player.vy = Math.min(player.vy, -560);
+    }
+  }
+
   function spawnLeviathanBoss() {
     const tech = getTechBonus();
-    // Lock camera at an arena slightly above the current view so player ascends into a fixed duel chamber
     arenaLockCamY = camY - 220;
-    const arenaY = arenaLockCamY + Math.max(195, H * 0.30);
+    const homeY = arenaLockCamY + Math.max(190, H * 0.28);
     const centerX = W * 0.5;
+    const secCode = SECTORS[currentSectorIdx % SECTORS.length].code;
 
     boss = {
       x: centerX,
-      y: arenaY,
+      y: homeY,
+      homeY,
       rot: 0,
+      laserAngle: Math.PI / 2,
+      laserActive: false,
+      aiState: 'ORBIT', // 'ORBIT' | 'TELEGRAPH_SLAM' | 'SLAM_DOWN' | 'RECOVER' | 'LASER_SWEEP'
+      aiTimer: 2.2,
+      slamTargetX: centerX,
+      salvoCooldown: 1.8,
       cores: [
         { angle: -Math.PI / 2, alive: true },
         { angle: Math.PI / 6, alive: true },
         { angle: (5 * Math.PI) / 6, alive: true }
       ]
     };
+    bossProjectiles = [];
 
-    // Clear nearby hazards inside the locked boss arena for clean slingshot angles
-    hazards = hazards.filter(h => Math.abs(h.y - arenaY) > 360);
+    // Clear nearby hazards inside the locked boss arena
+    hazards = hazards.filter(h => Math.abs(h.y - homeY) > 380);
 
-    // Spawn 2 dedicated slingshot anchors (one Cobalt Sonic Boost, one Brass) directly below the Leviathan
+    // Spawn 2 dedicated slingshot anchors (Cobalt Sonic Boost + Brass) below the Leviathan
     const spanX = Math.min(185, W * 0.28);
     anchors.push(
       {
         x: centerX - spanX,
-        y: arenaY + 145,
+        y: homeY + 155,
         r: 19,
         captureRadius: 195 + tech.captureBonus,
         type: 'cobalt',
@@ -2458,7 +2554,7 @@ function bootOrbita() {
       },
       {
         x: centerX + spanX,
-        y: arenaY + 145,
+        y: homeY + 155,
         r: 19,
         captureRadius: 195 + tech.captureBonus,
         type: 'brass',
@@ -2467,11 +2563,12 @@ function bootOrbita() {
       }
     );
 
+    document.getElementById('boss-title-txt').textContent = `⚠ ${secCode} GATEWAY GUARDIAN`;
     document.getElementById('boss-bar-wrap').classList.remove('hidden');
     updateBossBar();
     sfx.playFever();
     addShake(10);
-    spawnPopup(centerX, arenaY + 215, '⚠ ARENA LOCKED · DESTROY ALL 3 CORES!', '#DF3E26');
+    spawnPopup(centerX, homeY + 225, 'DEFLECT ORBS OR SLINGSHOT INTO CORES!', '#DF3E26');
   }
 
   function updateBossBar() {
@@ -2487,7 +2584,7 @@ function bootOrbita() {
   }
 
   function generateRow(y) {
-    if (boss && Math.abs(y - boss.y) < 340) return;
+    if (boss && Math.abs(y - boss.homeY) < 380) return;
 
     const difficulty = Math.min(1, Math.abs(y) / 14000);
     const margin = Math.max(80, W * 0.14);
@@ -2576,8 +2673,9 @@ function bootOrbita() {
     hitstopTimer = 0;
     shakeMag = 0;
     currentSectorIdx = 0;
-    nextBossScore = 2500;
+    bossesSpawnedCount = 0;
     boss = null;
+    bossProjectiles = [];
     arenaLockCamY = null;
     document.getElementById('boss-bar-wrap').classList.add('hidden');
     runStats = { grazes: 0, stars: 0, fever: 0, bosses: 0, cobalt: 0 };
@@ -2592,6 +2690,8 @@ function bootOrbita() {
     player.trail = [];
     player.tether = null;
     player.squash = 1.25;
+    player.sonicBoostTimer = 0;
+    player.invulnTimer = 0;
 
     camY = player.y - H * 0.68;
 
@@ -2628,6 +2728,7 @@ function bootOrbita() {
   function endRun() {
     state = 'GAMEOVER';
     boss = null;
+    bossProjectiles = [];
     arenaLockCamY = null;
     document.getElementById('boss-bar-wrap').classList.add('hidden');
     sfx.playCrash();
@@ -2705,6 +2806,7 @@ function bootOrbita() {
     player.squash = 1.32;
 
     if (isCobalt) {
+      player.sonicBoostTimer = 1.35;
       runStats.cobalt++;
       checkMissions();
       spawnPopup(player.x, player.y - 16, 'SONIC BOOST!', '#1E5AA8');
@@ -2804,6 +2906,8 @@ function bootOrbita() {
     const tech = getTechBonus();
 
     if (feverTimer > 0) feverTimer = Math.max(0, feverTimer - dt);
+    if (player.sonicBoostTimer > 0) player.sonicBoostTimer = Math.max(0, player.sonicBoostTimer - dt);
+    if (player.invulnTimer > 0) player.invulnTimer = Math.max(0, player.invulnTimer - dt);
     if (combo > 1) {
       comboTimer -= dt;
       if (comboTimer <= 0) combo = 1;
@@ -2867,7 +2971,7 @@ function bootOrbita() {
     if (boss && arenaLockCamY !== null) {
       camY += (arenaLockCamY - camY) * Math.min(1, dt * 4.5);
 
-      // Top Arena Containment Ceiling so player never flies off above the Leviathan
+      // Top Arena Containment Ceiling
       const topLimit = camY + 36;
       if (player.y < topLimit) {
         player.y = topLimit;
@@ -2876,7 +2980,7 @@ function bootOrbita() {
         addShake(3);
       }
 
-      // Elastic Bottom Safety Barrier during Boss Fight so player never falls out while lining up shots
+      // Elastic Bottom Safety Barrier during Boss Fight
       const floorLimit = camY + H - 30;
       if (player.y > floorLimit) {
         player.y = floorLimit;
@@ -2898,72 +3002,186 @@ function bootOrbita() {
       }
     }
 
-    // Sector Transitions (2,500 -> 5,500 -> 9,500 -> 14,500)
-    let newSectorIdx = 0;
-    if (score >= 14500) newSectorIdx = 3 + Math.floor((score - 14500) / 5500);
-    else if (score >= 9500) newSectorIdx = 3;
-    else if (score >= 5500) newSectorIdx = 2;
-    else if (score >= 2500) newSectorIdx = 1;
-
-    if (newSectorIdx > currentSectorIdx) {
-      currentSectorIdx = newSectorIdx;
-      showSectorBanner(currentSectorIdx);
-    }
-
-    // Spawn Locked Boss Arena every 2,500 points
-    if (!boss && score >= nextBossScore) {
-      nextBossScore += 2500;
+    // Spawn 1 Boss strictly per sector threshold
+    const nextThreshold = getBossThreshold(bossesSpawnedCount);
+    if (!boss && score >= nextThreshold) {
+      bossesSpawnedCount += 1;
       spawnLeviathanBoss();
     }
 
-    // Update Leviathan Dreadnought & Weakpoint Core Collisions
+    // Active Leviathan Boss AI & Combat Mechanics
     if (boss) {
-      boss.x = W * 0.5 + Math.sin(globalTime * 0.95) * Math.min(115, W * 0.20);
-      boss.rot += dt * 0.75;
+      boss.rot += dt * 0.78;
+      boss.aiTimer -= dt;
 
-      const coreOrbitR = 64;
-      for (const c of boss.cores) {
-        if (!c.alive) continue;
-        const cx = boss.x + Math.cos(boss.rot + c.angle) * coreOrbitR;
-        const cy = boss.y + Math.sin(boss.rot + c.angle) * coreOrbitR;
-        const dist = Math.hypot(player.x - cx, player.y - cy);
-        if (dist < player.radius + 26) {
-          c.alive = false;
-          score += 300;
-          runInk += 5;
-          triggerHitstop(0.055);
-          addShake(13);
-          sfx.playGraze();
-          spawnShockwave(cx, cy, 95, '#DF3E26');
-          spawnParticles(cx, cy, '#DF3E26', 18, 250);
-          spawnPopup(cx, cy - 14, 'CORE SHATTERED! +300', '#DF3E26');
+      // Salvo of Deflectable Plasma Orbs during ORBIT or LASER_SWEEP
+      if (boss.aiState === 'ORBIT' || boss.aiState === 'LASER_SWEEP') {
+        boss.salvoCooldown -= dt;
+        if (boss.salvoCooldown <= 0) {
+          boss.salvoCooldown = 2.05;
+          const aimAng = Math.atan2(player.y - boss.y, player.x - boss.x);
+          const spd = 215;
+          bossProjectiles.push({
+            x: boss.x,
+            y: boss.y + 28,
+            vx: Math.cos(aimAng) * spd,
+            vy: Math.sin(aimAng) * spd,
+            r: 12,
+            reflected: false,
+            grazed: false
+          });
+          sfx.playClick(260);
+        }
+      }
 
-          // Upward rebound so player can chain into another core or anchor
-          const pushAng = Math.atan2(player.y - cy, player.x - cx);
-          player.vx = Math.cos(pushAng) * 430;
-          player.vy = Math.min(-340, Math.sin(pushAng) * 430);
-          updateBossBar();
-
-          if (boss.cores.every(core => !core.alive)) {
-            const bx = boss.x;
-            const by = boss.y;
-            boss = null;
-            arenaLockCamY = null;
-            updateBossBar();
-            score += 1500;
-            runInk += 25;
-            runStats.bosses++;
-            checkMissions();
-            sfx.playBossBoom();
-            addShake(20);
-            spawnShockwave(bx, by, 230, '#E3A024');
-            spawnParticles(bx, by, '#E3A024', 34, 340);
-            spawnParticles(bx, by, '#DF3E26', 24, 300);
-            spawnPopup(bx, by, 'LEVIATHAN DESTROYED! +1,500 & +25 INK', '#DF3E26');
-            // Launch player upward as the arena unlocks
-            player.vy = Math.min(player.vy, -540);
+      if (boss.aiState === 'ORBIT') {
+        boss.x = W * 0.5 + Math.sin(globalTime * 1.1) * Math.min(130, W * 0.22);
+        boss.y += (boss.homeY - boss.y) * Math.min(1, dt * 5);
+        if (boss.aiTimer <= 0) {
+          // Alternate between Telegraphed Charge Slam and Rotating Laser Sweep
+          if (Math.random() < 0.52) {
+            boss.aiState = 'TELEGRAPH_SLAM';
+            boss.aiTimer = 1.05;
+            boss.slamTargetX = Math.max(95, Math.min(W - 95, player.x));
+            sfx.playClick(640);
+          } else {
+            boss.aiState = 'LASER_SWEEP';
+            boss.aiTimer = 3.2;
+            boss.laserAngle = Math.PI * 0.22;
+            sfx.playClick(740);
           }
-          break;
+        }
+      } else if (boss.aiState === 'TELEGRAPH_SLAM') {
+        boss.x += (boss.slamTargetX - boss.x) * Math.min(1, dt * 7);
+        boss.y = boss.homeY - 22 + Math.sin(globalTime * 45) * 3; // Vibration wind-up
+        if (boss.aiTimer <= 0) {
+          boss.aiState = 'SLAM_DOWN';
+          boss.aiTimer = 0.42;
+          sfx.playCrash();
+        }
+      } else if (boss.aiState === 'SLAM_DOWN') {
+        boss.y += 760 * dt;
+        const slamLimitY = boss.homeY + 195;
+        if (boss.y >= slamLimitY || boss.aiTimer <= 0) {
+          boss.y = slamLimitY;
+          boss.aiState = 'RECOVER';
+          boss.aiTimer = 0.95;
+          addShake(15);
+          spawnShockwave(boss.x, boss.y, 175, '#DF3E26');
+          spawnParticles(boss.x, boss.y, '#DF3E26', 18, 240);
+          // Shockwave check if player is right under the slam
+          if (Math.hypot(player.x - boss.x, player.y - boss.y) < 115 && feverTimer <= 0 && player.invulnTimer <= 0) {
+            endRun();
+            return;
+          }
+        }
+      } else if (boss.aiState === 'RECOVER') {
+        boss.y += (boss.homeY - boss.y) * Math.min(1, dt * 4.5);
+        if (boss.aiTimer <= 0) {
+          boss.aiState = 'ORBIT';
+          boss.aiTimer = 2.4;
+        }
+      } else if (boss.aiState === 'LASER_SWEEP') {
+        boss.x += (W * 0.5 - boss.x) * Math.min(1, dt * 4);
+        boss.y += (boss.homeY - boss.y) * Math.min(1, dt * 4);
+        // First 0.85s is telegraphed dotted warning beam; remaining 2.35s sweeps hot crimson laser
+        const warmUp = boss.aiTimer > 2.35;
+        boss.laserActive = !warmUp;
+        if (!warmUp) {
+          boss.laserAngle += dt * 0.95;
+          const beamLen = Math.max(W, H) * 0.85;
+          const bx2 = boss.x + Math.cos(boss.laserAngle) * beamLen;
+          const by2 = boss.y + Math.sin(boss.laserAngle) * beamLen;
+          const dBeam = distToSegment(player.x, player.y, boss.x, boss.y, bx2, by2);
+          if (dBeam < player.radius + 7 && feverTimer <= 0 && player.invulnTimer <= 0) {
+            endRun();
+            return;
+          }
+        }
+        if (boss.aiTimer <= 0) {
+          boss.laserActive = false;
+          boss.aiState = 'ORBIT';
+          boss.aiTimer = 2.4;
+        }
+      }
+
+      // Check player direct slingshot collision with the 3 rotating Weakpoint Cores
+      if (boss) {
+        const coreOrbitR = 66;
+        for (const c of boss.cores) {
+          if (!c.alive) continue;
+          const cx = boss.x + Math.cos(boss.rot + c.angle) * coreOrbitR;
+          const cy = boss.y + Math.sin(boss.rot + c.angle) * coreOrbitR;
+          const dist = Math.hypot(player.x - cx, player.y - cy);
+          if (dist < player.radius + 26) {
+            const pushAng = Math.atan2(player.y - cy, player.x - cx);
+            player.vx = Math.cos(pushAng) * 440;
+            player.vy = Math.min(-340, Math.sin(pushAng) * 440);
+            damageBossCore(c, cx, cy, 'CORE SHATTERED! +300');
+            break;
+          }
+        }
+      }
+    }
+
+    // Update Boss Plasma Orbs (Dodge, Graze, or Deflect back into Boss!)
+    for (let i = bossProjectiles.length - 1; i >= 0; i--) {
+      const orb = bossProjectiles[i];
+      orb.x += orb.vx * dt;
+      orb.y += orb.vy * dt;
+
+      if (orb.y > camY + H + 80 || orb.y < camY - 120 || orb.x < -60 || orb.x > W + 60) {
+        bossProjectiles.splice(i, 1);
+        continue;
+      }
+
+      if (!orb.reflected) {
+        const dist = Math.hypot(player.x - orb.x, player.y - orb.y);
+        const canDeflect = feverTimer > 0 || player.sonicBoostTimer > 0 || !player.tether;
+        // Slingshotting into a plasma orb (or touching during Fever / Cobalt Sonic Boost) deflects it back!
+        if (dist < player.radius + orb.r + 6) {
+          const speed = Math.hypot(player.vx, player.vy);
+          if (feverTimer > 0 || player.sonicBoostTimer > 0 || speed > 440) {
+            orb.reflected = true;
+            if (boss) {
+              const retAng = Math.atan2(boss.y - orb.y, boss.x - orb.x);
+              orb.vx = Math.cos(retAng) * 680;
+              orb.vy = Math.sin(retAng) * 680;
+            } else {
+              orb.vy = -680;
+            }
+            sfx.playDeflect();
+            addShake(8);
+            triggerHitstop(0.04);
+            spawnShockwave(orb.x, orb.y, 65, '#1E5AA8');
+            spawnPopup(orb.x, orb.y - 12, 'DEFLECTED!', '#1E5AA8');
+          } else if (player.invulnTimer <= 0) {
+            endRun();
+            return;
+          }
+        } else if (!orb.grazed && dist < player.radius + orb.r + 28) {
+          orb.grazed = true;
+          runInk += 2;
+          runStats.grazes++;
+          addOverdrive(20);
+          sfx.playGraze();
+          spawnPopup(player.x, player.y - 16, 'ORB GRAZE!', '#DF3E26');
+        }
+      } else if (boss) {
+        // Reflected orb homing onto closest alive core
+        const aliveCores = boss.cores.filter(c => c.alive);
+        if (aliveCores.length > 0) {
+          const targetCore = aliveCores[0];
+          const cx = boss.x + Math.cos(boss.rot + targetCore.angle) * 66;
+          const cy = boss.y + Math.sin(boss.rot + targetCore.angle) * 66;
+          const ang = Math.atan2(cy - orb.y, cx - orb.x);
+          orb.vx = Math.cos(ang) * 700;
+          orb.vy = Math.sin(ang) * 700;
+
+          if (Math.hypot(orb.x - cx, orb.y - cy) < 32) {
+            bossProjectiles.splice(i, 1);
+            damageBossCore(targetCore, cx, cy, 'ORB DEFLECT HIT! +300');
+          }
         }
       }
     }
@@ -3031,7 +3249,7 @@ function bootOrbita() {
           spawnParticles(h.x, h.y, '#DF3E26', 18, 260);
           spawnPopup(h.x, h.y - 14, `SHATTER +${250 * combo}!`, '#DF3E26');
           checkMissions();
-        } else {
+        } else if (player.invulnTimer <= 0) {
           endRun();
           return;
         }
@@ -3092,7 +3310,7 @@ function bootOrbita() {
       ctx.font = '700 10px "Courier New", monospace';
       ctx.fillStyle = '#1E5AA8';
       ctx.textAlign = 'center';
-      ctx.fillText('▲ ELASTIC ARENA DEFLECTOR ACTIVE ▲', W * 0.5, floorY - 8);
+      ctx.fillText('▲ ELASTIC ARENA DEFLECTOR · FAST LAUNCH DEFLECTS PLASMA ORBS ▲', W * 0.5, floorY - 8);
       ctx.restore();
     }
 
@@ -3195,8 +3413,52 @@ function bootOrbita() {
       ctx.restore();
     }
 
-    // 4. Leviathan Dreadnought Boss
+    // 4. Leviathan Boss & Telegraphed Attack Visuals
     if (boss) {
+      // Telegraphed Charge Slam Lane
+      if (boss.aiState === 'TELEGRAPH_SLAM' || boss.aiState === 'SLAM_DOWN') {
+        ctx.save();
+        ctx.fillStyle = 'rgba(223, 62, 38, 0.12)';
+        ctx.fillRect(boss.slamTargetX - 44, boss.homeY, 88, 240);
+        ctx.strokeStyle = '#DF3E26';
+        ctx.lineWidth = 2;
+        ctx.setLineDash([6, 6]);
+        ctx.strokeRect(boss.slamTargetX - 44, boss.homeY, 88, 240);
+        ctx.restore();
+      }
+
+      // Telegraphed / Active Rotating Laser Sweep Beam
+      if (boss.aiState === 'LASER_SWEEP') {
+        const beamLen = Math.max(W, H) * 0.85;
+        const bx2 = boss.x + Math.cos(boss.laserAngle) * beamLen;
+        const by2 = boss.y + Math.sin(boss.laserAngle) * beamLen;
+        ctx.save();
+        if (boss.laserActive) {
+          ctx.strokeStyle = 'rgba(223, 62, 38, 0.28)';
+          ctx.lineWidth = 20;
+          ctx.beginPath();
+          ctx.moveTo(boss.x, boss.y);
+          ctx.lineTo(bx2, by2);
+          ctx.stroke();
+
+          ctx.strokeStyle = '#DF3E26';
+          ctx.lineWidth = 6;
+          ctx.beginPath();
+          ctx.moveTo(boss.x, boss.y);
+          ctx.lineTo(bx2, by2);
+          ctx.stroke();
+        } else {
+          ctx.strokeStyle = '#DF3E26';
+          ctx.lineWidth = 2;
+          ctx.setLineDash([8, 8]);
+          ctx.beginPath();
+          ctx.moveTo(boss.x, boss.y);
+          ctx.lineTo(bx2, by2);
+          ctx.stroke();
+        }
+        ctx.restore();
+      }
+
       ctx.save();
       ctx.translate(boss.x, boss.y);
 
@@ -3205,7 +3467,7 @@ function bootOrbita() {
       ctx.lineWidth = 1.5;
       ctx.setLineDash([6, 6]);
       ctx.beginPath();
-      ctx.arc(0, 0, 92, 0, Math.PI * 2);
+      ctx.arc(0, 0, 94, 0, Math.PI * 2);
       ctx.stroke();
       ctx.restore();
 
@@ -3227,7 +3489,7 @@ function bootOrbita() {
       ctx.stroke();
       ctx.restore();
 
-      const coreOrbitR = 64;
+      const coreOrbitR = 66;
       const pulseScale = 1 + Math.sin(globalTime * 8) * 0.14;
       for (const c of boss.cores) {
         const cx = Math.cos(boss.rot + c.angle) * coreOrbitR;
@@ -3261,6 +3523,25 @@ function bootOrbita() {
         }
       }
 
+      ctx.restore();
+    }
+
+    // 4b. Boss Plasma Orbs
+    for (const orb of bossProjectiles) {
+      ctx.save();
+      ctx.translate(orb.x, orb.y);
+      ctx.fillStyle = orb.reflected ? '#1E5AA8' : '#DF3E26';
+      ctx.strokeStyle = '#171614';
+      ctx.lineWidth = 2.4;
+      ctx.beginPath();
+      ctx.arc(0, 0, orb.r, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.stroke();
+
+      ctx.fillStyle = orb.reflected ? '#FAF6EE' : '#E3A024';
+      ctx.beginPath();
+      ctx.arc(0, 0, 4.5, 0, Math.PI * 2);
+      ctx.fill();
       ctx.restore();
     }
 
@@ -3323,7 +3604,7 @@ function bootOrbita() {
 
     if (state === 'PLAYING') {
       drawTrail(ctx, player.trail, save.equippedTrail, feverTimer > 0);
-      drawVessel(ctx, player.x, player.y, player.angle, save.equippedShip, 1, feverTimer > 0, globalTime, player.squash);
+      drawVessel(ctx, player.x, player.y, player.angle, save.equippedShip, 1, feverTimer > 0, globalTime, player.squash, player.sonicBoostTimer > 0);
     }
 
     for (const pop of popups) {
@@ -3397,7 +3678,7 @@ function bootOrbita() {
     const previewTrailId = inspected.category === 'trail' ? inspected.id : save.equippedTrail;
 
     drawTrail(pCtx, previewTrail, previewTrailId, false);
-    drawVessel(pCtx, x, y, ang, previewShipId, 1.25, false, globalTime, 1);
+    drawVessel(pCtx, x, y, ang, previewShipId, 1.25, false, globalTime, 1, false);
   }
 
   /* =========================================================
@@ -3695,6 +3976,7 @@ function bootOrbita() {
     sfx.stopCharge();
     state = 'MENU';
     boss = null;
+    bossProjectiles = [];
     arenaLockCamY = null;
     document.getElementById('boss-bar-wrap').classList.add('hidden');
     document.getElementById('hud').classList.add('hidden');
