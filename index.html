@@ -82,15 +82,16 @@
   /* HUD */
   #hud {
     position: absolute;
-    top: 22px;
-    left: 24px;
-    right: 24px;
+    top: 20px;
+    left: 22px;
+    right: 22px;
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
     pointer-events: none;
     z-index: 12;
-    transition: opacity 0.2s ease;
+    gap: 10px;
+    flex-wrap: wrap;
   }
 
   #hud.hidden {
@@ -100,7 +101,7 @@
   .hud-group {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 8px;
     flex-wrap: wrap;
   }
 
@@ -108,15 +109,15 @@
     background: var(--paper-elevated);
     border: var(--border-thick) solid var(--ink);
     box-shadow: var(--shadow-sm);
-    padding: 7px 14px;
+    padding: 6px 12px;
     display: flex;
     flex-direction: column;
-    min-width: 92px;
+    min-width: 84px;
   }
 
   .hud-label {
-    font-size: 9.5px;
-    letter-spacing: 0.12em;
+    font-size: 9px;
+    letter-spacing: 0.11em;
     text-transform: uppercase;
     color: var(--ink-soft);
     font-weight: 700;
@@ -124,7 +125,7 @@
 
   .hud-value {
     font-family: var(--font-display);
-    font-size: 22px;
+    font-size: 20px;
     line-height: 1.1;
     color: var(--ink);
     margin-top: 2px;
@@ -132,26 +133,27 @@
 
   .hud-value.vermilion { color: var(--vermilion); }
   .hud-value.ochre { color: #B8790C; }
+  .hud-value.cobalt { color: var(--cobalt); }
 
   .overdrive-card {
     background: var(--paper-elevated);
     border: var(--border-thick) solid var(--ink);
     box-shadow: var(--shadow-sm);
-    padding: 7px 12px;
-    min-width: 154px;
+    padding: 6px 11px;
+    min-width: 146px;
   }
 
   .overdrive-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 5px;
+    margin-bottom: 4px;
   }
 
   .od-segments {
     display: grid;
     grid-template-columns: repeat(10, 1fr);
-    gap: 3px;
+    gap: 2.5px;
     height: 10px;
   }
 
@@ -163,24 +165,92 @@
   .od-seg.filled { background: var(--ochre); }
   .od-seg.fever { background: var(--vermilion); }
 
+  /* Sector & Boss Banners */
+  #sector-banner {
+    position: absolute;
+    top: 94px;
+    left: 50%;
+    transform: translateX(-50%) translateY(-20px);
+    background: var(--paper-elevated);
+    border: 2.5px solid var(--ink);
+    box-shadow: 5px 5px 0 var(--ink);
+    padding: 8px 20px;
+    text-align: center;
+    z-index: 14;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.35s ease, transform 0.35s ease;
+  }
+
+  #sector-banner.show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+
+  #boss-bar-wrap {
+    position: absolute;
+    top: 92px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: min(360px, 84vw);
+    background: var(--paper-elevated);
+    border: 2.5px solid var(--ink);
+    box-shadow: 4px 4px 0 var(--ink);
+    padding: 7px 12px;
+    z-index: 13;
+    pointer-events: none;
+  }
+
+  #boss-bar-wrap.hidden {
+    display: none;
+  }
+
+  .boss-bar-top {
+    display: flex;
+    justify-content: space-between;
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 5px;
+    color: var(--vermilion);
+  }
+
+  .boss-pips {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 6px;
+    height: 10px;
+  }
+
+  .boss-pip {
+    background: var(--vermilion);
+    border: 1.5px solid var(--ink);
+  }
+
+  .boss-pip.destroyed {
+    background: var(--paper-deep);
+    opacity: 0.45;
+  }
+
   /* Buttons */
   .btn-swiss {
     pointer-events: auto;
     font-family: var(--font-mono);
     font-weight: 700;
-    font-size: 12px;
+    font-size: 11.5px;
     text-transform: uppercase;
     letter-spacing: 0.06em;
     background: var(--paper-elevated);
     color: var(--ink);
     border: var(--border-thick) solid var(--ink);
     box-shadow: var(--shadow-sm);
-    padding: 9px 14px;
+    padding: 8px 13px;
     cursor: pointer;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: 7px;
+    gap: 6px;
   }
 
   .btn-swiss:hover:not(:disabled) {
@@ -218,9 +288,9 @@
     background: var(--ochre);
     color: var(--ink);
     font-family: var(--font-display);
-    font-size: 13px;
+    font-size: 12.5px;
     letter-spacing: 0.04em;
-    padding: 11px 16px;
+    padding: 10px 14px;
     box-shadow: var(--shadow-sm);
   }
 
@@ -236,8 +306,8 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 16px;
-    background: rgba(245, 240, 230, 0.84);
+    padding: 14px;
+    background: rgba(245, 240, 230, 0.85);
   }
 
   .overlay-backdrop.hidden {
@@ -246,7 +316,7 @@
 
   .hub-shell {
     width: 100%;
-    max-width: 840px;
+    max-width: 880px;
     max-height: 92vh;
     background: var(--paper-elevated);
     border: 3px solid var(--ink);
@@ -260,7 +330,7 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 14px 22px;
+    padding: 13px 20px;
     border-bottom: var(--border-thick) solid var(--ink);
     background: var(--paper);
     gap: 12px;
@@ -276,7 +346,7 @@
 
   .brand-title {
     font-family: var(--font-display);
-    font-size: clamp(24px, 4vw, 34px);
+    font-size: clamp(22px, 3.8vw, 32px);
     letter-spacing: -0.02em;
     line-height: 1;
   }
@@ -286,7 +356,7 @@
   .brand-sub {
     font-family: var(--font-serif);
     font-style: italic;
-    font-size: 17px;
+    font-size: 16px;
     color: var(--ink-soft);
   }
 
@@ -313,9 +383,10 @@
     font-size: 15px;
   }
 
+  /* 5 Navigation Tabs */
   .hub-tabs {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(5, 1fr);
     border-bottom: var(--border-thick) solid var(--ink);
     background: var(--paper-deep);
   }
@@ -323,10 +394,10 @@
   .hub-tab {
     font-family: var(--font-mono);
     font-weight: 700;
-    font-size: 11.5px;
-    letter-spacing: 0.06em;
+    font-size: 10.5px;
+    letter-spacing: 0.04em;
     text-transform: uppercase;
-    padding: 12px 6px;
+    padding: 11px 4px;
     border: none;
     border-right: 2px solid var(--ink);
     background: transparent;
@@ -335,7 +406,8 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 6px;
+    gap: 5px;
+    text-align: center;
   }
 
   .hub-tab:last-child { border-right: none; }
@@ -349,13 +421,13 @@
   .tab-badge {
     background: var(--vermilion);
     color: #fff;
-    font-size: 10px;
+    font-size: 9.5px;
     padding: 1px 5px;
     border-radius: 99px;
   }
 
   .hub-body {
-    padding: 20px;
+    padding: 18px;
     overflow-y: auto;
     flex: 1;
   }
@@ -366,11 +438,11 @@
   .play-hero {
     display: grid;
     grid-template-columns: 1.15fr 0.85fr;
-    gap: 18px;
+    gap: 16px;
     align-items: stretch;
   }
 
-  @media (max-width: 660px) {
+  @media (max-width: 680px) {
     .play-hero { grid-template-columns: 1fr; }
   }
 
@@ -381,7 +453,7 @@
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    gap: 14px;
+    gap: 12px;
   }
 
   .editorial-kicker {
@@ -394,8 +466,8 @@
 
   .editorial-headline {
     font-family: var(--font-serif);
-    font-size: 27px;
-    line-height: 1.12;
+    font-size: 25px;
+    line-height: 1.14;
     color: var(--ink);
     margin-top: 4px;
   }
@@ -403,27 +475,27 @@
   .mechanic-list {
     display: flex;
     flex-direction: column;
-    gap: 9px;
+    gap: 8px;
     border-top: 1.5px solid rgba(23,22,20,0.2);
-    padding-top: 12px;
+    padding-top: 10px;
   }
 
   .mechanic-row {
     display: flex;
     align-items: center;
     gap: 10px;
-    font-size: 12px;
+    font-size: 11.5px;
     color: var(--ink-soft);
   }
 
   .mech-tag {
     font-weight: 700;
-    font-size: 10px;
+    font-size: 9.5px;
     padding: 2px 6px;
     border: 1.5px solid var(--ink);
     background: var(--paper-elevated);
     color: var(--ink);
-    min-width: 64px;
+    min-width: 66px;
     text-align: center;
   }
 
@@ -434,23 +506,23 @@
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    gap: 14px;
+    gap: 12px;
   }
 
   .stat-pair {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 10px;
+    gap: 9px;
   }
 
   .mini-stat {
     background: var(--paper-elevated);
     border: 1.5px solid var(--ink);
-    padding: 10px;
+    padding: 9px;
   }
 
   .mini-stat-label {
-    font-size: 9.5px;
+    font-size: 9px;
     text-transform: uppercase;
     letter-spacing: 0.08em;
     color: var(--ink-soft);
@@ -458,7 +530,7 @@
 
   .mini-stat-val {
     font-family: var(--font-display);
-    font-size: 19px;
+    font-size: 18px;
     margin-top: 2px;
   }
 
@@ -468,7 +540,7 @@
   .atelier-layout {
     display: grid;
     grid-template-columns: 275px 1fr;
-    gap: 18px;
+    gap: 16px;
     align-items: start;
   }
 
@@ -479,11 +551,11 @@
   .inspector-panel {
     border: 2.5px solid var(--ink);
     background: var(--paper);
-    padding: 14px;
+    padding: 13px;
     box-shadow: var(--shadow-sm);
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 9px;
     position: sticky;
     top: 0;
   }
@@ -504,7 +576,7 @@
   .tier-badge {
     padding: 2px 6px;
     border: 1.5px solid var(--ink);
-    font-size: 9.5px;
+    font-size: 9px;
     background: var(--paper-elevated);
     color: var(--ink);
   }
@@ -514,7 +586,7 @@
 
   canvas#atelier-preview {
     width: 100%;
-    height: 175px;
+    height: 170px;
     border: 2px solid var(--ink);
     background: var(--paper-elevated);
     display: block;
@@ -522,14 +594,14 @@
 
   .inspector-title {
     font-family: var(--font-display);
-    font-size: 18px;
+    font-size: 17px;
     line-height: 1.1;
     color: var(--ink);
   }
 
   .inspector-desc {
-    font-size: 11.5px;
-    line-height: 1.4;
+    font-size: 11px;
+    line-height: 1.38;
     color: var(--ink-soft);
   }
 
@@ -539,13 +611,13 @@
     gap: 6px;
     border-top: 1px dashed rgba(23,22,20,0.3);
     border-bottom: 1px dashed rgba(23,22,20,0.3);
-    padding: 8px 0;
-    font-size: 10.5px;
+    padding: 7px 0;
+    font-size: 10px;
   }
 
   .spec-cell span {
     display: block;
-    font-size: 9px;
+    font-size: 8.5px;
     color: var(--ink-muted);
     text-transform: uppercase;
   }
@@ -556,9 +628,9 @@
   }
 
   .shop-section-title {
-    font-size: 11px;
+    font-size: 10.5px;
     font-weight: 700;
-    letter-spacing: 0.12em;
+    letter-spacing: 0.11em;
     text-transform: uppercase;
     color: var(--ink-soft);
     margin-bottom: 8px;
@@ -600,7 +672,7 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    font-size: 9.5px;
+    font-size: 9px;
     font-weight: 700;
     color: var(--ink-muted);
   }
@@ -636,6 +708,65 @@
   .status-pill.locked {
     background: var(--ochre-soft);
     color: var(--ink);
+  }
+
+  /* =========================================================
+     ENGINEERING LAB (TECH UPGRADES)
+     ========================================================= */
+  .tech-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 12px;
+  }
+
+  .tech-card {
+    border: 2px solid var(--ink);
+    background: var(--paper);
+    padding: 14px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 10px;
+  }
+
+  .tech-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 8px;
+  }
+
+  .tech-title {
+    font-family: var(--font-display);
+    font-size: 14px;
+  }
+
+  .tech-rank {
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--cobalt);
+  }
+
+  .tech-desc {
+    font-size: 11.5px;
+    color: var(--ink-soft);
+    line-height: 1.35;
+  }
+
+  .tech-pips {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 4px;
+    height: 9px;
+  }
+
+  .tech-pip {
+    border: 1.5px solid var(--ink);
+    background: var(--paper-deep);
+  }
+
+  .tech-pip.active {
+    background: var(--cobalt);
   }
 
   /* =========================================================
@@ -793,7 +924,7 @@
   /* GAME OVER */
   .gameover-card {
     width: 100%;
-    max-width: 450px;
+    max-width: 480px;
     background: var(--paper-elevated);
     border: 3px solid var(--ink);
     box-shadow: 10px 10px 0px var(--ink);
@@ -818,7 +949,7 @@
 
   .go-stats {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(2, 1fr);
     gap: 10px;
     margin-bottom: 20px;
   }
@@ -869,6 +1000,10 @@
         <span class="hud-label">Combo</span>
         <span class="hud-value vermilion" id="hud-mult">x1</span>
       </div>
+      <div class="hud-card">
+        <span class="hud-label">Sector</span>
+        <span class="hud-value cobalt" id="hud-sector">SEC I</span>
+      </div>
       <div class="overdrive-card">
         <div class="overdrive-header">
           <span class="hud-label" id="od-label">Overdrive</span>
@@ -891,13 +1026,32 @@
     </div>
   </div>
 
+  <!-- SECTOR TRANSITION BANNER -->
+  <div id="sector-banner">
+    <div style="font-size:9.5px; font-weight:700; letter-spacing:0.15em; color:var(--vermilion);" id="sb-kicker">SECTOR II ENTERED</div>
+    <div style="font-family:var(--font-display); font-size:18px; margin-top:2px;" id="sb-name">COBALT IONOSPHERE</div>
+  </div>
+
+  <!-- LEVIATHAN BOSS HEALTH BAR -->
+  <div id="boss-bar-wrap" class="hidden">
+    <div class="boss-bar-top">
+      <span>⚠ ORBITAL LEVIATHAN DREADNOUGHT</span>
+      <span id="boss-cores-txt">3 CORES LEFT</span>
+    </div>
+    <div class="boss-pips">
+      <div class="boss-pip" id="bpip-0"></div>
+      <div class="boss-pip" id="bpip-1"></div>
+      <div class="boss-pip" id="bpip-2"></div>
+    </div>
+  </div>
+
   <!-- MAIN MENU HUB -->
   <div class="overlay-backdrop" id="menu-overlay">
     <div class="hub-shell">
       <div class="hub-masthead">
         <div class="brand-lockup">
           <div class="brand-title">ORBITA <span>’74</span></div>
-          <div class="brand-sub">Bauhaus Orbital Observatory</div>
+          <div class="brand-sub">Bauhaus Orbital Observatory · Super Mega Edition</div>
         </div>
         <div class="ink-wallet">
           <div class="ink-dot"></div>
@@ -909,8 +1063,9 @@
       <div class="hub-tabs">
         <button class="hub-tab active" data-tab="play" type="button">01 / Launch</button>
         <button class="hub-tab" data-tab="atelier" type="button">02 / Atelier</button>
-        <button class="hub-tab" data-tab="missions" type="button">03 / Directives <span class="tab-badge" id="mission-badge">3</span></button>
-        <button class="hub-tab" data-tab="calibrate" type="button">04 / Calibrate</button>
+        <button class="hub-tab" data-tab="tech" type="button">03 / Engineering</button>
+        <button class="hub-tab" data-tab="missions" type="button">04 / Directives <span class="tab-badge" id="mission-badge">3</span></button>
+        <button class="hub-tab" data-tab="calibrate" type="button">05 / Calibrate</button>
       </div>
 
       <div class="hub-body">
@@ -919,43 +1074,43 @@
           <div class="play-hero">
             <div class="editorial-pitch">
               <div>
-                <div class="editorial-kicker">Kinetic Slingshot Simulation</div>
+                <div class="editorial-kicker">4 Galactic Sectors · Leviathan Bosses</div>
                 <h1 class="editorial-headline">Hold to tether into gravity wells. Release to slingshot across the meridian.</h1>
               </div>
               <div class="mechanic-list">
                 <div class="mechanic-row">
-                  <span class="mech-tag">HOLD</span>
-                  <span>Latch onto nearby brass &amp; cobalt anchors. Tighter orbits build launch speed.</span>
+                  <span class="mech-tag">ANCHORS</span>
+                  <span>Brass Standard, Cobalt Sonic Boost, Fragile Dashed &amp; Ochre Gravity Wells.</span>
                 </div>
                 <div class="mechanic-row">
-                  <span class="mech-tag">GRAZE</span>
-                  <span>Skim close to vermilion hazards for hitstop impact, bonus Ink &amp; multiplier chains.</span>
+                  <span class="mech-tag">LEVIATHAN</span>
+                  <span>Every 2,500 pts, shatter all 3 Vermilion Cores on the Dreadnought for +1,500 &amp; +25 Ink!</span>
                 </div>
                 <div class="mechanic-row">
                   <span class="mech-tag">FEVER</span>
-                  <span>Fill all 10 Overdrive cells to ignite—shattering straight through hazards!</span>
+                  <span>Chain Grazes &amp; Gold Ink Stars to ignite Overdrive and smash straight through hazards.</span>
                 </div>
               </div>
             </div>
 
             <div class="launch-box">
               <div>
-                <div class="shop-section-title">Telemetry Record</div>
+                <div class="shop-section-title">Observatory Telemetry</div>
                 <div class="stat-pair">
                   <div class="mini-stat">
                     <div class="mini-stat-label">Best Score</div>
                     <div class="mini-stat-val" id="menu-best">0</div>
                   </div>
                   <div class="mini-stat">
-                    <div class="mini-stat-label">Total Grazes</div>
-                    <div class="mini-stat-val" id="menu-grazes">0</div>
+                    <div class="mini-stat-label">Leviathans Slain</div>
+                    <div class="mini-stat-val vermilion" id="menu-bosses">0</div>
                   </div>
                 </div>
               </div>
 
               <div class="mini-stat">
                 <div class="mini-stat-label">Equipped Configuration</div>
-                <div style="font-size:12px; font-weight:700; margin-top:4px;" id="equipped-summary">01 MONOLITH + VERMILION RIBBON</div>
+                <div style="font-size:11.5px; font-weight:700; margin-top:4px;" id="equipped-summary">01 MONOLITH + VERMILION RIBBON</div>
               </div>
 
               <button class="btn-swiss btn-primary" id="btn-launch" type="button" style="width:100%;">LAUNCH VESSEL →</button>
@@ -966,16 +1121,15 @@
         <!-- TAB 2: ATELIER (2-STEP INSPECT -> BUY -> CONFIRM) -->
         <div class="tab-panel" id="tab-atelier">
           <div class="atelier-layout">
-            <!-- LEFT: LIVE WIND-TUNNEL INSPECTOR -->
             <div class="inspector-panel">
               <div class="inspector-header">
                 <span id="insp-code">BLUEPRINT · 01</span>
                 <span class="tier-badge" id="insp-tier">STANDARD</span>
               </div>
-              <canvas id="atelier-preview" width="260" height="175"></canvas>
+              <canvas id="atelier-preview" width="260" height="170"></canvas>
               <div>
                 <div class="inspector-title" id="insp-name">01 Monolith</div>
-                <div class="inspector-desc" id="insp-desc">Balanced Bauhaus delta wing with twin ion thrusters.</div>
+                <div class="inspector-desc" id="insp-desc">Crisp Bauhaus delta wing with twin ion thrusters.</div>
               </div>
               <div class="inspector-specs">
                 <div class="spec-cell">
@@ -984,13 +1138,12 @@
                 </div>
                 <div class="spec-cell">
                   <span>Signature Feature</span>
-                  <strong id="insp-feat">Twin Ion Flare</strong>
+                  <strong id="insp-feat">Twin Ion Thrusters</strong>
                 </div>
               </div>
               <button class="btn-swiss btn-gold" id="insp-action-btn" type="button" style="width:100%;">EQUIPPED</button>
             </div>
 
-            <!-- RIGHT: COSMETICS CATALOG -->
             <div>
               <div class="shop-section-title">
                 <span>Vessel Chassis (Click to Inspect)</span>
@@ -1007,7 +1160,16 @@
           </div>
         </div>
 
-        <!-- TAB 3: MISSIONS -->
+        <!-- TAB 3: ENGINEERING LAB -->
+        <div class="tab-panel" id="tab-tech">
+          <div class="shop-section-title">
+            <span>Observatory Engineering Lab</span>
+            <span>Permanent Vessel Upgrades (Max Rank 5)</span>
+          </div>
+          <div class="tech-grid" id="tech-grid"></div>
+        </div>
+
+        <!-- TAB 4: DIRECTIVES -->
         <div class="tab-panel" id="tab-missions">
           <div class="shop-section-title">
             <span>Active Observatory Directives</span>
@@ -1016,7 +1178,7 @@
           <div class="mission-list" id="mission-list"></div>
         </div>
 
-        <!-- TAB 4: CALIBRATE -->
+        <!-- TAB 5: CALIBRATE -->
         <div class="tab-panel" id="tab-calibrate">
           <div class="shop-section-title">
             <span>Instrument Calibration</span>
@@ -1074,11 +1236,11 @@
         </div>
         <div class="ledger-row" style="color:var(--vermilion);">
           <span>Requisition Cost</span>
-          <strong id="confirm-cost">-80 INK</strong>
+          <strong id="confirm-cost">-75 INK</strong>
         </div>
         <div class="ledger-row total">
           <span>Remaining Balance</span>
-          <strong id="confirm-bal-after">20 INK</strong>
+          <strong id="confirm-bal-after">25 INK</strong>
         </div>
       </div>
       <div class="confirm-actions">
@@ -1099,12 +1261,16 @@
           <div class="mini-stat-val" id="go-score">0</div>
         </div>
         <div class="mini-stat">
-          <div class="mini-stat-label">Best</div>
+          <div class="mini-stat-label">Best Score</div>
           <div class="mini-stat-val vermilion" id="go-best">0</div>
         </div>
         <div class="mini-stat">
           <div class="mini-stat-label">Ink Earned</div>
           <div class="mini-stat-val ochre" id="go-ink">+0</div>
+        </div>
+        <div class="mini-stat">
+          <div class="mini-stat-label">Bosses Defeated</div>
+          <div class="mini-stat-val cobalt" id="go-bosses">0</div>
         </div>
       </div>
       <div class="go-actions">
@@ -1120,8 +1286,31 @@
 <script>
 function bootOrbita() {
   /* =========================================================
-     1. UPGRADED ATELIER CATALOG (6 MULTI-PART VESSELS + 6 TRAILS)
+     1. CATALOG, SECTORS & ENGINEERING UPGRADES
      ========================================================= */
+  const SECTORS = [
+    {
+      code: 'SEC I',
+      name: 'ARCHIVAL MERIDIAN',
+      washes: ['rgba(227, 160, 36, 0.09)', 'rgba(56, 125, 100, 0.08)', 'rgba(30, 90, 168, 0.07)']
+    },
+    {
+      code: 'SEC II',
+      name: 'COBALT IONOSPHERE',
+      washes: ['rgba(30, 90, 168, 0.13)', 'rgba(56, 125, 100, 0.09)', 'rgba(30, 90, 168, 0.08)']
+    },
+    {
+      code: 'SEC III',
+      name: 'OCHRE SOLAR FORGE',
+      washes: ['rgba(227, 160, 36, 0.15)', 'rgba(223, 62, 38, 0.08)', 'rgba(227, 160, 36, 0.10)']
+    },
+    {
+      code: 'SEC IV',
+      name: 'VERMILION EVENT HORIZON',
+      washes: ['rgba(223, 62, 38, 0.14)', 'rgba(227, 160, 36, 0.11)', 'rgba(23, 22, 20, 0.07)']
+    }
+  ];
+
   const SHIPS = [
     {
       id: 'monolith',
@@ -1236,27 +1425,36 @@ function bootOrbita() {
     }
   ];
 
+  const TECH_MODULES = [
+    { id: 'capture', name: 'Magnetic Capture Field', desc: 'Expands anchor tether lock-on perimeter (+12px per rank).', baseCost: 50, step: 45 },
+    { id: 'thrust',  name: 'Slingshot Capacitor',    desc: 'Increases tangential launch velocity (+35 speed per rank).', baseCost: 60, step: 50 },
+    { id: 'overdrive', name: 'Overdrive Reactor',    desc: 'Increases Overdrive charge gained from Grazes & Stars (+15% per rank).', baseCost: 70, step: 55 },
+    { id: 'cooling', name: 'Grav-Tether Cooling',    desc: 'Extends maximum anchor hold duration before auto-release (+0.35s per rank).', baseCost: 55, step: 45 }
+  ];
+
   const MISSION_POOL = [
     { id: 'graze_5',   title: 'Razor Margin',      desc: 'Perform 5 close-call Grazes in a single run.', target: 5,    reward: 65, type: 'run_grazes' },
     { id: 'stars_12',  title: 'Celestial Harvest', desc: 'Collect 12 Gold Ink Atoms in one flight.',     target: 12,   reward: 60, type: 'run_stars' },
     { id: 'score_15',  title: 'Meridian Crossing', desc: 'Reach a score of 1,500 in a single run.',      target: 1500, reward: 80, type: 'run_score' },
     { id: 'fever_1',   title: 'Solar Ignition',    desc: 'Trigger Overdrive Fever Mode.',                target: 1,    reward: 75, type: 'run_fever' },
-    { id: 'shatter_2', title: 'Kinetic Breaker',   desc: 'Shatter 2 hazards while in Fever Mode.',       target: 2,    reward: 95, type: 'run_shatter' },
+    { id: 'boss_1',    title: 'Leviathan Hunter',  desc: 'Defeat an Orbital Leviathan Dreadnought.',     target: 1,    reward: 120, type: 'run_bosses' },
     { id: 'cobalt_4',  title: 'Sonic Slingshot',   desc: 'Launch off 4 Cobalt Pulse Anchors.',           target: 4,    reward: 70, type: 'run_cobalt' }
   ];
 
   const DEFAULT_SAVE = {
-    ink: 100, // Starter Ink so player can immediately test Inspect -> Buy -> Confirm!
+    ink: 100,
     bestScore: 0,
     totalGrazes: 0,
+    totalBosses: 0,
     unlockedShips: ['monolith'],
     unlockedTrails: ['vermilion'],
     equippedShip: 'monolith',
     equippedTrail: 'vermilion',
+    tech: { capture: 0, thrust: 0, overdrive: 0, cooling: 0 },
     missions: [
       { id: 'graze_5', progress: 0, done: false },
       { id: 'stars_12', progress: 0, done: false },
-      { id: 'fever_1', progress: 0, done: false }
+      { id: 'boss_1', progress: 0, done: false }
     ],
     missionCursor: 3,
     settings: {
@@ -1269,12 +1467,13 @@ function bootOrbita() {
 
   function loadSave() {
     try {
-      const raw = window.localStorage.getItem('orbita74_save_v6');
+      const raw = window.localStorage.getItem('orbita74_supermega_v1');
       if (!raw) return JSON.parse(JSON.stringify(DEFAULT_SAVE));
       const parsed = JSON.parse(raw);
       return {
         ...JSON.parse(JSON.stringify(DEFAULT_SAVE)),
         ...parsed,
+        tech: { ...DEFAULT_SAVE.tech, ...(parsed.tech || {}) },
         settings: { ...DEFAULT_SAVE.settings, ...(parsed.settings || {}) }
       };
     } catch (e) {
@@ -1286,13 +1485,12 @@ function bootOrbita() {
 
   function persist() {
     try {
-      window.localStorage.setItem('orbita74_save_v6', JSON.stringify(save));
+      window.localStorage.setItem('orbita74_supermega_v1', JSON.stringify(save));
     } catch (e) {}
   }
 
-  // Currently inspected item in the Atelier (can be locked or unlocked)
   let inspected = {
-    category: 'ship', // 'ship' or 'trail'
+    category: 'ship',
     id: save.equippedShip
   };
   let pendingPurchase = null;
@@ -1465,6 +1663,27 @@ function bootOrbita() {
       } catch (e) {}
     }
 
+    playBossBoom() {
+      if (!save.settings.sound) return;
+      this.init();
+      if (!this.ctx) return;
+      try {
+        const now = this.ctx.currentTime;
+        [110, 164.81, 220, 329.63].forEach((f, i) => {
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+          osc.type = 'sawtooth';
+          osc.frequency.setValueAtTime(f, now + i * 0.06);
+          osc.frequency.exponentialRampToValueAtTime(f * 0.5, now + i * 0.06 + 0.45);
+          gain.gain.setValueAtTime(0.2, now + i * 0.06);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + i * 0.06 + 0.48);
+          osc.connect(gain).connect(this.ctx.destination);
+          osc.start(now + i * 0.06);
+          osc.stop(now + i * 0.06 + 0.5);
+        });
+      } catch (e) {}
+    }
+
     playCrash() {
       this.stopCharge();
       if (!save.settings.sound) return;
@@ -1489,7 +1708,7 @@ function bootOrbita() {
   const sfx = new SoundEngine();
 
   /* =========================================================
-     3. CANVAS & CALM GALLERIA BACKGROUND
+     3. CANVAS & CALM SECTOR BACKGROUND (NO SPINNING CIRCLES!)
      ========================================================= */
   const canvas = document.getElementById('world');
   const ctx = canvas.getContext('2d');
@@ -1497,10 +1716,10 @@ function bootOrbita() {
   let H = Math.max(480, window.innerHeight || document.documentElement.clientHeight || 600);
   let DPR = 1;
 
-  const washes = [
-    { nx: 0.18, ny: 0.24, r: 340, color: 'rgba(227, 160, 36, 0.09)', speed: 0.18, phase: 0.2 },
-    { nx: 0.82, ny: 0.32, r: 390, color: 'rgba(56, 125, 100, 0.08)', speed: 0.14, phase: 2.1 },
-    { nx: 0.52, ny: 0.78, r: 420, color: 'rgba(30, 90, 168, 0.07)', speed: 0.16, phase: 4.0 }
+  const washNodes = [
+    { nx: 0.18, ny: 0.24, r: 340, speed: 0.18, phase: 0.2 },
+    { nx: 0.82, ny: 0.32, r: 390, speed: 0.14, phase: 2.1 },
+    { nx: 0.52, ny: 0.78, r: 420, speed: 0.16, phase: 4.0 }
   ];
 
   const motes = Array.from({ length: 28 }, () => ({
@@ -1523,19 +1742,20 @@ function bootOrbita() {
   window.addEventListener('resize', resize);
   resize();
 
-  function drawCalmBackground(time, camY) {
+  function drawCalmBackground(time, camY, sectorIdx) {
     ctx.fillStyle = '#F5F0E6';
     ctx.fillRect(0, 0, W, H);
 
-    for (const w of washes) {
+    const sector = SECTORS[sectorIdx % SECTORS.length];
+    washNodes.forEach((w, idx) => {
       const cx = w.nx * W + Math.sin(time * w.speed + w.phase) * 35;
       const cy = w.ny * H + Math.cos(time * w.speed * 0.8 + w.phase) * 25;
       const grad = ctx.createRadialGradient(cx, cy, 10, cx, cy, w.r);
-      grad.addColorStop(0, w.color);
+      grad.addColorStop(0, sector.washes[idx]);
       grad.addColorStop(1, 'rgba(245, 240, 230, 0)');
       ctx.fillStyle = grad;
       ctx.fillRect(0, 0, W, H);
-    }
+    });
 
     const gridSpacing = 220;
     const offsetY = ((-camY * 0.25) % gridSpacing + gridSpacing) % gridSpacing;
@@ -1581,7 +1801,6 @@ function bootOrbita() {
     c.rotate(angle);
     c.scale(scale * squash, scale / Math.sqrt(Math.max(0.2, squash)));
 
-    // Fever aura
     if (fever) {
       c.save();
       c.strokeStyle = '#DF3E26';
@@ -1592,7 +1811,6 @@ function bootOrbita() {
       c.restore();
     }
 
-    // Print Drop Shadow
     c.save();
     c.translate(3, 4);
     c.fillStyle = 'rgba(23, 22, 20, 0.22)';
@@ -1609,18 +1827,15 @@ function bootOrbita() {
     c.strokeStyle = '#171614';
 
     if (shipId === 'valkyrie') {
-      // 02 VALKYRIE: Forward canards + variable-geometry folding swing wings + cobalt afterburners
       const sweep = Math.sin(time * 5) * 0.18;
       const flame = 8 + Math.sin(time * 38) * 3;
 
-      // Twin cobalt afterburner plumes
       c.fillStyle = '#1E5AA8';
       c.beginPath();
       c.moveTo(-11, -5); c.lineTo(-11 - flame, -3.5); c.lineTo(-11, -2);
       c.moveTo(-11, 5);  c.lineTo(-11 - flame, 3.5);  c.lineTo(-11, 2);
       c.fill();
 
-      // Articulated Swing Wings
       [-1, 1].forEach(side => {
         c.save();
         c.translate(-2, side * 4);
@@ -1637,7 +1852,6 @@ function bootOrbita() {
         c.restore();
       });
 
-      // Forward Canards
       c.fillStyle = '#DF3E26';
       c.beginPath();
       c.moveTo(11, 0);
@@ -1648,7 +1862,6 @@ function bootOrbita() {
       c.fill();
       c.stroke();
 
-      // Main Ivory Fuselage
       c.fillStyle = '#FAF6EE';
       c.beginPath();
       c.moveTo(21, 0);
@@ -1659,14 +1872,12 @@ function bootOrbita() {
       c.fill();
       c.stroke();
 
-      // Cockpit visor
       c.fillStyle = '#1E5AA8';
       c.beginPath();
       c.ellipse(6, 0, 4.5, 2.2, 0, 0, Math.PI * 2);
       c.fill();
 
     } else if (shipId === 'chronograph') {
-      // 03 CHRONOGRAPH: Horological brass tourbillon + ticking escapement wheel + balance ring
       c.save();
       c.rotate(-time * 3.5);
       c.strokeStyle = '#E3A024';
@@ -1674,7 +1885,6 @@ function bootOrbita() {
       c.beginPath();
       c.arc(0, 0, 15.5, 0, Math.PI * 2);
       c.stroke();
-      // Compass cardinal lugs
       for (let i = 0; i < 4; i++) {
         const a = (i * Math.PI) / 2;
         c.beginPath();
@@ -1684,7 +1894,6 @@ function bootOrbita() {
       }
       c.restore();
 
-      // Enamel outer housing
       c.fillStyle = '#FAF6EE';
       c.beginPath();
       c.moveTo(19, 0);
@@ -1697,7 +1906,6 @@ function bootOrbita() {
       c.fill();
       c.stroke();
 
-      // Ticking Tourbillon Escapement Gear inside hull
       const tickAngle = Math.floor(time * 8) * (Math.PI / 6);
       c.save();
       c.translate(-1, 0);
@@ -1714,7 +1922,6 @@ function bootOrbita() {
       c.stroke();
       c.restore();
 
-      // Vermilion nose tip
       c.fillStyle = '#DF3E26';
       c.beginPath();
       c.moveTo(19, 0);
@@ -1724,10 +1931,8 @@ function bootOrbita() {
       c.fill();
 
     } else if (shipId === 'seraph') {
-      // 04 SERAPH: Multi-layered origami prism craft + articulated golden wing-vanes + solar halo
       const flap = Math.sin(time * 7) * 2.5;
 
-      // Golden Solar Halo behind craft
       c.save();
       c.translate(-6, 0);
       c.strokeStyle = '#E3A024';
@@ -1737,7 +1942,6 @@ function bootOrbita() {
       c.stroke();
       c.restore();
 
-      // Upper & Lower Origami Wing Vanes
       c.fillStyle = '#E3A024';
       c.beginPath();
       c.moveTo(4, -3);
@@ -1755,7 +1959,6 @@ function bootOrbita() {
       c.fill();
       c.stroke();
 
-      // Layered Ivory & Vermilion Origami Core
       c.fillStyle = '#FAF6EE';
       c.beginPath();
       c.moveTo(20, 0);
@@ -1776,10 +1979,8 @@ function bootOrbita() {
       c.fill();
 
     } else if (shipId === 'hyperion') {
-      // 05 HYPERION: Twin-hull catamaran railgun with energized plasma arc suspended between pontoons
       const arcFlicker = Math.sin(time * 45) * 2;
 
-      // Energized Plasma Bridge between pontoons
       c.save();
       c.strokeStyle = '#DF3E26';
       c.lineWidth = 3;
@@ -1794,11 +1995,9 @@ function bootOrbita() {
       c.fill();
       c.restore();
 
-      // Rear Cross-Strut Bridge
       c.fillStyle = '#171614';
       c.fillRect(-9, -8, 6, 16);
 
-      // Twin Armored Pontoons (Cobalt + Ivory)
       [-1, 1].forEach(side => {
         c.fillStyle = '#1E5AA8';
         c.beginPath();
@@ -1811,18 +2010,15 @@ function bootOrbita() {
         c.fill();
         c.stroke();
 
-        // Gold trim stripe
         c.fillStyle = '#E3A024';
         c.fillRect(-6, side * 7.8 - 1.2, 14, 2.4);
       });
 
     } else if (shipId === 'sovereign') {
-      // 06 SOVEREIGN: Prestige gold-trimmed flagship + orbiting miniature brass satellite drone
       const satAng = time * 5.2;
       const sx = Math.cos(satAng) * 21;
       const sy = Math.sin(satAng) * 17;
 
-      // Subtle satellite tether ring
       c.save();
       c.strokeStyle = 'rgba(227, 160, 36, 0.35)';
       c.lineWidth = 1.2;
@@ -1832,7 +2028,6 @@ function bootOrbita() {
       c.stroke();
       c.restore();
 
-      // Flagship Wing & Hull
       c.fillStyle = '#171614';
       c.beginPath();
       c.moveTo(20, 0);
@@ -1845,7 +2040,6 @@ function bootOrbita() {
       c.fill();
       c.stroke();
 
-      // Gold Leaf Inlay Plates
       c.fillStyle = '#E3A024';
       c.beginPath();
       c.moveTo(15, 0);
@@ -1855,7 +2049,6 @@ function bootOrbita() {
       c.closePath();
       c.fill();
 
-      // Vermilion Royal Core
       c.fillStyle = '#DF3E26';
       c.beginPath();
       c.moveTo(8, 0);
@@ -1864,7 +2057,6 @@ function bootOrbita() {
       c.closePath();
       c.fill();
 
-      // Orbiting Escort Drone
       c.save();
       c.translate(sx, sy);
       c.rotate(time * 8);
@@ -1879,7 +2071,6 @@ function bootOrbita() {
       c.restore();
 
     } else {
-      // 01 MONOLITH: Crisp Bauhaus delta wing + pulsing twin ion thrusters
       const thruster = 6 + Math.sin(time * 34) * 2.5;
       c.fillStyle = '#E3A024';
       c.beginPath();
@@ -1914,7 +2105,6 @@ function bootOrbita() {
     c.save();
 
     if (trailId === 'golden_ratio') {
-      // T2 GOLDEN RATIO: Drafting baseline + Fibonacci spiral compass arcs
       c.strokeStyle = fever ? '#DF3E26' : '#B8790C';
       c.lineWidth = 2;
       c.beginPath();
@@ -1934,7 +2124,6 @@ function bootOrbita() {
         c.stroke();
       }
     } else if (trailId === 'constellation') {
-      // T3 CONSTELLATION: Star-chart triangulation lines + glowing 4-point star nodes
       c.strokeStyle = 'rgba(30, 90, 168, 0.55)';
       c.lineWidth = 1.4;
       c.beginPath();
@@ -1965,7 +2154,6 @@ function bootOrbita() {
         c.restore();
       }
     } else if (trailId === 'prism') {
-      // T4 BAUHAUS PRISM: Overlapping vermilion, ochre & cobalt silkscreen ribbons + chevrons
       const cols = ['#DF3E26', '#E3A024', '#1E5AA8'];
       cols.forEach((col, idx) => {
         const off = (idx - 1) * 4;
@@ -1995,7 +2183,6 @@ function bootOrbita() {
         c.restore();
       }
     } else if (trailId === 'eclipse') {
-      // T5 ECLIPSE CORONA: Obsidian ink core rimmed with gold-leaf embers
       for (let i = 1; i < points.length; i++) {
         const t = i / points.length;
         c.strokeStyle = '#E3A024';
@@ -2021,7 +2208,6 @@ function bootOrbita() {
         c.fillRect(p.x + jitterX - 1.5, p.y + jitterY - 1.5, 3, 3);
       }
     } else if (trailId === 'supernova') {
-      // T6 SUPERNOVA WAKE: Multi-layered chromatic shock rings + diamond glints
       for (let i = 1; i < points.length; i++) {
         const t = i / points.length;
         c.strokeStyle = fever ? '#DF3E26' : '#1E5AA8';
@@ -2043,7 +2229,6 @@ function bootOrbita() {
         c.stroke();
       }
     } else {
-      // T1 VERMILION RIBBON: Tapered silkscreen brush stroke + ink droplets
       for (let i = 1; i < points.length; i++) {
         const t = i / points.length;
         c.strokeStyle = fever ? '#E3A024' : '#DF3E26';
@@ -2068,7 +2253,7 @@ function bootOrbita() {
   }
 
   /* =========================================================
-     5. GAMEPLAY SIMULATION & ENTITIES
+     5. GAMEPLAY, SECTORS & LEVIATHAN BOSS SYSTEM
      ========================================================= */
   let state = 'MENU';
   let globalTime = 0;
@@ -2081,8 +2266,11 @@ function bootOrbita() {
   let hitstopTimer = 0;
   let shakeMag = 0;
   let camY = 0;
+  let currentSectorIdx = 0;
+  let nextBossScore = 2500;
+  let boss = null;
 
-  let runStats = { grazes: 0, stars: 0, fever: 0, shatter: 0, cobalt: 0 };
+  let runStats = { grazes: 0, stars: 0, fever: 0, bosses: 0, cobalt: 0 };
 
   const player = {
     x: 0, y: 0,
@@ -2103,10 +2291,19 @@ function bootOrbita() {
   let highestSpawnY = 0;
   let isHolding = false;
 
+  function getTechBonus() {
+    return {
+      captureBonus: save.tech.capture * 12,
+      thrustBonus: save.tech.thrust * 35,
+      odMult: 1 + save.tech.overdrive * 0.15,
+      maxHold: 2.4 + save.tech.cooling * 0.35
+    };
+  }
+
   function addShake(amount) {
     if (save.settings.shake === 'OFF') return;
     const mult = save.settings.shake === 'LOW' ? 0.5 : 1.0;
-    shakeMag = Math.min(22, shakeMag + amount * mult);
+    shakeMag = Math.min(24, shakeMag + amount * mult);
   }
 
   function triggerHitstop(duration) {
@@ -2133,17 +2330,59 @@ function bootOrbita() {
   }
 
   function spawnPopup(x, y, text, color) {
-    popups.push({ x, y, text, color: color || '#171614', life: 0.85, maxLife: 0.85 });
+    popups.push({ x, y, text, color: color || '#171614', life: 0.9, maxLife: 0.9 });
   }
 
   function spawnShockwave(x, y, maxR, color) {
-    shockwaves.push({ x, y, r: 8, maxR, color: color || '#171614', life: 0.38, maxLife: 0.38 });
+    shockwaves.push({ x, y, r: 8, maxR, color: color || '#171614', life: 0.4, maxLife: 0.4 });
+  }
+
+  let bannerTimer = null;
+  function showSectorBanner(secIdx) {
+    const sec = SECTORS[secIdx % SECTORS.length];
+    document.getElementById('sb-kicker').textContent = `${sec.code} ENTERED`;
+    document.getElementById('sb-name').textContent = sec.name;
+    const el = document.getElementById('sector-banner');
+    el.classList.add('show');
+    clearTimeout(bannerTimer);
+    bannerTimer = setTimeout(() => el.classList.remove('show'), 2600);
+  }
+
+  function spawnLeviathanBoss() {
+    boss = {
+      x: W * 0.5,
+      y: camY + 135,
+      rot: 0,
+      cores: [
+        { angle: -Math.PI / 2, alive: true },
+        { angle: Math.PI / 6, alive: true },
+        { angle: (5 * Math.PI) / 6, alive: true }
+      ]
+    };
+    document.getElementById('boss-bar-wrap').classList.remove('hidden');
+    updateBossBar();
+    sfx.playFever();
+    addShake(10);
+    spawnPopup(W * 0.5, camY + 210, '⚠ LEVIATHAN DREADNOUGHT!', '#DF3E26');
+  }
+
+  function updateBossBar() {
+    if (!boss) {
+      document.getElementById('boss-bar-wrap').classList.add('hidden');
+      return;
+    }
+    const aliveCount = boss.cores.filter(c => c.alive).length;
+    document.getElementById('boss-cores-txt').textContent = `${aliveCount} CORE${aliveCount === 1 ? '' : 'S'} LEFT`;
+    boss.cores.forEach((c, i) => {
+      document.getElementById(`bpip-${i}`).classList.toggle('destroyed', !c.alive);
+    });
   }
 
   function generateRow(y) {
     const difficulty = Math.min(1, Math.abs(y) / 14000);
     const margin = Math.max(80, W * 0.14);
     const span = Math.max(120, W - margin * 2);
+    const tech = getTechBonus();
 
     const anchorCount = Math.random() < 0.48 ? 2 : 1;
     const placedX = [];
@@ -2156,16 +2395,18 @@ function bootOrbita() {
       }
       placedX.push(ax);
 
+      // 4 anchor types: brass, cobalt (sonic), fragile (dashed), well (ochre gravity pull)
       const roll = Math.random();
       let type = 'brass';
-      if (roll < 0.24) type = 'cobalt';
-      else if (roll < 0.42 && difficulty > 0.15) type = 'fragile';
+      if (roll < 0.22) type = 'cobalt';
+      else if (roll < 0.38 && difficulty > 0.1) type = 'fragile';
+      else if (roll < 0.54 && currentSectorIdx >= 1) type = 'well';
 
       anchors.push({
         x: ax,
         y: y + (Math.random() - 0.5) * 45,
         r: 18,
-        captureRadius: 170,
+        captureRadius: 170 + tech.captureBonus,
         type,
         broken: false,
         pulse: Math.random() * Math.PI * 2
@@ -2225,7 +2466,13 @@ function bootOrbita() {
     feverTimer = 0;
     hitstopTimer = 0;
     shakeMag = 0;
-    runStats = { grazes: 0, stars: 0, fever: 0, shatter: 0, cobalt: 0 };
+    currentSectorIdx = 0;
+    nextBossScore = 2500;
+    boss = null;
+    document.getElementById('boss-bar-wrap').classList.add('hidden');
+    runStats = { grazes: 0, stars: 0, fever: 0, bosses: 0, cobalt: 0 };
+
+    const tech = getTechBonus();
 
     player.x = W * 0.5;
     player.y = H * 0.68;
@@ -2249,7 +2496,7 @@ function bootOrbita() {
       x: W * 0.5 + (Math.random() < 0.5 ? -60 : 60),
       y: player.y - 165,
       r: 18,
-      captureRadius: 195,
+      captureRadius: 195 + tech.captureBonus,
       type: 'brass',
       broken: false,
       pulse: 0
@@ -2264,11 +2511,14 @@ function bootOrbita() {
     document.getElementById('menu-overlay').classList.add('hidden');
     document.getElementById('gameover-overlay').classList.add('hidden');
     document.getElementById('hud').classList.remove('hidden');
+    showSectorBanner(0);
     updateHud();
   }
 
   function endRun() {
     state = 'GAMEOVER';
+    boss = null;
+    document.getElementById('boss-bar-wrap').classList.add('hidden');
     sfx.playCrash();
     addShake(16);
     spawnParticles(player.x, player.y, '#DF3E26', 28, 320);
@@ -2277,11 +2527,13 @@ function bootOrbita() {
     save.ink += runInk;
     if (score > save.bestScore) save.bestScore = score;
     save.totalGrazes += runStats.grazes;
+    save.totalBosses += runStats.bosses;
     persist();
 
     document.getElementById('go-score').textContent = score.toLocaleString();
     document.getElementById('go-best').textContent = save.bestScore.toLocaleString();
     document.getElementById('go-ink').textContent = `+${runInk}`;
+    document.getElementById('go-bosses').textContent = runStats.bosses;
     document.getElementById('hud').classList.add('hidden');
     setTimeout(() => {
       if (state === 'GAMEOVER') {
@@ -2330,9 +2582,10 @@ function bootOrbita() {
   function releaseTether() {
     if (!player.tether) return;
     const t = player.tether;
+    const tech = getTechBonus();
     const isCobalt = t.anchor.type === 'cobalt';
     const chargeBonus = Math.min(1, t.holdTime / 0.85);
-    const launchSpeed = (isCobalt ? 640 : 490) + chargeBonus * 175 + (feverTimer > 0 ? 90 : 0);
+    const launchSpeed = (isCobalt ? 640 : 490) + tech.thrustBonus + chargeBonus * 175 + (feverTimer > 0 ? 90 : 0);
 
     const tangentAngle = t.angle + (Math.PI / 2) * t.dir;
     player.vx = Math.cos(tangentAngle) * launchSpeed;
@@ -2359,7 +2612,8 @@ function bootOrbita() {
 
   function addOverdrive(amt) {
     if (feverTimer > 0) return;
-    overdrive = Math.min(100, overdrive + amt);
+    const tech = getTechBonus();
+    overdrive = Math.min(100, overdrive + amt * tech.odMult);
     if (overdrive >= 100) {
       feverTimer = 6.5;
       overdrive = 0;
@@ -2384,7 +2638,7 @@ function bootOrbita() {
       if (def.type === 'run_stars') val = runStats.stars;
       if (def.type === 'run_score') val = score;
       if (def.type === 'run_fever') val = runStats.fever;
-      if (def.type === 'run_shatter') val = runStats.shatter;
+      if (def.type === 'run_bosses') val = runStats.bosses;
       if (def.type === 'run_cobalt') val = runStats.cobalt;
 
       mState.progress = Math.max(mState.progress, val);
@@ -2436,6 +2690,8 @@ function bootOrbita() {
 
     if (state !== 'PLAYING') return;
 
+    const tech = getTechBonus();
+
     if (feverTimer > 0) feverTimer = Math.max(0, feverTimer - dt);
     if (combo > 1) {
       comboTimer -= dt;
@@ -2447,7 +2703,8 @@ function bootOrbita() {
     if (player.tether) {
       const t = player.tether;
       t.holdTime += dt;
-      t.radius = Math.max(36, t.radius - 42 * dt);
+      const pullRate = t.anchor.type === 'well' ? 68 : 42;
+      t.radius = Math.max(34, t.radius - pullRate * dt);
       const angularSpeed = (340 + Math.min(220, t.holdTime * 210)) / t.radius;
       t.angle += angularSpeed * t.dir * dt;
 
@@ -2456,11 +2713,24 @@ function bootOrbita() {
       player.angle = t.angle + (Math.PI / 2) * t.dir;
       sfx.updateCharge(Math.min(1, t.holdTime / 1.2));
 
-      if (t.holdTime > 2.4) releaseTether();
+      if (t.holdTime > tech.maxHold) releaseTether();
     } else {
       player.vy += 215 * dt;
       player.vx *= Math.pow(0.88, dt);
       player.vy *= Math.pow(0.92, dt);
+
+      // Gentle pull toward Ochre Gravity Wells when flying nearby
+      for (const a of anchors) {
+        if (a.type === 'well' && !a.broken) {
+          const dx = a.x - player.x;
+          const dy = a.y - player.y;
+          const d = Math.hypot(dx, dy);
+          if (d < a.captureRadius && d > 10) {
+            player.vx += (dx / d) * 280 * dt;
+            player.vy += (dy / d) * 280 * dt;
+          }
+        }
+      }
 
       player.x += player.vx * dt;
       player.y += player.vy * dt;
@@ -2491,6 +2761,66 @@ function bootOrbita() {
         checkMissions();
       }
       camY = targetCamY;
+    }
+
+    // Check Sector Transitions every 2,500 score
+    const newSectorIdx = Math.floor(score / 2500);
+    if (newSectorIdx > currentSectorIdx) {
+      currentSectorIdx = newSectorIdx;
+      showSectorBanner(currentSectorIdx);
+    }
+
+    // Spawn Leviathan Boss every 2,500 score
+    if (!boss && score >= nextBossScore) {
+      nextBossScore += 2500;
+      spawnLeviathanBoss();
+    }
+
+    // Update Leviathan Boss
+    if (boss) {
+      boss.x = W * 0.5 + Math.sin(globalTime * 1.1) * Math.min(130, W * 0.24);
+      boss.y = camY + 135;
+      boss.rot += dt * 0.85;
+
+      const coreOrbitR = 54;
+      for (const c of boss.cores) {
+        if (!c.alive) continue;
+        const cx = boss.x + Math.cos(boss.rot + c.angle) * coreOrbitR;
+        const cy = boss.y + Math.sin(boss.rot + c.angle) * coreOrbitR;
+        const dist = Math.hypot(player.x - cx, player.y - cy);
+        if (dist < player.radius + 17) {
+          c.alive = false;
+          triggerHitstop(0.055);
+          addShake(13);
+          sfx.playGraze();
+          spawnShockwave(cx, cy, 80, '#DF3E26');
+          spawnParticles(cx, cy, '#DF3E26', 18, 250);
+          spawnPopup(cx, cy - 12, 'CORE SHATTERED!', '#DF3E26');
+          // Bounce player safely away from core
+          const pushAng = Math.atan2(player.y - cy, player.x - cx);
+          player.vx = Math.cos(pushAng) * 460;
+          player.vy = Math.sin(pushAng) * 460;
+          updateBossBar();
+
+          if (boss.cores.every(core => !core.alive)) {
+            const bx = boss.x;
+            const by = boss.y;
+            boss = null;
+            updateBossBar();
+            score += 1500;
+            runInk += 25;
+            runStats.bosses++;
+            checkMissions();
+            sfx.playBossBoom();
+            addShake(20);
+            spawnShockwave(bx, by, 210, '#E3A024');
+            spawnParticles(bx, by, '#E3A024', 34, 340);
+            spawnParticles(bx, by, '#DF3E26', 24, 300);
+            spawnPopup(bx, by, 'LEVIATHAN DESTROYED! +1,500 & +25 INK', '#DF3E26');
+          }
+          break;
+        }
+      }
     }
 
     while (highestSpawnY > camY - 400) {
@@ -2548,7 +2878,6 @@ function bootOrbita() {
         if (feverTimer > 0) {
           h.shattered = true;
           runInk += 3;
-          runStats.shatter++;
           score += 250 * combo;
           triggerHitstop(0.05);
           addShake(11);
@@ -2582,7 +2911,7 @@ function bootOrbita() {
   }
 
   function render() {
-    drawCalmBackground(globalTime, camY);
+    drawCalmBackground(globalTime, camY, currentSectorIdx);
 
     ctx.save();
     if (shakeMag > 0.1) {
@@ -2592,6 +2921,7 @@ function bootOrbita() {
     }
     ctx.translate(0, -camY);
 
+    // 1. Anchors & Capture Perimeters
     for (const a of anchors) {
       a.pulse += 0.04;
       const distToPlayer = Math.hypot(a.x - player.x, a.y - player.y);
@@ -2614,7 +2944,9 @@ function bootOrbita() {
       ctx.arc(3, 4, a.r, 0, Math.PI * 2);
       ctx.fill();
 
-      ctx.fillStyle = a.type === 'cobalt' ? '#1E5AA8' : (a.type === 'fragile' ? '#FAF6EE' : '#E3A024');
+      ctx.fillStyle = a.type === 'cobalt' ? '#1E5AA8'
+        : (a.type === 'fragile' ? '#FAF6EE'
+        : (a.type === 'well' ? '#387D64' : '#E3A024'));
       ctx.strokeStyle = '#171614';
       ctx.lineWidth = 2.5;
       if (a.type === 'fragile') ctx.setLineDash([4, 3]);
@@ -2624,13 +2956,14 @@ function bootOrbita() {
       ctx.stroke();
       ctx.setLineDash([]);
 
-      ctx.fillStyle = a.type === 'cobalt' ? '#FAF6EE' : '#171614';
+      ctx.fillStyle = (a.type === 'cobalt' || a.type === 'well') ? '#FAF6EE' : '#171614';
       ctx.beginPath();
       ctx.arc(0, 0, 4.5, 0, Math.PI * 2);
       ctx.fill();
       ctx.restore();
     }
 
+    // 2. Gold Ink Stars
     for (const s of stars) {
       const yOff = Math.sin(s.bob) * 4;
       ctx.save();
@@ -2652,6 +2985,7 @@ function bootOrbita() {
       ctx.restore();
     }
 
+    // 3. Bauhaus Hazards
     for (const h of hazards) {
       ctx.save();
       ctx.translate(h.x, h.y);
@@ -2686,6 +3020,62 @@ function bootOrbita() {
       ctx.restore();
     }
 
+    // 4. Leviathan Dreadnought Boss
+    if (boss) {
+      ctx.save();
+      ctx.translate(boss.x, boss.y);
+
+      // Armor Chassis Hexagon
+      ctx.save();
+      ctx.rotate(-boss.rot * 0.5);
+      ctx.fillStyle = '#171614';
+      ctx.strokeStyle = '#E3A024';
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      for (let i = 0; i < 6; i++) {
+        const a = (i * Math.PI) / 3;
+        const px = Math.cos(a) * 34;
+        const py = Math.sin(a) * 34;
+        if (i === 0) ctx.moveTo(px, py);
+        else ctx.lineTo(px, py);
+      }
+      ctx.closePath();
+      ctx.fill();
+      ctx.stroke();
+      ctx.restore();
+
+      // 3 Orbiting Weakpoint Cores
+      const coreOrbitR = 54;
+      for (const c of boss.cores) {
+        const cx = Math.cos(boss.rot + c.angle) * coreOrbitR;
+        const cy = Math.sin(boss.rot + c.angle) * coreOrbitR;
+        ctx.strokeStyle = '#171614';
+        ctx.lineWidth = 2.5;
+        ctx.beginPath();
+        ctx.moveTo(0, 0);
+        ctx.lineTo(cx, cy);
+        ctx.stroke();
+
+        if (c.alive) {
+          ctx.fillStyle = '#DF3E26';
+          ctx.strokeStyle = '#171614';
+          ctx.lineWidth = 2.5;
+          ctx.beginPath();
+          ctx.arc(cx, cy, 13, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.stroke();
+
+          ctx.fillStyle = '#FAF6EE';
+          ctx.beginPath();
+          ctx.arc(cx, cy, 4, 0, Math.PI * 2);
+          ctx.fill();
+        }
+      }
+
+      ctx.restore();
+    }
+
+    // 5. Active Tether & Sightline
     if (state === 'PLAYING' && player.tether) {
       const t = player.tether;
       ctx.strokeStyle = '#171614';
@@ -2711,6 +3101,7 @@ function bootOrbita() {
       ctx.restore();
     }
 
+    // 6. Shockwaves & Particles
     for (const s of shockwaves) {
       ctx.save();
       ctx.strokeStyle = s.color;
@@ -2782,7 +3173,7 @@ function bootOrbita() {
   }
 
   /* =========================================================
-     6. ATELIER LIVE WIND-TUNNEL PREVIEW (SHOWS INSPECTED ITEM)
+     6. ATELIER LIVE WIND-TUNNEL PREVIEW
      ========================================================= */
   const previewCanvas = document.getElementById('atelier-preview');
   const pCtx = previewCanvas.getContext('2d');
@@ -2813,7 +3204,6 @@ function bootOrbita() {
     previewTrail.push({ x, y });
     if (previewTrail.length > 28) previewTrail.shift();
 
-    // Preview the currently inspected ship/trail (or equipped for the other slot)
     const previewShipId = inspected.category === 'ship' ? inspected.id : save.equippedShip;
     const previewTrailId = inspected.category === 'trail' ? inspected.id : save.equippedTrail;
 
@@ -2822,11 +3212,12 @@ function bootOrbita() {
   }
 
   /* =========================================================
-     7. UI BINDINGS, 2-STEP INSPECT -> BUY -> CONFIRM & HUD
+     7. UI BINDINGS, INSPECTOR, ENGINEERING & HUD
      ========================================================= */
   function updateHud() {
     document.getElementById('hud-score').textContent = score.toLocaleString();
     document.getElementById('hud-mult').textContent = `x${combo}`;
+    document.getElementById('hud-sector').textContent = SECTORS[currentSectorIdx % SECTORS.length].code;
     document.getElementById('hud-ink').textContent = runInk;
 
     const segs = document.querySelectorAll('#od-segments .od-seg');
@@ -2870,8 +3261,8 @@ function bootOrbita() {
     } else if (isUnlocked) {
       actionBtn.textContent = 'EQUIP BLUEPRINT';
       actionBtn.className = 'btn-swiss btn-primary';
-      actionBtn.style.padding = '11px 14px';
-      actionBtn.style.fontSize = '13px';
+      actionBtn.style.padding = '10px 14px';
+      actionBtn.style.fontSize = '12.5px';
       actionBtn.disabled = false;
     } else {
       actionBtn.textContent = `PURCHASE · ${item.cost} INK`;
@@ -2950,14 +3341,14 @@ function bootOrbita() {
   function refreshMenuUI() {
     document.getElementById('wallet-ink').textContent = save.ink.toLocaleString();
     document.getElementById('menu-best').textContent = save.bestScore.toLocaleString();
-    document.getElementById('menu-grazes').textContent = save.totalGrazes.toLocaleString();
+    document.getElementById('menu-bosses').textContent = save.totalBosses.toLocaleString();
 
     const shipObj = SHIPS.find(s => s.id === save.equippedShip) || SHIPS[0];
     const trailObj = TRAILS.find(t => t.id === save.equippedTrail) || TRAILS[0];
     document.getElementById('equipped-summary').textContent =
       `${shipObj.code} ${shipObj.name.toUpperCase()} + ${trailObj.name.toUpperCase()}`;
 
-    // Render Ships Catalog
+    // Ships Catalog
     const shipsGrid = document.getElementById('shop-ships');
     shipsGrid.innerHTML = '';
     for (const item of SHIPS) {
@@ -2983,7 +3374,7 @@ function bootOrbita() {
       shipsGrid.appendChild(el);
     }
 
-    // Render Trails Catalog
+    // Trails Catalog
     const trailsGrid = document.getElementById('shop-trails');
     trailsGrid.innerHTML = '';
     for (const item of TRAILS) {
@@ -3011,7 +3402,51 @@ function bootOrbita() {
 
     updateInspectorPanel();
 
-    // Render Missions
+    // Engineering Lab Tech Grid
+    const techGrid = document.getElementById('tech-grid');
+    techGrid.innerHTML = '';
+    for (const mod of TECH_MODULES) {
+      const rank = save.tech[mod.id] || 0;
+      const maxed = rank >= 5;
+      const cost = mod.baseCost + rank * mod.step;
+      const card = document.createElement('div');
+      card.className = 'tech-card';
+      let pipsHtml = '';
+      for (let i = 0; i < 5; i++) {
+        pipsHtml += `<div class="tech-pip ${i < rank ? 'active' : ''}"></div>`;
+      }
+      card.innerHTML = `
+        <div>
+          <div class="tech-header">
+            <div class="tech-title">${mod.name}</div>
+            <div class="tech-rank">RANK ${rank}/5</div>
+          </div>
+          <div class="tech-desc" style="margin-top:4px;">${mod.desc}</div>
+        </div>
+        <div class="tech-pips">${pipsHtml}</div>
+        <button class="btn-swiss ${maxed ? '' : 'btn-gold'}" type="button" ${maxed ? 'disabled' : ''}>
+          ${maxed ? 'MAXED OUT' : `UPGRADE · ${cost} INK`}
+        </button>
+      `;
+      if (!maxed) {
+        card.querySelector('button').addEventListener('click', () => {
+          if (save.ink >= cost) {
+            save.ink -= cost;
+            save.tech[mod.id] = rank + 1;
+            sfx.playFever();
+            persist();
+            refreshMenuUI();
+            showToast(`UPGRADED ${mod.name.toUpperCase()} TO RANK ${rank + 1}`);
+          } else {
+            sfx.playClick(240);
+            showToast(`NEED ${cost - save.ink} MORE INK ATOMS`);
+          }
+        });
+      }
+      techGrid.appendChild(card);
+    }
+
+    // Directives
     const mList = document.getElementById('mission-list');
     mList.innerHTML = '';
     let activeCount = 0;
@@ -3074,6 +3509,8 @@ function bootOrbita() {
   document.getElementById('btn-menu-pause').addEventListener('click', () => {
     sfx.stopCharge();
     state = 'MENU';
+    boss = null;
+    document.getElementById('boss-bar-wrap').classList.add('hidden');
     document.getElementById('hud').classList.add('hidden');
     document.getElementById('menu-overlay').classList.remove('hidden');
     refreshMenuUI();
