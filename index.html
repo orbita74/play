@@ -5,6 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
 <title>Classroom</title>
 <style>
+  /* =========================================================
+     DESIGN TOKENS & BAUHAUS PRINT STUDIO PALETTE
+     ========================================================= */
   :root {
     --paper: #F5F0E6;
     --paper-elevated: #FAF6EE;
@@ -79,7 +82,9 @@
   .print-frame::before { top: -2px; left: -2px; border-right: none; border-bottom: none; }
   .print-frame::after { bottom: -2px; right: -2px; border-left: none; border-top: none; }
 
-  /* HUD */
+  /* =========================================================
+     ACTIVE FLIGHT HUD
+     ========================================================= */
   #hud {
     position: absolute;
     top: 20px;
@@ -112,7 +117,7 @@
     padding: 6px 12px;
     display: flex;
     flex-direction: column;
-    min-width: 84px;
+    min-width: 82px;
   }
 
   .hud-label {
@@ -192,7 +197,7 @@
     top: 92px;
     left: 50%;
     transform: translateX(-50%);
-    width: min(360px, 84vw);
+    width: min(370px, 84vw);
     background: var(--paper-elevated);
     border: 2.5px solid var(--ink);
     box-shadow: 4px 4px 0 var(--ink);
@@ -233,7 +238,9 @@
     opacity: 0.45;
   }
 
-  /* Buttons */
+  /* =========================================================
+     SWISS PRINT BUTTONS
+     ========================================================= */
   .btn-swiss {
     pointer-events: auto;
     font-family: var(--font-mono);
@@ -298,7 +305,9 @@
     background: #D49117;
   }
 
-  /* Overlay Screens */
+  /* =========================================================
+     OVERLAY HUB & 5-TAB NAVIGATION
+     ========================================================= */
   .overlay-backdrop {
     position: absolute;
     inset: 0;
@@ -383,7 +392,6 @@
     font-size: 15px;
   }
 
-  /* 5 Navigation Tabs */
   .hub-tabs {
     display: grid;
     grid-template-columns: repeat(5, 1fr);
@@ -444,6 +452,7 @@
 
   @media (max-width: 680px) {
     .play-hero { grid-template-columns: 1fr; }
+    .hub-tabs { grid-template-columns: repeat(3, 1fr); }
   }
 
   .editorial-pitch {
@@ -1080,11 +1089,11 @@
               <div class="mechanic-list">
                 <div class="mechanic-row">
                   <span class="mech-tag">ANCHORS</span>
-                  <span>Brass Standard, Cobalt Sonic Boost, Fragile Dashed &amp; Ochre Gravity Wells.</span>
+                  <span>Brass Standard, Cobalt Sonic Boost, Fragile Dashed &amp; Sage Gravity Wells.</span>
                 </div>
                 <div class="mechanic-row">
                   <span class="mech-tag">LEVIATHAN</span>
-                  <span>Every 2,500 pts, shatter all 3 Vermilion Cores on the Dreadnought for +1,500 &amp; +25 Ink!</span>
+                  <span>Slingshot off arena anchors into all 3 Vermilion Cores on the Dreadnought for +1,500 &amp; +25 Ink!</span>
                 </div>
                 <div class="mechanic-row">
                   <span class="mech-tag">FEVER</span>
@@ -1286,28 +1295,40 @@
 <script>
 function bootOrbita() {
   /* =========================================================
-     1. CATALOG, SECTORS & ENGINEERING UPGRADES
+     1. CATALOG, 4 VISUAL SECTORS & ENGINEERING UPGRADES
      ========================================================= */
   const SECTORS = [
     {
       code: 'SEC I',
       name: 'ARCHIVAL MERIDIAN',
-      washes: ['rgba(227, 160, 36, 0.09)', 'rgba(56, 125, 100, 0.08)', 'rgba(30, 90, 168, 0.07)']
+      bgRGB: [245, 240, 230],
+      gridType: 'horizontal',
+      darkTheme: false,
+      washes: ['rgba(227, 160, 36, 0.13)', 'rgba(56, 125, 100, 0.10)', 'rgba(30, 90, 168, 0.08)']
     },
     {
       code: 'SEC II',
       name: 'COBALT IONOSPHERE',
-      washes: ['rgba(30, 90, 168, 0.13)', 'rgba(56, 125, 100, 0.09)', 'rgba(30, 90, 168, 0.08)']
+      bgRGB: [230, 238, 244],
+      gridType: 'blueprint',
+      darkTheme: false,
+      washes: ['rgba(30, 90, 168, 0.18)', 'rgba(56, 125, 100, 0.12)', 'rgba(30, 90, 168, 0.11)']
     },
     {
       code: 'SEC III',
       name: 'OCHRE SOLAR FORGE',
-      washes: ['rgba(227, 160, 36, 0.15)', 'rgba(223, 62, 38, 0.08)', 'rgba(227, 160, 36, 0.10)']
+      bgRGB: [247, 234, 210],
+      gridType: 'diagonal',
+      darkTheme: false,
+      washes: ['rgba(227, 160, 36, 0.22)', 'rgba(223, 62, 38, 0.12)', 'rgba(227, 160, 36, 0.15)']
     },
     {
       code: 'SEC IV',
       name: 'VERMILION EVENT HORIZON',
-      washes: ['rgba(223, 62, 38, 0.14)', 'rgba(227, 160, 36, 0.11)', 'rgba(23, 22, 20, 0.07)']
+      bgRGB: [35, 32, 30],
+      gridType: 'horizon',
+      darkTheme: true,
+      washes: ['rgba(223, 62, 38, 0.22)', 'rgba(227, 160, 36, 0.14)', 'rgba(30, 90, 168, 0.14)']
     }
   ];
 
@@ -1435,7 +1456,7 @@ function bootOrbita() {
   const MISSION_POOL = [
     { id: 'graze_5',   title: 'Razor Margin',      desc: 'Perform 5 close-call Grazes in a single run.', target: 5,    reward: 65, type: 'run_grazes' },
     { id: 'stars_12',  title: 'Celestial Harvest', desc: 'Collect 12 Gold Ink Atoms in one flight.',     target: 12,   reward: 60, type: 'run_stars' },
-    { id: 'score_15',  title: 'Meridian Crossing', desc: 'Reach a score of 1,500 in a single run.',      target: 1500, reward: 80, type: 'run_score' },
+    { id: 'score_18',  title: 'Meridian Crossing', desc: 'Reach Sector II (1,800 pts) in one flight.',   target: 1800, reward: 80, type: 'run_score' },
     { id: 'fever_1',   title: 'Solar Ignition',    desc: 'Trigger Overdrive Fever Mode.',                target: 1,    reward: 75, type: 'run_fever' },
     { id: 'boss_1',    title: 'Leviathan Hunter',  desc: 'Defeat an Orbital Leviathan Dreadnought.',     target: 1,    reward: 120, type: 'run_bosses' },
     { id: 'cobalt_4',  title: 'Sonic Slingshot',   desc: 'Launch off 4 Cobalt Pulse Anchors.',           target: 4,    reward: 70, type: 'run_cobalt' }
@@ -1467,7 +1488,7 @@ function bootOrbita() {
 
   function loadSave() {
     try {
-      const raw = window.localStorage.getItem('orbita74_supermega_v1');
+      const raw = window.localStorage.getItem('orbita74_classroom_v1');
       if (!raw) return JSON.parse(JSON.stringify(DEFAULT_SAVE));
       const parsed = JSON.parse(raw);
       return {
@@ -1485,7 +1506,7 @@ function bootOrbita() {
 
   function persist() {
     try {
-      window.localStorage.setItem('orbita74_supermega_v1', JSON.stringify(save));
+      window.localStorage.setItem('orbita74_classroom_v1', JSON.stringify(save));
     } catch (e) {}
   }
 
@@ -1708,27 +1729,29 @@ function bootOrbita() {
   const sfx = new SoundEngine();
 
   /* =========================================================
-     3. CANVAS & CALM SECTOR BACKGROUND (NO SPINNING CIRCLES!)
+     3. CANVAS & CALM 4-SECTOR THEME BACKGROUND
      ========================================================= */
   const canvas = document.getElementById('world');
   const ctx = canvas.getContext('2d');
   let W = Math.max(320, window.innerWidth || document.documentElement.clientWidth || 800);
   let H = Math.max(480, window.innerHeight || document.documentElement.clientHeight || 600);
   let DPR = 1;
+  let currentBgRGB = [245, 240, 230];
+  let darkBlend = 0;
 
   const washNodes = [
-    { nx: 0.18, ny: 0.24, r: 340, speed: 0.18, phase: 0.2 },
-    { nx: 0.82, ny: 0.32, r: 390, speed: 0.14, phase: 2.1 },
-    { nx: 0.52, ny: 0.78, r: 420, speed: 0.16, phase: 4.0 }
+    { nx: 0.18, ny: 0.24, r: 360, speed: 0.18, phase: 0.2 },
+    { nx: 0.82, ny: 0.32, r: 410, speed: 0.14, phase: 2.1 },
+    { nx: 0.52, ny: 0.78, r: 440, speed: 0.16, phase: 4.0 }
   ];
 
-  const motes = Array.from({ length: 28 }, () => ({
+  const motes = Array.from({ length: 32 }, () => ({
     x: Math.random(),
     y: Math.random(),
-    size: 1.5 + Math.random() * 1.8,
+    size: 1.6 + Math.random() * 2.0,
     vx: (Math.random() - 0.5) * 0.008,
     vy: -0.005 - Math.random() * 0.01,
-    alpha: 0.15 + Math.random() * 0.25
+    alpha: 0.16 + Math.random() * 0.26
   }));
 
   function resize() {
@@ -1742,34 +1765,67 @@ function bootOrbita() {
   window.addEventListener('resize', resize);
   resize();
 
-  function drawCalmBackground(time, camY, sectorIdx) {
-    ctx.fillStyle = '#F5F0E6';
+  function drawCalmBackground(time, camY, sectorIdx, dt) {
+    const sector = SECTORS[sectorIdx % SECTORS.length];
+    const targetRGB = sector.bgRGB;
+    const lerpSpeed = Math.min(1, (dt || 0.016) * 2.4);
+    for (let i = 0; i < 3; i++) {
+      currentBgRGB[i] += (targetRGB[i] - currentBgRGB[i]) * lerpSpeed;
+    }
+    const targetDark = sector.darkTheme ? 1 : 0;
+    darkBlend += (targetDark - darkBlend) * lerpSpeed;
+
+    const r = Math.round(currentBgRGB[0]);
+    const g = Math.round(currentBgRGB[1]);
+    const b = Math.round(currentBgRGB[2]);
+    ctx.fillStyle = `rgb(${r}, ${g}, ${b})`;
     ctx.fillRect(0, 0, W, H);
 
-    const sector = SECTORS[sectorIdx % SECTORS.length];
     washNodes.forEach((w, idx) => {
       const cx = w.nx * W + Math.sin(time * w.speed + w.phase) * 35;
       const cy = w.ny * H + Math.cos(time * w.speed * 0.8 + w.phase) * 25;
       const grad = ctx.createRadialGradient(cx, cy, 10, cx, cy, w.r);
       grad.addColorStop(0, sector.washes[idx]);
-      grad.addColorStop(1, 'rgba(245, 240, 230, 0)');
+      grad.addColorStop(1, `rgba(${r}, ${g}, ${b}, 0)`);
       ctx.fillStyle = grad;
       ctx.fillRect(0, 0, W, H);
     });
 
-    const gridSpacing = 220;
+    const isDark = darkBlend > 0.5;
+    const lineRGB = isDark ? '245, 240, 230' : (sector.gridType === 'blueprint' ? '30, 90, 168' : '23, 22, 20');
+    const gridSpacing = 200;
     const offsetY = ((-camY * 0.25) % gridSpacing + gridSpacing) % gridSpacing;
-    ctx.strokeStyle = 'rgba(23, 22, 20, 0.06)';
+
+    ctx.strokeStyle = `rgba(${lineRGB}, ${isDark ? 0.11 : 0.08})`;
     ctx.lineWidth = 1;
     ctx.beginPath();
     for (let y = offsetY; y < H; y += gridSpacing) {
       ctx.moveTo(28, y);
       ctx.lineTo(W - 28, y);
     }
+
+    // Sector II & IV: Vertical architectural meridian lines
+    if (sector.gridType === 'blueprint' || sector.gridType === 'horizon') {
+      const vStep = Math.max(180, Math.floor(W / 4));
+      for (let x = vStep * 0.5; x < W - 28; x += vStep) {
+        ctx.moveTo(x, 28);
+        ctx.lineTo(x, H - 28);
+      }
+    }
+
+    // Sector III: Bauhaus 45-degree drafting diagonals
+    if (sector.gridType === 'diagonal') {
+      const diagStep = 280;
+      for (let y = offsetY - W; y < H + W; y += diagStep) {
+        ctx.moveTo(28, y);
+        ctx.lineTo(W - 28, y + (W - 56) * 0.55);
+      }
+    }
     ctx.stroke();
 
-    const colSpacing = Math.max(260, Math.floor(W / 3));
-    ctx.strokeStyle = 'rgba(23, 22, 20, 0.14)';
+    // Registration crosshairs
+    const colSpacing = Math.max(240, Math.floor(W / 3));
+    ctx.strokeStyle = `rgba(${lineRGB}, ${isDark ? 0.24 : 0.16})`;
     ctx.lineWidth = 1.2;
     for (let y = offsetY; y < H; y += gridSpacing) {
       for (let x = colSpacing * 0.5; x < W - 40; x += colSpacing) {
@@ -1787,7 +1843,7 @@ function bootOrbita() {
       m.y = (m.y + m.vy * 0.016 + 1) % 1;
       const px = m.x * W;
       const py = ((m.y * H - camY * 0.15) % H + H) % H;
-      ctx.fillStyle = `rgba(23, 22, 20, ${m.alpha})`;
+      ctx.fillStyle = isDark ? `rgba(227, 160, 36, ${m.alpha + 0.12})` : `rgba(${lineRGB}, ${m.alpha})`;
       ctx.fillRect(px, py, m.size, m.size);
     }
   }
@@ -2253,7 +2309,7 @@ function bootOrbita() {
   }
 
   /* =========================================================
-     5. GAMEPLAY, SECTORS & LEVIATHAN BOSS SYSTEM
+     5. GAMEPLAY, SECTORS & FIXED-ALTITUDE LEVIATHAN BOSS ARENA
      ========================================================= */
   let state = 'MENU';
   let globalTime = 0;
@@ -2267,7 +2323,7 @@ function bootOrbita() {
   let shakeMag = 0;
   let camY = 0;
   let currentSectorIdx = 0;
-  let nextBossScore = 2500;
+  let nextBossScore = 2200;
   let boss = null;
 
   let runStats = { grazes: 0, stars: 0, fever: 0, bosses: 0, cobalt: 0 };
@@ -2349,9 +2405,12 @@ function bootOrbita() {
   }
 
   function spawnLeviathanBoss() {
+    const tech = getTechBonus();
+    const arenaY = camY - 190;
+    const centerX = W * 0.5;
     boss = {
-      x: W * 0.5,
-      y: camY + 135,
+      x: centerX,
+      y: arenaY,
       rot: 0,
       cores: [
         { angle: -Math.PI / 2, alive: true },
@@ -2359,11 +2418,38 @@ function bootOrbita() {
         { angle: (5 * Math.PI) / 6, alive: true }
       ]
     };
+
+    // Clear nearby hazards inside the boss arena for clean slingshot lanes
+    hazards = hazards.filter(h => Math.abs(h.y - arenaY) > 260);
+
+    // Spawn 2 dedicated arena slingshot anchors positioned right below/beside the Leviathan
+    const spanX = Math.min(185, W * 0.28);
+    anchors.push(
+      {
+        x: centerX - spanX,
+        y: arenaY + 135,
+        r: 19,
+        captureRadius: 190 + tech.captureBonus,
+        type: 'cobalt',
+        broken: false,
+        pulse: 0
+      },
+      {
+        x: centerX + spanX,
+        y: arenaY + 135,
+        r: 19,
+        captureRadius: 190 + tech.captureBonus,
+        type: 'brass',
+        broken: false,
+        pulse: 1.5
+      }
+    );
+
     document.getElementById('boss-bar-wrap').classList.remove('hidden');
     updateBossBar();
     sfx.playFever();
     addShake(10);
-    spawnPopup(W * 0.5, camY + 210, '⚠ LEVIATHAN DREADNOUGHT!', '#DF3E26');
+    spawnPopup(centerX, camY + 120, '⚠ LEVIATHAN DREADNOUGHT AHEAD!', '#DF3E26');
   }
 
   function updateBossBar() {
@@ -2379,6 +2465,8 @@ function bootOrbita() {
   }
 
   function generateRow(y) {
+    if (boss && Math.abs(y - boss.y) < 250) return;
+
     const difficulty = Math.min(1, Math.abs(y) / 14000);
     const margin = Math.max(80, W * 0.14);
     const span = Math.max(120, W - margin * 2);
@@ -2395,7 +2483,6 @@ function bootOrbita() {
       }
       placedX.push(ax);
 
-      // 4 anchor types: brass, cobalt (sonic), fragile (dashed), well (ochre gravity pull)
       const roll = Math.random();
       let type = 'brass';
       if (roll < 0.22) type = 'cobalt';
@@ -2467,7 +2554,7 @@ function bootOrbita() {
     hitstopTimer = 0;
     shakeMag = 0;
     currentSectorIdx = 0;
-    nextBossScore = 2500;
+    nextBossScore = 2200;
     boss = null;
     document.getElementById('boss-bar-wrap').classList.add('hidden');
     runStats = { grazes: 0, stars: 0, fever: 0, bosses: 0, cobalt: 0 };
@@ -2719,7 +2806,6 @@ function bootOrbita() {
       player.vx *= Math.pow(0.88, dt);
       player.vy *= Math.pow(0.92, dt);
 
-      // Gentle pull toward Ochre Gravity Wells when flying nearby
       for (const a of anchors) {
         if (a.type === 'well' && !a.broken) {
           const dx = a.x - player.x;
@@ -2763,62 +2849,72 @@ function bootOrbita() {
       camY = targetCamY;
     }
 
-    // Check Sector Transitions every 2,500 score
-    const newSectorIdx = Math.floor(score / 2500);
+    // Rebalanced Sector Transitions (1,800 -> 4,800 -> 9,000 -> 14,500)
+    let newSectorIdx = 0;
+    if (score >= 14500) newSectorIdx = 3 + Math.floor((score - 14500) / 6000);
+    else if (score >= 9000) newSectorIdx = 3;
+    else if (score >= 4800) newSectorIdx = 2;
+    else if (score >= 1800) newSectorIdx = 1;
+
     if (newSectorIdx > currentSectorIdx) {
       currentSectorIdx = newSectorIdx;
       showSectorBanner(currentSectorIdx);
     }
 
-    // Spawn Leviathan Boss every 2,500 score
+    // Spawn Leviathan Boss at fixed world position ahead of the player
     if (!boss && score >= nextBossScore) {
-      nextBossScore += 2500;
+      nextBossScore += 3200;
       spawnLeviathanBoss();
     }
 
-    // Update Leviathan Boss
+    // Update Leviathan Boss (anchored at fixed world Y so player climbs up to fight it!)
     if (boss) {
-      boss.x = W * 0.5 + Math.sin(globalTime * 1.1) * Math.min(130, W * 0.24);
-      boss.y = camY + 135;
-      boss.rot += dt * 0.85;
+      boss.x = W * 0.5 + Math.sin(globalTime * 0.95) * Math.min(115, W * 0.20);
+      boss.rot += dt * 0.72;
 
-      const coreOrbitR = 54;
-      for (const c of boss.cores) {
-        if (!c.alive) continue;
-        const cx = boss.x + Math.cos(boss.rot + c.angle) * coreOrbitR;
-        const cy = boss.y + Math.sin(boss.rot + c.angle) * coreOrbitR;
-        const dist = Math.hypot(player.x - cx, player.y - cy);
-        if (dist < player.radius + 17) {
-          c.alive = false;
-          triggerHitstop(0.055);
-          addShake(13);
-          sfx.playGraze();
-          spawnShockwave(cx, cy, 80, '#DF3E26');
-          spawnParticles(cx, cy, '#DF3E26', 18, 250);
-          spawnPopup(cx, cy - 12, 'CORE SHATTERED!', '#DF3E26');
-          // Bounce player safely away from core
-          const pushAng = Math.atan2(player.y - cy, player.x - cx);
-          player.vx = Math.cos(pushAng) * 460;
-          player.vy = Math.sin(pushAng) * 460;
-          updateBossBar();
-
-          if (boss.cores.every(core => !core.alive)) {
-            const bx = boss.x;
-            const by = boss.y;
-            boss = null;
+      if (boss.y > camY + H + 120) {
+        boss = null;
+        updateBossBar();
+      } else {
+        const coreOrbitR = 64;
+        for (const c of boss.cores) {
+          if (!c.alive) continue;
+          const cx = boss.x + Math.cos(boss.rot + c.angle) * coreOrbitR;
+          const cy = boss.y + Math.sin(boss.rot + c.angle) * coreOrbitR;
+          const dist = Math.hypot(player.x - cx, player.y - cy);
+          if (dist < player.radius + 26) {
+            c.alive = false;
+            score += 300;
+            runInk += 5;
+            triggerHitstop(0.055);
+            addShake(13);
+            sfx.playGraze();
+            spawnShockwave(cx, cy, 95, '#DF3E26');
+            spawnParticles(cx, cy, '#DF3E26', 18, 250);
+            spawnPopup(cx, cy - 14, 'CORE SHATTERED! +300', '#DF3E26');
+            const pushAng = Math.atan2(player.y - cy, player.x - cx);
+            player.vx = Math.cos(pushAng) * 440;
+            player.vy = Math.min(-320, Math.sin(pushAng) * 440);
             updateBossBar();
-            score += 1500;
-            runInk += 25;
-            runStats.bosses++;
-            checkMissions();
-            sfx.playBossBoom();
-            addShake(20);
-            spawnShockwave(bx, by, 210, '#E3A024');
-            spawnParticles(bx, by, '#E3A024', 34, 340);
-            spawnParticles(bx, by, '#DF3E26', 24, 300);
-            spawnPopup(bx, by, 'LEVIATHAN DESTROYED! +1,500 & +25 INK', '#DF3E26');
+
+            if (boss.cores.every(core => !core.alive)) {
+              const bx = boss.x;
+              const by = boss.y;
+              boss = null;
+              updateBossBar();
+              score += 1500;
+              runInk += 25;
+              runStats.bosses++;
+              checkMissions();
+              sfx.playBossBoom();
+              addShake(20);
+              spawnShockwave(bx, by, 220, '#E3A024');
+              spawnParticles(bx, by, '#E3A024', 34, 340);
+              spawnParticles(bx, by, '#DF3E26', 24, 300);
+              spawnPopup(bx, by, 'LEVIATHAN DESTROYED! +1,500 & +25 INK', '#DF3E26');
+            }
+            break;
           }
-          break;
         }
       }
     }
@@ -2911,7 +3007,9 @@ function bootOrbita() {
   }
 
   function render() {
-    drawCalmBackground(globalTime, camY, currentSectorIdx);
+    drawCalmBackground(globalTime, camY, currentSectorIdx, 0.016);
+    const isDark = darkBlend > 0.5;
+    const inkStroke = isDark ? '#F5F0E6' : '#171614';
 
     ctx.save();
     if (shakeMag > 0.1) {
@@ -2928,7 +3026,7 @@ function bootOrbita() {
       const inRange = state === 'PLAYING' && distToPlayer <= a.captureRadius;
 
       ctx.save();
-      ctx.strokeStyle = inRange ? 'rgba(223, 62, 38, 0.5)' : 'rgba(23, 22, 20, 0.14)';
+      ctx.strokeStyle = inRange ? 'rgba(223, 62, 38, 0.65)' : (isDark ? 'rgba(245, 240, 230, 0.20)' : 'rgba(23, 22, 20, 0.14)');
       ctx.lineWidth = inRange ? 2 : 1.2;
       ctx.setLineDash([5, 6]);
       ctx.beginPath();
@@ -2939,7 +3037,7 @@ function bootOrbita() {
       ctx.save();
       ctx.translate(a.x, a.y);
 
-      ctx.fillStyle = 'rgba(23, 22, 20, 0.22)';
+      ctx.fillStyle = isDark ? 'rgba(0, 0, 0, 0.45)' : 'rgba(23, 22, 20, 0.22)';
       ctx.beginPath();
       ctx.arc(3, 4, a.r, 0, Math.PI * 2);
       ctx.fill();
@@ -2947,7 +3045,7 @@ function bootOrbita() {
       ctx.fillStyle = a.type === 'cobalt' ? '#1E5AA8'
         : (a.type === 'fragile' ? '#FAF6EE'
         : (a.type === 'well' ? '#387D64' : '#E3A024'));
-      ctx.strokeStyle = '#171614';
+      ctx.strokeStyle = inkStroke;
       ctx.lineWidth = 2.5;
       if (a.type === 'fragile') ctx.setLineDash([4, 3]);
       ctx.beginPath();
@@ -3025,7 +3123,15 @@ function bootOrbita() {
       ctx.save();
       ctx.translate(boss.x, boss.y);
 
-      // Armor Chassis Hexagon
+      ctx.save();
+      ctx.strokeStyle = 'rgba(223, 62, 38, 0.28)';
+      ctx.lineWidth = 1.5;
+      ctx.setLineDash([6, 6]);
+      ctx.beginPath();
+      ctx.arc(0, 0, 92, 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.restore();
+
       ctx.save();
       ctx.rotate(-boss.rot * 0.5);
       ctx.fillStyle = '#171614';
@@ -3034,8 +3140,8 @@ function bootOrbita() {
       ctx.beginPath();
       for (let i = 0; i < 6; i++) {
         const a = (i * Math.PI) / 3;
-        const px = Math.cos(a) * 34;
-        const py = Math.sin(a) * 34;
+        const px = Math.cos(a) * 36;
+        const py = Math.sin(a) * 36;
         if (i === 0) ctx.moveTo(px, py);
         else ctx.lineTo(px, py);
       }
@@ -3044,30 +3150,36 @@ function bootOrbita() {
       ctx.stroke();
       ctx.restore();
 
-      // 3 Orbiting Weakpoint Cores
-      const coreOrbitR = 54;
+      const coreOrbitR = 64;
+      const pulseScale = 1 + Math.sin(globalTime * 8) * 0.14;
       for (const c of boss.cores) {
         const cx = Math.cos(boss.rot + c.angle) * coreOrbitR;
         const cy = Math.sin(boss.rot + c.angle) * coreOrbitR;
-        ctx.strokeStyle = '#171614';
-        ctx.lineWidth = 2.5;
+        ctx.strokeStyle = inkStroke;
+        ctx.lineWidth = 3;
         ctx.beginPath();
         ctx.moveTo(0, 0);
         ctx.lineTo(cx, cy);
         ctx.stroke();
 
         if (c.alive) {
+          ctx.strokeStyle = 'rgba(223, 62, 38, 0.7)';
+          ctx.lineWidth = 1.8;
+          ctx.beginPath();
+          ctx.arc(cx, cy, 24 * pulseScale, 0, Math.PI * 2);
+          ctx.stroke();
+
           ctx.fillStyle = '#DF3E26';
-          ctx.strokeStyle = '#171614';
+          ctx.strokeStyle = inkStroke;
           ctx.lineWidth = 2.5;
           ctx.beginPath();
-          ctx.arc(cx, cy, 13, 0, Math.PI * 2);
+          ctx.arc(cx, cy, 18, 0, Math.PI * 2);
           ctx.fill();
           ctx.stroke();
 
           ctx.fillStyle = '#FAF6EE';
           ctx.beginPath();
-          ctx.arc(cx, cy, 4, 0, Math.PI * 2);
+          ctx.arc(cx, cy, 5.5, 0, Math.PI * 2);
           ctx.fill();
         }
       }
@@ -3078,7 +3190,7 @@ function bootOrbita() {
     // 5. Active Tether & Sightline
     if (state === 'PLAYING' && player.tether) {
       const t = player.tether;
-      ctx.strokeStyle = '#171614';
+      ctx.strokeStyle = inkStroke;
       ctx.lineWidth = 2.5;
       ctx.beginPath();
       ctx.moveTo(t.anchor.x, t.anchor.y);
@@ -3142,7 +3254,7 @@ function bootOrbita() {
       ctx.globalAlpha = Math.min(1, (pop.life / pop.maxLife) * 1.4);
       ctx.font = '700 13px "Courier New", monospace';
       ctx.textAlign = 'center';
-      ctx.fillStyle = pop.color;
+      ctx.fillStyle = (isDark && pop.color === '#171614') ? '#FAF6EE' : pop.color;
       ctx.fillText(pop.text, pop.x, pop.y);
       ctx.restore();
     }
@@ -3348,7 +3460,6 @@ function bootOrbita() {
     document.getElementById('equipped-summary').textContent =
       `${shipObj.code} ${shipObj.name.toUpperCase()} + ${trailObj.name.toUpperCase()}`;
 
-    // Ships Catalog
     const shipsGrid = document.getElementById('shop-ships');
     shipsGrid.innerHTML = '';
     for (const item of SHIPS) {
@@ -3374,7 +3485,6 @@ function bootOrbita() {
       shipsGrid.appendChild(el);
     }
 
-    // Trails Catalog
     const trailsGrid = document.getElementById('shop-trails');
     trailsGrid.innerHTML = '';
     for (const item of TRAILS) {
@@ -3402,7 +3512,6 @@ function bootOrbita() {
 
     updateInspectorPanel();
 
-    // Engineering Lab Tech Grid
     const techGrid = document.getElementById('tech-grid');
     techGrid.innerHTML = '';
     for (const mod of TECH_MODULES) {
@@ -3446,7 +3555,6 @@ function bootOrbita() {
       techGrid.appendChild(card);
     }
 
-    // Directives
     const mList = document.getElementById('mission-list');
     mList.innerHTML = '';
     let activeCount = 0;
