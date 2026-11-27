@@ -64,6 +64,17 @@
     cursor: crosshair;
   }
 
+  /* Subtle Silkscreen Paper Grain Overlay */
+  .paper-grain {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 4;
+    opacity: 0.24;
+    background-image: radial-gradient(rgba(23, 22, 20, 0.22) 0.75px, transparent 0.75px);
+    background-size: 4px 4px;
+  }
+
   .print-frame {
     position: absolute;
     inset: 10px;
@@ -197,7 +208,7 @@
     top: 92px;
     left: 50%;
     transform: translateX(-50%);
-    width: min(370px, 84vw);
+    width: min(390px, 86vw);
     background: var(--paper-elevated);
     border: 2.5px solid var(--ink);
     box-shadow: 4px 4px 0 var(--ink);
@@ -996,6 +1007,7 @@
 
 <div id="game-stage">
   <canvas id="world"></canvas>
+  <div class="paper-grain"></div>
   <div class="print-frame"></div>
 
   <!-- ACTIVE GAME HUD -->
@@ -1044,7 +1056,7 @@
   <!-- LEVIATHAN BOSS HEALTH BAR -->
   <div id="boss-bar-wrap" class="hidden">
     <div class="boss-bar-top">
-      <span>⚠ ORBITAL LEVIATHAN DREADNOUGHT</span>
+      <span>⚠ ARENA LOCKED · LEVIATHAN DREADNOUGHT</span>
       <span id="boss-cores-txt">3 CORES LEFT</span>
     </div>
     <div class="boss-pips">
@@ -1072,7 +1084,7 @@
       <div class="hub-tabs">
         <button class="hub-tab active" data-tab="play" type="button">01 / Launch</button>
         <button class="hub-tab" data-tab="atelier" type="button">02 / Atelier</button>
-        <button class="hub-tab" data-tab="tech" type="button">03 / Engineering</button>
+        <button class="hub-tab" data-tab="tech" type="button">03 / Eng. Lab</button>
         <button class="hub-tab" data-tab="missions" type="button">04 / Directives <span class="tab-badge" id="mission-badge">3</span></button>
         <button class="hub-tab" data-tab="calibrate" type="button">05 / Calibrate</button>
       </div>
@@ -1083,7 +1095,7 @@
           <div class="play-hero">
             <div class="editorial-pitch">
               <div>
-                <div class="editorial-kicker">4 Galactic Sectors · Leviathan Bosses</div>
+                <div class="editorial-kicker">4 Galactic Sectors · Locked Boss Arenas</div>
                 <h1 class="editorial-headline">Hold to tether into gravity wells. Release to slingshot across the meridian.</h1>
               </div>
               <div class="mechanic-list">
@@ -1092,12 +1104,12 @@
                   <span>Brass Standard, Cobalt Sonic Boost, Fragile Dashed &amp; Sage Gravity Wells.</span>
                 </div>
                 <div class="mechanic-row">
-                  <span class="mech-tag">LEVIATHAN</span>
-                  <span>Slingshot off arena anchors into all 3 Vermilion Cores on the Dreadnought for +1,500 &amp; +25 Ink!</span>
+                  <span class="mech-tag">ARENA</span>
+                  <span>Every 2,500 pts locks the camera for a Leviathan duel—smash all 3 Vermilion Cores!</span>
                 </div>
                 <div class="mechanic-row">
                   <span class="mech-tag">FEVER</span>
-                  <span>Chain Grazes &amp; Gold Ink Stars to ignite Overdrive and smash straight through hazards.</span>
+                  <span>Chain Grazes &amp; Gold Ink Stars to ignite Overdrive and shatter hazards on contact.</span>
                 </div>
               </div>
             </div>
@@ -1301,34 +1313,30 @@ function bootOrbita() {
     {
       code: 'SEC I',
       name: 'ARCHIVAL MERIDIAN',
-      bgRGB: [245, 240, 230],
+      bgRGB: [245, 240, 230], // Warm Cotton Paper #F5F0E6
       gridType: 'horizontal',
-      darkTheme: false,
       washes: ['rgba(227, 160, 36, 0.13)', 'rgba(56, 125, 100, 0.10)', 'rgba(30, 90, 168, 0.08)']
     },
     {
       code: 'SEC II',
       name: 'COBALT IONOSPHERE',
-      bgRGB: [230, 238, 244],
+      bgRGB: [232, 238, 245], // Cool Blueprint Mist #E8EEF5
       gridType: 'blueprint',
-      darkTheme: false,
-      washes: ['rgba(30, 90, 168, 0.18)', 'rgba(56, 125, 100, 0.12)', 'rgba(30, 90, 168, 0.11)']
+      washes: ['rgba(30, 90, 168, 0.17)', 'rgba(56, 125, 100, 0.12)', 'rgba(30, 90, 168, 0.11)']
     },
     {
       code: 'SEC III',
       name: 'OCHRE SOLAR FORGE',
-      bgRGB: [247, 234, 210],
+      bgRGB: [246, 235, 214], // Sunlit Parchment #F6EBD6
       gridType: 'diagonal',
-      darkTheme: false,
       washes: ['rgba(227, 160, 36, 0.22)', 'rgba(223, 62, 38, 0.12)', 'rgba(227, 160, 36, 0.15)']
     },
     {
       code: 'SEC IV',
-      name: 'VERMILION EVENT HORIZON',
-      bgRGB: [35, 32, 30],
-      gridType: 'horizon',
-      darkTheme: true,
-      washes: ['rgba(223, 62, 38, 0.22)', 'rgba(227, 160, 36, 0.14)', 'rgba(30, 90, 168, 0.14)']
+      name: 'EVENT HORIZON',
+      bgRGB: [229, 227, 236], // Twilight Slate Paper #E5E3EC
+      gridType: 'double',
+      washes: ['rgba(223, 62, 38, 0.16)', 'rgba(30, 90, 168, 0.16)', 'rgba(227, 160, 36, 0.13)']
     }
   ];
 
@@ -1449,14 +1457,14 @@ function bootOrbita() {
   const TECH_MODULES = [
     { id: 'capture', name: 'Magnetic Capture Field', desc: 'Expands anchor tether lock-on perimeter (+12px per rank).', baseCost: 50, step: 45 },
     { id: 'thrust',  name: 'Slingshot Capacitor',    desc: 'Increases tangential launch velocity (+35 speed per rank).', baseCost: 60, step: 50 },
-    { id: 'overdrive', name: 'Overdrive Reactor',    desc: 'Increases Overdrive charge gained from Grazes & Stars (+15% per rank).', baseCost: 70, step: 55 },
-    { id: 'cooling', name: 'Grav-Tether Cooling',    desc: 'Extends maximum anchor hold duration before auto-release (+0.35s per rank).', baseCost: 55, step: 45 }
+    { id: 'overdrive', name: 'Overdrive Core',       desc: 'Increases Overdrive charge gained from Grazes & Stars (+15% per rank).', baseCost: 70, step: 55 },
+    { id: 'cooling', name: 'Tether Heat Sink',        desc: 'Extends maximum anchor hold duration before auto-release (+0.35s per rank).', baseCost: 55, step: 45 }
   ];
 
   const MISSION_POOL = [
     { id: 'graze_5',   title: 'Razor Margin',      desc: 'Perform 5 close-call Grazes in a single run.', target: 5,    reward: 65, type: 'run_grazes' },
     { id: 'stars_12',  title: 'Celestial Harvest', desc: 'Collect 12 Gold Ink Atoms in one flight.',     target: 12,   reward: 60, type: 'run_stars' },
-    { id: 'score_18',  title: 'Meridian Crossing', desc: 'Reach Sector II (1,800 pts) in one flight.',   target: 1800, reward: 80, type: 'run_score' },
+    { id: 'score_25',  title: 'Meridian Crossing', desc: 'Reach Sector II (2,500 pts) in one flight.',   target: 2500, reward: 80, type: 'run_score' },
     { id: 'fever_1',   title: 'Solar Ignition',    desc: 'Trigger Overdrive Fever Mode.',                target: 1,    reward: 75, type: 'run_fever' },
     { id: 'boss_1',    title: 'Leviathan Hunter',  desc: 'Defeat an Orbital Leviathan Dreadnought.',     target: 1,    reward: 120, type: 'run_bosses' },
     { id: 'cobalt_4',  title: 'Sonic Slingshot',   desc: 'Launch off 4 Cobalt Pulse Anchors.',           target: 4,    reward: 70, type: 'run_cobalt' }
@@ -1488,7 +1496,7 @@ function bootOrbita() {
 
   function loadSave() {
     try {
-      const raw = window.localStorage.getItem('orbita74_classroom_v1');
+      const raw = window.localStorage.getItem('orbita74_classroom_v2');
       if (!raw) return JSON.parse(JSON.stringify(DEFAULT_SAVE));
       const parsed = JSON.parse(raw);
       return {
@@ -1506,7 +1514,7 @@ function bootOrbita() {
 
   function persist() {
     try {
-      window.localStorage.setItem('orbita74_classroom_v1', JSON.stringify(save));
+      window.localStorage.setItem('orbita74_classroom_v2', JSON.stringify(save));
     } catch (e) {}
   }
 
@@ -1729,7 +1737,7 @@ function bootOrbita() {
   const sfx = new SoundEngine();
 
   /* =========================================================
-     3. CANVAS & CALM 4-SECTOR THEME BACKGROUND
+     3. CANVAS & CALM 4-SECTOR GALLERY BACKGROUND
      ========================================================= */
   const canvas = document.getElementById('world');
   const ctx = canvas.getContext('2d');
@@ -1737,21 +1745,20 @@ function bootOrbita() {
   let H = Math.max(480, window.innerHeight || document.documentElement.clientHeight || 600);
   let DPR = 1;
   let currentBgRGB = [245, 240, 230];
-  let darkBlend = 0;
 
   const washNodes = [
-    { nx: 0.18, ny: 0.24, r: 360, speed: 0.18, phase: 0.2 },
-    { nx: 0.82, ny: 0.32, r: 410, speed: 0.14, phase: 2.1 },
-    { nx: 0.52, ny: 0.78, r: 440, speed: 0.16, phase: 4.0 }
+    { nx: 0.18, ny: 0.24, r: 360, speed: 0.16, phase: 0.2 },
+    { nx: 0.82, ny: 0.32, r: 410, speed: 0.12, phase: 2.1 },
+    { nx: 0.52, ny: 0.78, r: 440, speed: 0.14, phase: 4.0 }
   ];
 
-  const motes = Array.from({ length: 32 }, () => ({
+  const motes = Array.from({ length: 30 }, () => ({
     x: Math.random(),
     y: Math.random(),
     size: 1.6 + Math.random() * 2.0,
-    vx: (Math.random() - 0.5) * 0.008,
-    vy: -0.005 - Math.random() * 0.01,
-    alpha: 0.16 + Math.random() * 0.26
+    vx: (Math.random() - 0.5) * 0.007,
+    vy: -0.004 - Math.random() * 0.009,
+    alpha: 0.15 + Math.random() * 0.24
   }));
 
   function resize() {
@@ -1772,8 +1779,6 @@ function bootOrbita() {
     for (let i = 0; i < 3; i++) {
       currentBgRGB[i] += (targetRGB[i] - currentBgRGB[i]) * lerpSpeed;
     }
-    const targetDark = sector.darkTheme ? 1 : 0;
-    darkBlend += (targetDark - darkBlend) * lerpSpeed;
 
     const r = Math.round(currentBgRGB[0]);
     const g = Math.round(currentBgRGB[1]);
@@ -1781,9 +1786,10 @@ function bootOrbita() {
     ctx.fillStyle = `rgb(${r}, ${g}, ${b})`;
     ctx.fillRect(0, 0, W, H);
 
+    // Subtle organic watercolor washes
     washNodes.forEach((w, idx) => {
-      const cx = w.nx * W + Math.sin(time * w.speed + w.phase) * 35;
-      const cy = w.ny * H + Math.cos(time * w.speed * 0.8 + w.phase) * 25;
+      const cx = w.nx * W + Math.sin(time * w.speed + w.phase) * 32;
+      const cy = w.ny * H + Math.cos(time * w.speed * 0.8 + w.phase) * 22;
       const grad = ctx.createRadialGradient(cx, cy, 10, cx, cy, w.r);
       grad.addColorStop(0, sector.washes[idx]);
       grad.addColorStop(1, `rgba(${r}, ${g}, ${b}, 0)`);
@@ -1791,12 +1797,11 @@ function bootOrbita() {
       ctx.fillRect(0, 0, W, H);
     });
 
-    const isDark = darkBlend > 0.5;
-    const lineRGB = isDark ? '245, 240, 230' : (sector.gridType === 'blueprint' ? '30, 90, 168' : '23, 22, 20');
+    const lineRGB = sector.gridType === 'blueprint' ? '30, 90, 168' : '23, 22, 20';
     const gridSpacing = 200;
     const offsetY = ((-camY * 0.25) % gridSpacing + gridSpacing) % gridSpacing;
 
-    ctx.strokeStyle = `rgba(${lineRGB}, ${isDark ? 0.11 : 0.08})`;
+    ctx.strokeStyle = `rgba(${lineRGB}, 0.08)`;
     ctx.lineWidth = 1;
     ctx.beginPath();
     for (let y = offsetY; y < H; y += gridSpacing) {
@@ -1804,8 +1809,8 @@ function bootOrbita() {
       ctx.lineTo(W - 28, y);
     }
 
-    // Sector II & IV: Vertical architectural meridian lines
-    if (sector.gridType === 'blueprint' || sector.gridType === 'horizon') {
+    // Sector II: Cross-grid vertical blueprint meridians
+    if (sector.gridType === 'blueprint') {
       const vStep = Math.max(180, Math.floor(W / 4));
       for (let x = vStep * 0.5; x < W - 28; x += vStep) {
         ctx.moveTo(x, 28);
@@ -1813,7 +1818,7 @@ function bootOrbita() {
       }
     }
 
-    // Sector III: Bauhaus 45-degree drafting diagonals
+    // Sector III: 45-degree Bauhaus diagonals
     if (sector.gridType === 'diagonal') {
       const diagStep = 280;
       for (let y = offsetY - W; y < H + W; y += diagStep) {
@@ -1821,11 +1826,23 @@ function bootOrbita() {
         ctx.lineTo(W - 28, y + (W - 56) * 0.55);
       }
     }
+
+    // Sector IV: Double architectural framing rules
+    if (sector.gridType === 'double') {
+      for (let y = offsetY; y < H; y += gridSpacing) {
+        ctx.moveTo(28, y + 6);
+        ctx.lineTo(W - 28, y + 6);
+      }
+      ctx.moveTo(46, 28);
+      ctx.lineTo(46, H - 28);
+      ctx.moveTo(W - 46, 28);
+      ctx.lineTo(W - 46, H - 28);
+    }
     ctx.stroke();
 
     // Registration crosshairs
     const colSpacing = Math.max(240, Math.floor(W / 3));
-    ctx.strokeStyle = `rgba(${lineRGB}, ${isDark ? 0.24 : 0.16})`;
+    ctx.strokeStyle = `rgba(${lineRGB}, 0.16)`;
     ctx.lineWidth = 1.2;
     for (let y = offsetY; y < H; y += gridSpacing) {
       for (let x = colSpacing * 0.5; x < W - 40; x += colSpacing) {
@@ -1838,12 +1855,13 @@ function bootOrbita() {
       }
     }
 
+    // Gentle drifting ink motes
     for (const m of motes) {
       m.x = (m.x + m.vx * 0.016 + 1) % 1;
       m.y = (m.y + m.vy * 0.016 + 1) % 1;
       const px = m.x * W;
       const py = ((m.y * H - camY * 0.15) % H + H) % H;
-      ctx.fillStyle = isDark ? `rgba(227, 160, 36, ${m.alpha + 0.12})` : `rgba(${lineRGB}, ${m.alpha})`;
+      ctx.fillStyle = `rgba(${lineRGB}, ${m.alpha})`;
       ctx.fillRect(px, py, m.size, m.size);
     }
   }
@@ -2309,7 +2327,7 @@ function bootOrbita() {
   }
 
   /* =========================================================
-     5. GAMEPLAY, SECTORS & FIXED-ALTITUDE LEVIATHAN BOSS ARENA
+     5. GAMEPLAY, SECTORS & LOCKED LEVIATHAN BOSS ARENA
      ========================================================= */
   let state = 'MENU';
   let globalTime = 0;
@@ -2323,8 +2341,9 @@ function bootOrbita() {
   let shakeMag = 0;
   let camY = 0;
   let currentSectorIdx = 0;
-  let nextBossScore = 2200;
+  let nextBossScore = 2500;
   let boss = null;
+  let arenaLockCamY = null;
 
   let runStats = { grazes: 0, stars: 0, fever: 0, bosses: 0, cobalt: 0 };
 
@@ -2406,8 +2425,11 @@ function bootOrbita() {
 
   function spawnLeviathanBoss() {
     const tech = getTechBonus();
-    const arenaY = camY - 190;
+    // Lock camera at an arena slightly above the current view so player ascends into a fixed duel chamber
+    arenaLockCamY = camY - 220;
+    const arenaY = arenaLockCamY + Math.max(195, H * 0.30);
     const centerX = W * 0.5;
+
     boss = {
       x: centerX,
       y: arenaY,
@@ -2419,26 +2441,26 @@ function bootOrbita() {
       ]
     };
 
-    // Clear nearby hazards inside the boss arena for clean slingshot lanes
-    hazards = hazards.filter(h => Math.abs(h.y - arenaY) > 260);
+    // Clear nearby hazards inside the locked boss arena for clean slingshot angles
+    hazards = hazards.filter(h => Math.abs(h.y - arenaY) > 360);
 
-    // Spawn 2 dedicated arena slingshot anchors positioned right below/beside the Leviathan
+    // Spawn 2 dedicated slingshot anchors (one Cobalt Sonic Boost, one Brass) directly below the Leviathan
     const spanX = Math.min(185, W * 0.28);
     anchors.push(
       {
         x: centerX - spanX,
-        y: arenaY + 135,
+        y: arenaY + 145,
         r: 19,
-        captureRadius: 190 + tech.captureBonus,
+        captureRadius: 195 + tech.captureBonus,
         type: 'cobalt',
         broken: false,
         pulse: 0
       },
       {
         x: centerX + spanX,
-        y: arenaY + 135,
+        y: arenaY + 145,
         r: 19,
-        captureRadius: 190 + tech.captureBonus,
+        captureRadius: 195 + tech.captureBonus,
         type: 'brass',
         broken: false,
         pulse: 1.5
@@ -2449,7 +2471,7 @@ function bootOrbita() {
     updateBossBar();
     sfx.playFever();
     addShake(10);
-    spawnPopup(centerX, camY + 120, '⚠ LEVIATHAN DREADNOUGHT AHEAD!', '#DF3E26');
+    spawnPopup(centerX, arenaY + 215, '⚠ ARENA LOCKED · DESTROY ALL 3 CORES!', '#DF3E26');
   }
 
   function updateBossBar() {
@@ -2465,7 +2487,7 @@ function bootOrbita() {
   }
 
   function generateRow(y) {
-    if (boss && Math.abs(y - boss.y) < 250) return;
+    if (boss && Math.abs(y - boss.y) < 340) return;
 
     const difficulty = Math.min(1, Math.abs(y) / 14000);
     const margin = Math.max(80, W * 0.14);
@@ -2554,8 +2576,9 @@ function bootOrbita() {
     hitstopTimer = 0;
     shakeMag = 0;
     currentSectorIdx = 0;
-    nextBossScore = 2200;
+    nextBossScore = 2500;
     boss = null;
+    arenaLockCamY = null;
     document.getElementById('boss-bar-wrap').classList.add('hidden');
     runStats = { grazes: 0, stars: 0, fever: 0, bosses: 0, cobalt: 0 };
 
@@ -2605,6 +2628,7 @@ function bootOrbita() {
   function endRun() {
     state = 'GAMEOVER';
     boss = null;
+    arenaLockCamY = null;
     document.getElementById('boss-bar-wrap').classList.add('hidden');
     sfx.playCrash();
     addShake(16);
@@ -2839,82 +2863,107 @@ function bootOrbita() {
     player.trail.push({ x: player.x, y: player.y });
     if (player.trail.length > 26) player.trail.shift();
 
-    const targetCamY = player.y - H * 0.62;
-    if (targetCamY < camY) {
-      const gained = Math.floor((camY - targetCamY) * 0.25);
-      if (gained > 0) {
-        score += gained * combo;
-        checkMissions();
+    // Camera handling: Locked to Boss Arena while Leviathan is alive, otherwise follows ascent
+    if (boss && arenaLockCamY !== null) {
+      camY += (arenaLockCamY - camY) * Math.min(1, dt * 4.5);
+
+      // Top Arena Containment Ceiling so player never flies off above the Leviathan
+      const topLimit = camY + 36;
+      if (player.y < topLimit) {
+        player.y = topLimit;
+        player.vy = Math.abs(player.vy) * 0.78;
+        player.squash = 0.8;
+        addShake(3);
       }
-      camY = targetCamY;
+
+      // Elastic Bottom Safety Barrier during Boss Fight so player never falls out while lining up shots
+      const floorLimit = camY + H - 30;
+      if (player.y > floorLimit) {
+        player.y = floorLimit;
+        player.vy = -Math.max(460, Math.abs(player.vy) * 0.92);
+        player.squash = 1.28;
+        sfx.playClick(300);
+        addShake(5);
+        spawnShockwave(player.x, floorLimit, 60, '#1E5AA8');
+      }
+    } else {
+      const targetCamY = player.y - H * 0.62;
+      if (targetCamY < camY) {
+        const gained = Math.floor((camY - targetCamY) * 0.25);
+        if (gained > 0) {
+          score += gained * combo;
+          checkMissions();
+        }
+        camY = targetCamY;
+      }
     }
 
-    // Rebalanced Sector Transitions (1,800 -> 4,800 -> 9,000 -> 14,500)
+    // Sector Transitions (2,500 -> 5,500 -> 9,500 -> 14,500)
     let newSectorIdx = 0;
-    if (score >= 14500) newSectorIdx = 3 + Math.floor((score - 14500) / 6000);
-    else if (score >= 9000) newSectorIdx = 3;
-    else if (score >= 4800) newSectorIdx = 2;
-    else if (score >= 1800) newSectorIdx = 1;
+    if (score >= 14500) newSectorIdx = 3 + Math.floor((score - 14500) / 5500);
+    else if (score >= 9500) newSectorIdx = 3;
+    else if (score >= 5500) newSectorIdx = 2;
+    else if (score >= 2500) newSectorIdx = 1;
 
     if (newSectorIdx > currentSectorIdx) {
       currentSectorIdx = newSectorIdx;
       showSectorBanner(currentSectorIdx);
     }
 
-    // Spawn Leviathan Boss at fixed world position ahead of the player
+    // Spawn Locked Boss Arena every 2,500 points
     if (!boss && score >= nextBossScore) {
-      nextBossScore += 3200;
+      nextBossScore += 2500;
       spawnLeviathanBoss();
     }
 
-    // Update Leviathan Boss (anchored at fixed world Y so player climbs up to fight it!)
+    // Update Leviathan Dreadnought & Weakpoint Core Collisions
     if (boss) {
       boss.x = W * 0.5 + Math.sin(globalTime * 0.95) * Math.min(115, W * 0.20);
-      boss.rot += dt * 0.72;
+      boss.rot += dt * 0.75;
 
-      if (boss.y > camY + H + 120) {
-        boss = null;
-        updateBossBar();
-      } else {
-        const coreOrbitR = 64;
-        for (const c of boss.cores) {
-          if (!c.alive) continue;
-          const cx = boss.x + Math.cos(boss.rot + c.angle) * coreOrbitR;
-          const cy = boss.y + Math.sin(boss.rot + c.angle) * coreOrbitR;
-          const dist = Math.hypot(player.x - cx, player.y - cy);
-          if (dist < player.radius + 26) {
-            c.alive = false;
-            score += 300;
-            runInk += 5;
-            triggerHitstop(0.055);
-            addShake(13);
-            sfx.playGraze();
-            spawnShockwave(cx, cy, 95, '#DF3E26');
-            spawnParticles(cx, cy, '#DF3E26', 18, 250);
-            spawnPopup(cx, cy - 14, 'CORE SHATTERED! +300', '#DF3E26');
-            const pushAng = Math.atan2(player.y - cy, player.x - cx);
-            player.vx = Math.cos(pushAng) * 440;
-            player.vy = Math.min(-320, Math.sin(pushAng) * 440);
+      const coreOrbitR = 64;
+      for (const c of boss.cores) {
+        if (!c.alive) continue;
+        const cx = boss.x + Math.cos(boss.rot + c.angle) * coreOrbitR;
+        const cy = boss.y + Math.sin(boss.rot + c.angle) * coreOrbitR;
+        const dist = Math.hypot(player.x - cx, player.y - cy);
+        if (dist < player.radius + 26) {
+          c.alive = false;
+          score += 300;
+          runInk += 5;
+          triggerHitstop(0.055);
+          addShake(13);
+          sfx.playGraze();
+          spawnShockwave(cx, cy, 95, '#DF3E26');
+          spawnParticles(cx, cy, '#DF3E26', 18, 250);
+          spawnPopup(cx, cy - 14, 'CORE SHATTERED! +300', '#DF3E26');
+
+          // Upward rebound so player can chain into another core or anchor
+          const pushAng = Math.atan2(player.y - cy, player.x - cx);
+          player.vx = Math.cos(pushAng) * 430;
+          player.vy = Math.min(-340, Math.sin(pushAng) * 430);
+          updateBossBar();
+
+          if (boss.cores.every(core => !core.alive)) {
+            const bx = boss.x;
+            const by = boss.y;
+            boss = null;
+            arenaLockCamY = null;
             updateBossBar();
-
-            if (boss.cores.every(core => !core.alive)) {
-              const bx = boss.x;
-              const by = boss.y;
-              boss = null;
-              updateBossBar();
-              score += 1500;
-              runInk += 25;
-              runStats.bosses++;
-              checkMissions();
-              sfx.playBossBoom();
-              addShake(20);
-              spawnShockwave(bx, by, 220, '#E3A024');
-              spawnParticles(bx, by, '#E3A024', 34, 340);
-              spawnParticles(bx, by, '#DF3E26', 24, 300);
-              spawnPopup(bx, by, 'LEVIATHAN DESTROYED! +1,500 & +25 INK', '#DF3E26');
-            }
-            break;
+            score += 1500;
+            runInk += 25;
+            runStats.bosses++;
+            checkMissions();
+            sfx.playBossBoom();
+            addShake(20);
+            spawnShockwave(bx, by, 230, '#E3A024');
+            spawnParticles(bx, by, '#E3A024', 34, 340);
+            spawnParticles(bx, by, '#DF3E26', 24, 300);
+            spawnPopup(bx, by, 'LEVIATHAN DESTROYED! +1,500 & +25 INK', '#DF3E26');
+            // Launch player upward as the arena unlocks
+            player.vy = Math.min(player.vy, -540);
           }
+          break;
         }
       }
     }
@@ -2929,7 +2978,7 @@ function bootOrbita() {
     hazards = hazards.filter(h => h.y < cullY && !h.shattered);
     stars = stars.filter(s => s.y < cullY && !s.collected);
 
-    if (player.y > camY + H + 35) {
+    if (!boss && player.y > camY + H + 35) {
       endRun();
       return;
     }
@@ -3008,8 +3057,6 @@ function bootOrbita() {
 
   function render() {
     drawCalmBackground(globalTime, camY, currentSectorIdx, 0.016);
-    const isDark = darkBlend > 0.5;
-    const inkStroke = isDark ? '#F5F0E6' : '#171614';
 
     ctx.save();
     if (shakeMag > 0.1) {
@@ -3019,6 +3066,36 @@ function bootOrbita() {
     }
     ctx.translate(0, -camY);
 
+    // 0. Locked Boss Arena Visual Perimeter & Bottom Safety Deflector
+    if (boss) {
+      const floorY = camY + H - 24;
+      const ceilY = camY + 24;
+      ctx.save();
+      ctx.strokeStyle = 'rgba(223, 62, 38, 0.45)';
+      ctx.lineWidth = 2;
+      ctx.setLineDash([10, 6]);
+      ctx.beginPath();
+      ctx.moveTo(24, ceilY);
+      ctx.lineTo(W - 24, ceilY);
+      ctx.stroke();
+
+      // Elastic Cobalt Bottom Deflector Line
+      ctx.strokeStyle = '#1E5AA8';
+      ctx.lineWidth = 3.5;
+      ctx.setLineDash([14, 6]);
+      ctx.beginPath();
+      ctx.moveTo(24, floorY);
+      ctx.lineTo(W - 24, floorY);
+      ctx.stroke();
+
+      ctx.setLineDash([]);
+      ctx.font = '700 10px "Courier New", monospace';
+      ctx.fillStyle = '#1E5AA8';
+      ctx.textAlign = 'center';
+      ctx.fillText('▲ ELASTIC ARENA DEFLECTOR ACTIVE ▲', W * 0.5, floorY - 8);
+      ctx.restore();
+    }
+
     // 1. Anchors & Capture Perimeters
     for (const a of anchors) {
       a.pulse += 0.04;
@@ -3026,7 +3103,7 @@ function bootOrbita() {
       const inRange = state === 'PLAYING' && distToPlayer <= a.captureRadius;
 
       ctx.save();
-      ctx.strokeStyle = inRange ? 'rgba(223, 62, 38, 0.65)' : (isDark ? 'rgba(245, 240, 230, 0.20)' : 'rgba(23, 22, 20, 0.14)');
+      ctx.strokeStyle = inRange ? 'rgba(223, 62, 38, 0.65)' : 'rgba(23, 22, 20, 0.14)';
       ctx.lineWidth = inRange ? 2 : 1.2;
       ctx.setLineDash([5, 6]);
       ctx.beginPath();
@@ -3037,7 +3114,7 @@ function bootOrbita() {
       ctx.save();
       ctx.translate(a.x, a.y);
 
-      ctx.fillStyle = isDark ? 'rgba(0, 0, 0, 0.45)' : 'rgba(23, 22, 20, 0.22)';
+      ctx.fillStyle = 'rgba(23, 22, 20, 0.22)';
       ctx.beginPath();
       ctx.arc(3, 4, a.r, 0, Math.PI * 2);
       ctx.fill();
@@ -3045,7 +3122,7 @@ function bootOrbita() {
       ctx.fillStyle = a.type === 'cobalt' ? '#1E5AA8'
         : (a.type === 'fragile' ? '#FAF6EE'
         : (a.type === 'well' ? '#387D64' : '#E3A024'));
-      ctx.strokeStyle = inkStroke;
+      ctx.strokeStyle = '#171614';
       ctx.lineWidth = 2.5;
       if (a.type === 'fragile') ctx.setLineDash([4, 3]);
       ctx.beginPath();
@@ -3155,7 +3232,7 @@ function bootOrbita() {
       for (const c of boss.cores) {
         const cx = Math.cos(boss.rot + c.angle) * coreOrbitR;
         const cy = Math.sin(boss.rot + c.angle) * coreOrbitR;
-        ctx.strokeStyle = inkStroke;
+        ctx.strokeStyle = '#171614';
         ctx.lineWidth = 3;
         ctx.beginPath();
         ctx.moveTo(0, 0);
@@ -3163,14 +3240,14 @@ function bootOrbita() {
         ctx.stroke();
 
         if (c.alive) {
-          ctx.strokeStyle = 'rgba(223, 62, 38, 0.7)';
+          ctx.strokeStyle = 'rgba(223, 62, 38, 0.72)';
           ctx.lineWidth = 1.8;
           ctx.beginPath();
           ctx.arc(cx, cy, 24 * pulseScale, 0, Math.PI * 2);
           ctx.stroke();
 
           ctx.fillStyle = '#DF3E26';
-          ctx.strokeStyle = inkStroke;
+          ctx.strokeStyle = '#171614';
           ctx.lineWidth = 2.5;
           ctx.beginPath();
           ctx.arc(cx, cy, 18, 0, Math.PI * 2);
@@ -3190,7 +3267,7 @@ function bootOrbita() {
     // 5. Active Tether & Sightline
     if (state === 'PLAYING' && player.tether) {
       const t = player.tether;
-      ctx.strokeStyle = inkStroke;
+      ctx.strokeStyle = '#171614';
       ctx.lineWidth = 2.5;
       ctx.beginPath();
       ctx.moveTo(t.anchor.x, t.anchor.y);
@@ -3254,7 +3331,7 @@ function bootOrbita() {
       ctx.globalAlpha = Math.min(1, (pop.life / pop.maxLife) * 1.4);
       ctx.font = '700 13px "Courier New", monospace';
       ctx.textAlign = 'center';
-      ctx.fillStyle = (isDark && pop.color === '#171614') ? '#FAF6EE' : pop.color;
+      ctx.fillStyle = pop.color;
       ctx.fillText(pop.text, pop.x, pop.y);
       ctx.restore();
     }
@@ -3618,6 +3695,7 @@ function bootOrbita() {
     sfx.stopCharge();
     state = 'MENU';
     boss = null;
+    arenaLockCamY = null;
     document.getElementById('boss-bar-wrap').classList.add('hidden');
     document.getElementById('hud').classList.add('hidden');
     document.getElementById('menu-overlay').classList.remove('hidden');
